@@ -405,7 +405,7 @@ export const GRADE_2_UNIT_7_SENTENCES: Grade['units'][0]['sentences'] = [
   { id: "g2u7s29", japaneseQuestion: "たくさんの木がその嵐で倒されました。", words: ["Many", "trees", "were", "blown", "down", "by", "the", "storm", "."], grammarTag: "不規則動詞の過去分詞", explanation: "blowの過去分詞はblownです。" },
   { id: "g2u7s30", japaneseQuestion: "そのお金は昨日盗まれました。", words: ["The", "money", "was", "stolen", "yesterday", "."], grammarTag: "不規則動詞の過去分詞", explanation: "stealの過去分詞はstolenです。" },
   { id: "g2u7s31", japaneseQuestion: "この料理には何が使われていますか？", words: ["What", "is", "used", "in", "this", "dish", "?"], grammarTag: "受け身の疑問文 (疑問詞)", explanation: "材料を尋ねる疑問文です。" },
-  { id: "g2u7s32", japaneseQuestion: "そのケーキは私のためにお母さんによって作られました。", words: ["The", "cake", "was", "made", "for", "me", "by", "my", "mother", "."], grammarTag: "受け身 (by 〜)", explanation: "for me（私のために）という句も入れられます。" },
+  { id: "g2u7s32", japaneseQuestion: "そのケーキは、母によって私のために作られました。", words: ["The", "cake", "was", "made", "for", "me", "by", "my", "mother", "."], grammarTag: "受け身 (by 〜)", explanation: "was made by ... で「〜によって作られました」という意味です。" },
   { id: "g2u7s33", japaneseQuestion: "ダイヤモンドは地球上で最も硬い物質として知られています。", words: ["Diamond", "is", "known", "as", "the", "hardest", "substance", "on", "earth", "."], grammarTag: "受け身 (be known as)", explanation: "事実を述べる受け身の文です。" },
   { id: "g2u7s34", japaneseQuestion: "その新しい法律は議会で議論されました。", words: ["The", "new", "law", "was", "discussed", "in", "parliament", "."], grammarTag: "受け身 (be + 過去分詞)", explanation: "in parliament で「議会で」という意味です。" },
   { id: "g2u7s35", japaneseQuestion: "その歌は彼女によって歌われませんでした。", words: ["The", "song", "was", "not", "sung", "by", "her", "."], grammarTag: "受け身の否定文", explanation: "singの過去分詞はsungです。" },
