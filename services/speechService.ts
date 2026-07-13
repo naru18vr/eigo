@@ -3,14 +3,14 @@
  * @param text The text to be spoken.
  * @param lang The language code (e.g., 'en-US'). Defaults to 'en-US'.
  */
-export const speakText = (text: string, lang: string = 'en-US'): void => {
+export const speakText = (text: string, lang: string = 'en-US', rate: number = 0.9): void => {
   if ('speechSynthesis' in window) {
     // Cancel any ongoing speech to prevent overlap
     window.speechSynthesis.cancel();
 
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = lang;
-    utterance.rate = 0.9; // A little slower can be clearer for learners
+    utterance.rate = rate;
     utterance.pitch = 1.0;
 
     // The voices are loaded asynchronously. We can try to find a good one.
