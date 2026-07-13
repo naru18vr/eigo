@@ -24,7 +24,7 @@ const formatSentence = (sentence: Sentence) => sentence.words.join(' ').replace(
 const Eiken4SentencesPage: React.FC = () => {
   const navigate = useNavigate();
   const { completeSentences } = useEiken4Session();
-  const questions = useMemo(() => eiken4Sentences.slice(0, QUESTION_COUNT), []);
+  const questions = useMemo(() => shuffleArray(eiken4Sentences).slice(0, QUESTION_COUNT), []);
   const [index, setIndex] = useState(0);
   const [builtWords, setBuiltWords] = useState<string[]>([]);
   const [wordBank, setWordBank] = useState<string[]>(() => shuffleArray(questions[0].words));
