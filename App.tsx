@@ -16,6 +16,7 @@ import Eiken4ResultPage from './pages/Eiken4ResultPage';
 import Eiken4DailyPage from './pages/Eiken4DailyPage';
 import Eiken4ReadingPage from './pages/Eiken4ReadingPage';
 import Eiken4MockPage from './pages/Eiken4MockPage';
+import Eiken4ProgressPage from './pages/Eiken4ProgressPage';
 import { Eiken4SessionProvider } from './contexts/Eiken4SessionContext';
 
 const App: React.FC = () => {
@@ -35,6 +36,7 @@ const App: React.FC = () => {
             <Route path="/eiken4/daily" element={<Eiken4DailyPage />} />
             <Route path="/eiken4/reading" element={<Eiken4ReadingPage />} />
             <Route path="/eiken4/mock" element={<Eiken4MockPage />} />
+            <Route path="/eiken4/progress" element={<Eiken4ProgressPage />} />
             <Route path="/eiken4/words" element={<Eiken4WordCardsPage />} />
             <Route path="/eiken4/words/quiz" element={<Eiken4WordQuizPage />} />
             <Route path="/eiken4/sentences" element={<Eiken4SentencesPage />} />
