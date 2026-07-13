@@ -26,7 +26,7 @@ const makeChoices = (target: Eiken4Word) => {
 const Eiken4WordQuizPage: React.FC = () => {
   const navigate = useNavigate();
   const { completeWordQuiz } = useEiken4Session();
-  const quizWords = useMemo(() => eiken4Words.slice(0, QUIZ_COUNT), []);
+  const quizWords = useMemo(() => shuffleArray(eiken4Words).slice(0, QUIZ_COUNT), []);
   const [index, setIndex] = useState(0);
   const [choices, setChoices] = useState<string[]>(() => makeChoices(quizWords[0]));
   const [selected, setSelected] = useState('');
