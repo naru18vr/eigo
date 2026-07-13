@@ -1,0 +1,67 @@
+export type Eiken4ReadingQuestion = {
+  question: string;
+  choices: string[];
+  answer: string;
+  evidence: string;
+  explanation: string;
+};
+
+export type Eiken4Reading = {
+  id: string;
+  type: string;
+  title: string;
+  passage: string;
+  translation: string;
+  questions: Eiken4ReadingQuestion[];
+};
+
+export const eiken4Readings: Eiken4Reading[] = [
+  { id: 'r001', type: 'メール', title: 'From: Lucy / To: Aya', passage: "Hi Aya, Thank you for inviting me to your birthday party this Saturday. I will come with my sister, Kate. We will take the 10:15 train and arrive at Midori Station at 10:45. Can you meet us there? We are looking forward to seeing you!", translation: 'アヤへ。今週土曜日の誕生日会に招待してくれてありがとう。妹のケイトと一緒に行きます。10時15分の電車に乗り、10時45分にみどり駅に着きます。そこで会えますか。会えるのを楽しみにしています。', questions: [
+    { question: 'ルーシーは誰とパーティーへ行きますか？', choices: ['妹', '母', '友達', '一人'], answer: '妹', evidence: 'I will come with my sister, Kate.', explanation: 'with my sisterから、妹と一緒に行くと分かります。' },
+    { question: '二人は何時に駅へ着きますか？', choices: ['10時15分', '10時30分', '10時45分', '11時'], answer: '10時45分', evidence: 'arrive at Midori Station at 10:45', explanation: 'arrive atは「〜に到着する」です。' },
+  ]},
+  { id: 'r002', type: 'お知らせ', title: 'Library Notice', passage: 'The school library will be closed next Monday morning. Teachers will have a meeting there. It will open at one in the afternoon. Students can return books to the box by the library door. Please do not put magazines in the box.', translation: '学校の図書館は次の月曜日の午前中は閉まります。先生たちがそこで会議をします。午後1時に開きます。生徒は図書館のドアのそばの箱へ本を返せます。雑誌は箱へ入れないでください。', questions: [
+    { question: '図書館は月曜日の何時に開きますか？', choices: ['午前9時', '正午', '午後1時', '午後3時'], answer: '午後1時', evidence: 'It will open at one in the afternoon.', explanation: 'one in the afternoonは午後1時です。' },
+    { question: '箱に入れてはいけないものは何ですか？', choices: ['本', '雑誌', '手紙', 'ノート'], answer: '雑誌', evidence: 'Please do not put magazines in the box.', explanation: 'do not put magazinesが禁止事項です。' },
+  ]},
+  { id: 'r003', type: '日記', title: "Ken's Sunday", passage: 'Yesterday, I went to the city museum with my father. We wanted to see the new dinosaur show. There were many people, but we did not wait long. My favorite thing was a very large dinosaur egg. I bought a postcard of it for my friend Taro.', translation: '昨日、父と市の博物館へ行きました。新しい恐竜展を見たかったからです。人は多かったですが、長く待ちませんでした。一番気に入ったのは、とても大きな恐竜の卵でした。それの絵はがきを友達の太郎に買いました。', questions: [
+    { question: 'ケンは誰と博物館へ行きましたか？', choices: ['父', '母', '太郎', '先生'], answer: '父', evidence: 'I went to the city museum with my father.', explanation: 'with my fatherが一緒に行った人です。' },
+    { question: 'ケンが一番気に入ったものは何ですか？', choices: ['恐竜の骨', '恐竜の卵', '絵はがき', '博物館の建物'], answer: '恐竜の卵', evidence: 'My favorite thing was a very large dinosaur egg.', explanation: 'favorite thingの後に答えがあります。' },
+  ]},
+  { id: 'r004', type: '会話', title: 'After School', passage: "Mika: Are you busy after school, Ben? Ben: I have soccer practice until four thirty. Why? Mika: I need a birthday present for my mother. Can you help me choose one? Ben: Sure. Let's meet in front of the flower shop at five.", translation: 'ミカ：放課後は忙しいですか、ベン。ベン：4時30分までサッカーの練習があります。どうして？ ミカ：母への誕生日プレゼントが必要です。選ぶのを手伝ってくれますか。ベン：もちろん。5時に花屋の前で会いましょう。', questions: [
+    { question: 'ミカは誰へのプレゼントを探していますか？', choices: ['母', '父', 'ベン', '先生'], answer: '母', evidence: 'I need a birthday present for my mother.', explanation: 'for my motherから母へのプレゼントだと分かります。' },
+    { question: '二人はどこで会いますか？', choices: ['学校の前', '駅', '花屋の前', 'サッカー場'], answer: '花屋の前', evidence: "Let's meet in front of the flower shop at five.", explanation: 'in front of the flower shopが待ち合わせ場所です。' },
+  ]},
+  { id: 'r005', type: '案内', title: 'Green Park Festival', passage: 'Come to the Green Park Festival on August 8! The music show starts at eleven. You can enjoy food from many countries from twelve to three. Children can make paper animals near the park office. Bring a hat because it may be hot. The festival ends at four.', translation: '8月8日のグリーン公園祭りへ来てください。音楽ショーは11時に始まります。12時から3時まで多くの国の食べ物を楽しめます。子どもは公園事務所の近くで紙の動物を作れます。暑いかもしれないので帽子を持ってきてください。祭りは4時に終わります。', questions: [
+    { question: '音楽ショーは何時に始まりますか？', choices: ['10時', '11時', '12時', '3時'], answer: '11時', evidence: 'The music show starts at eleven.', explanation: 'starts at elevenが開始時刻です。' },
+    { question: 'なぜ帽子を持っていくのですか？', choices: ['雨が降るから', '寒いから', '暑いかもしれないから', '動物を作るから'], answer: '暑いかもしれないから', evidence: 'Bring a hat because it may be hot.', explanation: 'becauseの後に理由があります。' },
+  ]},
+  { id: 'r006', type: 'メール', title: 'From: Mr. Hill / To: Class 2-B', passage: 'Tomorrow, our English class will be in Room 203, not in your classroom. Please bring your English book and a colored pencil. We will make posters about our favorite places. You do not need a dictionary. The class will start at nine as usual.', translation: '明日の英語の授業は皆さんの教室ではなく203号室で行います。英語の本と色鉛筆を持ってきてください。好きな場所についてポスターを作ります。辞書は必要ありません。授業はいつもどおり9時に始まります。', questions: [
+    { question: '英語の授業はどこで行われますか？', choices: ['2-Bの教室', '図書館', '203号室', '音楽室'], answer: '203号室', evidence: 'our English class will be in Room 203', explanation: 'in Room 203が授業の場所です。' },
+    { question: '持ってくる必要がないものは何ですか？', choices: ['英語の本', '色鉛筆', '辞書', 'かばん'], answer: '辞書', evidence: 'You do not need a dictionary.', explanation: 'do not needは「必要ない」です。' },
+  ]},
+  { id: 'r007', type: '物語', title: 'A Rainy Morning', passage: 'Sara left home at seven thirty. It started to rain when she was near the bus stop. She did not have an umbrella, but her classmate Yuki was there. Yuki had a large umbrella, so they walked to school together. They arrived five minutes before class.', translation: 'サラは7時30分に家を出ました。バス停の近くにいたとき雨が降り始めました。傘を持っていませんでしたが、同級生のユキがいました。ユキは大きな傘を持っていたので、一緒に学校まで歩きました。授業の5分前に着きました。', questions: [
+    { question: '誰が傘を持っていましたか？', choices: ['サラ', 'ユキ', '先生', '二人とも'], answer: 'ユキ', evidence: 'Yuki had a large umbrella', explanation: 'had a large umbrellaの主語はYukiです。' },
+    { question: '二人はどうやって学校へ行きましたか？', choices: ['歩いて', 'バスで', '自転車で', '車で'], answer: '歩いて', evidence: 'they walked to school together', explanation: 'walked to schoolは「歩いて学校へ行った」です。' },
+  ]},
+  { id: 'r008', type: '予定表', title: 'Saturday Plan', passage: "Amy's Saturday: 9:00 Tennis lesson; 11:30 Lunch with Nana; 1:00 Shopping; 3:30 Help her brother with math; 6:00 Dinner at home. Amy wants new shoes, so she will go to a sports shop after lunch. Her brother has a math test on Monday.", translation: 'エイミーの土曜日：9時 テニス、11時30分 ナナと昼食、1時 買い物、3時30分 弟の数学を手伝う、6時 家で夕食。新しい靴が欲しいので昼食後スポーツ店へ行きます。弟は月曜日に数学のテストがあります。', questions: [
+    { question: 'エイミーは昼食後に何をしますか？', choices: ['テニス', '買い物', '数学の勉強', '夕食'], answer: '買い物', evidence: 'she will go to a sports shop after lunch', explanation: 'after lunchの予定はスポーツ店での買い物です。' },
+    { question: '弟の数学のテストはいつですか？', choices: ['土曜日', '日曜日', '月曜日', '火曜日'], answer: '月曜日', evidence: 'Her brother has a math test on Monday.', explanation: 'on Mondayがテストの日です。' },
+  ]},
+  { id: 'r009', type: '紹介文', title: 'My New Pet', passage: 'My name is Rina. I got a small dog last month. His name is Pochi, and he is six months old. He likes playing with a red ball in our garden. I take him for a walk every morning before breakfast. On rainy days, we play inside.', translation: '私はリナです。先月小さな犬を飼い始めました。名前はポチで、生後6か月です。庭で赤いボールと遊ぶのが好きです。毎朝、朝食前に散歩させます。雨の日は家の中で遊びます。', questions: [
+    { question: 'ポチは何歳ですか？', choices: ['生後1か月', '生後6か月', '1歳', '6歳'], answer: '生後6か月', evidence: 'he is six months old', explanation: 'six months oldは生後6か月です。' },
+    { question: 'リナはいつポチを散歩させますか？', choices: ['朝食前', '朝食後', '放課後', '夕食後'], answer: '朝食前', evidence: 'every morning before breakfast', explanation: 'before breakfastは朝食前です。' },
+  ]},
+  { id: 'r010', type: 'メモ', title: 'Message for Dad', passage: 'Dad, I went to the swimming pool with Mai. I finished my homework before I left. We will be home around five. Mom called and said she will come home at six, so please start cooking rice at five thirty. The vegetables are in the refrigerator. — Kumi', translation: 'お父さんへ。マイとプールへ行きました。出かける前に宿題は終えました。5時ごろ家に戻ります。お母さんから電話があり、6時に帰るそうです。5時30分にご飯を炊き始めてください。野菜は冷蔵庫にあります。クミ', questions: [
+    { question: 'クミはどこへ行きましたか？', choices: ['図書館', 'プール', '公園', '学校'], answer: 'プール', evidence: 'I went to the swimming pool with Mai.', explanation: 'went to the swimming poolが行き先です。' },
+    { question: 'お父さんは何時にご飯を炊き始めますか？', choices: ['5時', '5時30分', '6時', '6時30分'], answer: '5時30分', evidence: 'please start cooking rice at five thirty', explanation: 'at five thirtyが時刻です。' },
+  ]},
+  { id: 'r011', type: '学校新聞', title: 'New School Lunch', passage: 'Our school will have a new lunch menu from September. On Wednesdays, students can choose rice or bread. Fruit will be served three times a week. The school asked students about their favorite fruit, and oranges were number one. The new menu will have oranges on Friday.', translation: '学校では9月から新しい給食メニューになります。水曜日はご飯かパンを選べます。果物は週3回出ます。好きな果物を生徒に尋ねたところ、オレンジが1位でした。新メニューでは金曜日にオレンジが出ます。', questions: [
+    { question: '生徒がご飯かパンを選べるのは何曜日ですか？', choices: ['月曜日', '水曜日', '木曜日', '金曜日'], answer: '水曜日', evidence: 'On Wednesdays, students can choose rice or bread.', explanation: 'On Wednesdaysが曜日を示します。' },
+    { question: '一番人気の果物は何ですか？', choices: ['りんご', 'バナナ', 'オレンジ', 'ぶどう'], answer: 'オレンジ', evidence: 'oranges were number one', explanation: 'number oneは1位という意味です。' },
+  ]},
+  { id: 'r012', type: '会話', title: 'At the Station', passage: "Anna: Excuse me, does this train go to Central Park? Man: No, you need the train on Platform Three. Anna: When does it leave? Man: In ten minutes, at two twenty. Anna: Thank you. Man: You're welcome. Hurry! It takes five minutes to walk there.", translation: 'アンナ：すみません、この電車は中央公園へ行きますか。男性：いいえ、3番ホームの電車に乗る必要があります。アンナ：いつ出ますか。男性：10分後の2時20分です。アンナ：ありがとう。男性：どういたしまして。急いで。そこまで歩いて5分かかります。', questions: [
+    { question: 'アンナはどのホームへ行く必要がありますか？', choices: ['1番', '2番', '3番', '5番'], answer: '3番', evidence: 'you need the train on Platform Three', explanation: 'Platform Threeは3番ホームです。' },
+    { question: '電車は何時に出ますか？', choices: ['2時10分', '2時15分', '2時20分', '2時30分'], answer: '2時20分', evidence: 'at two twenty', explanation: 'two twentyは2時20分です。' },
+  ]},
+];
