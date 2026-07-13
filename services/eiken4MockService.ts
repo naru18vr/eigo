@@ -3,6 +3,7 @@ import { eiken4Sentences } from '../data/eiken4Sentences';
 import { eiken4ListeningQuestions } from '../data/eiken4Listening';
 import { eiken4Readings } from '../data/eiken4Readings';
 import { DailyQuestion, getQuestionById } from './eiken4DailyService';
+import { recordEiken4Activity } from './eiken4ProgressService';
 
 const RESULT_KEY = 'eiken4WeeklyMockResultV1';
 
@@ -50,4 +51,5 @@ export const loadMockResult = (): MockResult | null => {
 };
 export const saveMockResult = (result: MockResult) => {
   if (typeof localStorage !== 'undefined') localStorage.setItem(RESULT_KEY, JSON.stringify(result));
+  recordEiken4Activity('mock');
 };
