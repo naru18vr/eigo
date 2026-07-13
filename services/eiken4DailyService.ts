@@ -1,5 +1,6 @@
 import { eiken4Sentences } from '../data/eiken4Sentences';
 import { eiken4Words } from '../data/eiken4Words';
+import { eiken4ListeningQuestions } from '../data/eiken4Listening';
 
 export const EIKEN4_DAILY_KEY = 'eiken4DailyProgressV2';
 const REVIEW_KEY = 'eiken4ReviewScheduleV1';
@@ -13,6 +14,9 @@ export type DailyQuestion = {
   choices: string[];
   explanation?: string;
   kind: string;
+  audioText?: string;
+  transcript?: string;
+  translation?: string;
 };
 
 export type DailyAnswer = { id: string; correct: boolean };
@@ -88,8 +92,25 @@ const sentenceQuestion = (sentenceId: string, date: string): DailyQuestion | und
   };
 };
 
+const listeningQuestion = (listeningId: string, date: string): DailyQuestion | undefined => {
+  const listening = eiken4ListeningQuestions.find(item => `listening-${item.id}` === listeningId);
+  if (!listening) return undefined;
+  return {
+    id: listeningId,
+    prompt: listening.question,
+    detail: '音声を2回まで聞いて答えよう',
+    answer: listening.answer,
+    choices: seededItems(listening.choices, `${date}-${listening.id}`, listening.choices.length),
+    explanation: listening.explanation,
+    kind: 'リスニング',
+    audioText: listening.audioText,
+    transcript: listening.transcript,
+    translation: listening.translation,
+  };
+};
+
 export const getQuestionById = (id: string, date = localDateKey()) =>
-  id.startsWith('word-') ? wordQuestion(id, date) : sentenceQuestion(id, date);
+  id.startsWith('word-') ? wordQuestion(id, date) : id.startsWith('listening-') ? listeningQuestion(id, date) : sentenceQuestion(id, date);
 
 const loadReviews = (): ReviewRecord[] => {
   if (typeof localStorage === 'undefined') return [];
@@ -118,10 +139,16 @@ export const recordReviewAnswer = (id: string, correct: boolean, isRetry: boolea
 
 const buildDailyQuestionIds = (date: string) => {
   const dueIds = loadReviews().filter(record => record.dueDate <= date).slice(0, 5).map(record => record.id);
-  const wordIds = seededItems(eiken4Words, `${date}-words`, 10).map(word => `word-${word.id}`);
+  const wordIds = seededItems(eiken4Words, `${date}-words`, 7).map(word => `word-${word.id}`);
   const sentenceIds = seededItems(eiken4Sentences, `${date}-sentences`, 5).map(sentence => `sentence-${sentence.id}`);
-  const candidates = [...dueIds, ...wordIds, ...sentenceIds];
-  return Array.from(new Set(candidates)).slice(0, 15);
+  const listeningIds = seededItems(eiken4ListeningQuestions, `${date}-listening`, 3).map(item => `listening-${item.id}`);
+  const category = (prefix: string, fresh: string[], count: number) =>
+    Array.from(new Set([...dueIds.filter(id => id.startsWith(prefix)), ...fresh])).slice(0, count);
+  return [
+    ...category('word-', wordIds, 7),
+    ...category('sentence-', sentenceIds, 5),
+    ...category('listening-', listeningIds, 3),
+  ];
 };
 
 const emptyProgress = (): DailyProgress => ({
