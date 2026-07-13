@@ -4,6 +4,8 @@ import Button from '../components/Button';
 import ArrowLeftIcon from '../components/shared/ArrowLeftIcon';
 import { eiken4Words, Eiken4Word } from '../data/eiken4Words';
 import { useEiken4Session } from '../contexts/Eiken4SessionContext';
+import SpeakerWaveIcon from '../components/shared/SpeakerWaveIcon';
+import { speakText } from '../services/speechService';
 
 const QUIZ_COUNT = 10;
 
@@ -85,6 +87,9 @@ const Eiken4WordQuizPage: React.FC = () => {
         <section className="bg-white rounded-xl shadow-xl border border-indigo-100 p-5">
           <p className="text-sm font-semibold text-slate-500 mb-2">Q{index + 1}. 次の意味は？</p>
           <h2 className="text-4xl font-bold text-slate-800 mb-5">{current.word}</h2>
+          <button onClick={() => speakText(current.word, 'en-US', 0.82)} className="mb-5 inline-flex items-center rounded-full bg-indigo-50 text-indigo-700 font-bold px-4 py-2">
+            <SpeakerWaveIcon className="h-5 w-5 mr-2" />発音を聞く
+          </button>
 
           <div className="space-y-3 mb-5">
             {choices.map((choice, choiceIndex) => {
@@ -119,6 +124,9 @@ const Eiken4WordQuizPage: React.FC = () => {
               </p>
               <p className="text-sm text-slate-700 mt-1">{current.word} = {current.meaning}</p>
               <p className="text-sm text-slate-500 mt-1">{current.example}</p>
+              <button onClick={() => speakText(`${current.word}. ${current.example}`, 'en-US', 0.82)} className="mt-3 inline-flex items-center text-sm font-bold text-indigo-700">
+                <SpeakerWaveIcon className="h-5 w-5 mr-1" />単語と例文を聞く
+              </button>
             </div>
           )}
 
