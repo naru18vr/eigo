@@ -58,10 +58,10 @@ export const GRADE_2_UNIT_0_SENTENCES: Grade['units'][0]['sentences'] = [
 export const GRADE_2_UNIT_1_SENTENCES: Grade['units'][0]['sentences'] = [
   { id: "g2u1s1", japaneseQuestion: "私は明日、叔母を訪ねる予定です。", words: ["I", "am", "going", "to", "visit", "my", "aunt", "tomorrow", "."], grammarTag: "be going to 〜", explanation: "未来の予定や意図を表すときに使います。" },
   { id: "g2u1s2", japaneseQuestion: "あなたはこの週末に何をしますか？", words: ["What", "are", "you", "going", "to", "do", "this", "weekend", "?"], grammarTag: "be going to 〜 の疑問文", explanation: "未来の予定を尋ねる疑問文です。" },
-  { id: "g2u1s3", japaneseQuestion: "彼は明日のパーティーに来ないでしょう。", words: ["He", "is", "not", "going", "to", "come", "to", "the", "party", "tomorrow", "."], grammarTag: "be going to 〜 の否定文", explanation: "未来の予定を否定するときに使います。" },
+  { id: "g2u1s3", japaneseQuestion: "彼は明日のパーティーに来る予定ではありません。", words: ["He", "is", "not", "going", "to", "come", "to", "the", "party", "tomorrow", "."], grammarTag: "be going to 〜 の否定文", explanation: "be not going to＋動詞の原形で、予定や意図を否定します。" },
   { id: "g2u1s4", japaneseQuestion: "私は将来、医者になるつもりです。", words: ["I", "will", "be", "a", "doctor", "in", "the", "future", "."], grammarTag: "will 〜 の文", explanation: "未来のことや意志を表すときに使います。" },
   { id: "g2u1s5", japaneseQuestion: "窓を開けてくれませんか？", words: ["Will", "you", "open", "the", "window", "?"], grammarTag: "Will you 〜?", explanation: "相手に依頼するときに使う丁寧な表現です。" },
-  { id: "g2u1s6", japaneseQuestion: "私は宿題を手伝いません。", words: ["I", "will", "not", "help", "you", "with", "your", "homework", "."], grammarTag: "I will not 〜.", explanation: "未来の行動を否定する意志を表します。" },
+  { id: "g2u1s6", japaneseQuestion: "私はあなたの宿題を手伝いません。", words: ["I", "will", "not", "help", "you", "with", "your", "homework", "."], grammarTag: "I will not 〜.", explanation: "will not＋動詞の原形で、未来の行動や意志を否定します。" },
   { id: "g2u1s7", japaneseQuestion: "彼にこの写真を見せてください。", words: ["Please", "show", "him", "this", "picture", "."], grammarTag: "show A B の文", explanation: "「AにBを見せる」という意味です。" },
   { id: "g2u1s8", japaneseQuestion: "私たちはその犬をポチと呼びます。", words: ["We", "call", "the", "dog", "Pochi", "."], grammarTag: "call A B の文", explanation: "「AをBと呼ぶ」という意味です。" },
   { id: "g2u1s9", japaneseQuestion: "彼女は来週、新しい自転車を買う予定です。", words: ["She", "is", "going", "to", "buy", "a", "new", "bicycle", "next", "week", "."], grammarTag: "be going to 〜", explanation: "未来の具体的な計画を表します。" },
@@ -147,7 +147,7 @@ export const GRADE_2_UNIT_2_SENTENCES: Grade['units'][0]['sentences'] = [
   { id: "g2u2s36", japaneseQuestion: "駅への道を教えていただけますか？", words: ["Could", "you", "tell", "me", "the", "way", "to", "the", "station", "?"], grammarTag: "Could you ～? の文", explanation: "道を尋ねる非常に丁寧な表現です。" },
   { id: "g2u2s37", japaneseQuestion: "もし英語を話したいなら、毎日練習しなければなりません。", words: ["If", "you", "want", "to", "speak", "English", ",", "you", "must", "practice", "every", "day", "."], grammarTag: "if 〜 の文", explanation: "目標達成のための条件を示します。" },
   { id: "g2u2s38", japaneseQuestion: "お腹が空いていたので、私はサンドイッチを食べました。", words: ["I", "ate", "a", "sandwich", "because", "I", "was", "hungry", "."], grammarTag: "because 〜 の文", explanation: "食事をした理由を述べています。" },
-  { id: "g2u2s39", japaneseQuestion: "私は彼女が戻ってくると思いますか？", words: ["Do", "you", "think", "that", "she", "will", "come", "back", "?"], grammarTag: "Do you think that 〜? の文", explanation: "相手の意見を尋ねる疑問文です。" },
+  { id: "g2u2s39", japaneseQuestion: "あなたは彼女が戻ってくると思いますか？", words: ["Do", "you", "think", "that", "she", "will", "come", "back", "?"], grammarTag: "Do you think that 〜? の文", explanation: "Do you think that ...? で相手の考えを尋ねます。" },
   { id: "g2u2s40", japaneseQuestion: "彼が日本に来たとき、彼は15歳でした。", words: ["He", "was", "fifteen", "when", "he", "came", "to", "Japan", "."], grammarTag: "when 〜 の文", explanation: "過去の特定の時点での年齢を述べます。" },
   { id: "g2u2s41", japaneseQuestion: "お手洗いをお借りしてもよろしいですか？", words: ["May", "I", "use", "the", "bathroom", "?"], grammarTag: "May I ～? の文", explanation: "丁寧な許可の求め方です。" },
   { id: "g2u2s42", japaneseQuestion: "これを運ぶのを手伝っていただけますか？", words: ["Could", "you", "help", "me", "carry", "this", "?"], grammarTag: "Could you ～? の文", explanation: "手伝いを求める丁寧な依頼です。" },
@@ -162,7 +162,7 @@ export const GRADE_2_UNIT_2_SENTENCES: Grade['units'][0]['sentences'] = [
 ];
 
 export const GRADE_2_UNIT_3_SENTENCES: Grade['units'][0]['sentences'] = [
-  { id: "g2u3s1", japaneseQuestion: "私は本を買いに図書館へ行きました。", words: ["I", "went", "to", "the", "library", "to", "borrow", "some", "books", "."], grammarTag: "to + 動詞の原形「〜するために」", explanation: "目的を表す不定詞の副詞的用法です。" },
+  { id: "g2u3s1", japaneseQuestion: "私は本を借りるために図書館へ行きました。", words: ["I", "went", "to", "the", "library", "to", "borrow", "some", "books", "."], grammarTag: "to + 動詞の原形「〜するために」", explanation: "to borrow ... が、図書館へ行った目的を表します。" },
   { id: "g2u3s2", japaneseQuestion: "私はその知らせを聞いてうれしいです。", words: ["I", "am", "happy", "to", "hear", "the", "news", "."], grammarTag: "to + 動詞の原形「～して」", explanation: "感情の原因を表す不定詞の副詞的用法です。" },
   { id: "g2u3s3", japaneseQuestion: "私には今日やるべき宿題がたくさんあります。", words: ["I", "have", "a", "lot", "of", "homework", "to", "do", "today", "."], grammarTag: "to + 動詞の原形「〜するべき，〜するための」", explanation: "名詞を修飾する不定詞の形容詞的用法です。" },
   { id: "g2u3s4", japaneseQuestion: "早起きすることは大切です。", words: ["It", "is", "important", "to", "get", "up", "early", "."], grammarTag: "It's important to 〜. の文", explanation: "It が形式主語で、to以下が真主語となる構文です。" },
@@ -196,7 +196,7 @@ export const GRADE_2_UNIT_3_SENTENCES: Grade['units'][0]['sentences'] = [
   { id: "g2u3s32", japaneseQuestion: "彼の声を聞いて私は安心しました。", words: ["I", "was", "relieved", "to", "hear", "his", "voice", "."], grammarTag: "to + 動詞の原形「～して」", explanation: "感情の原因を表します。" },
   { id: "g2u3s33", japaneseQuestion: "何か書くものを持っていますか？", words: ["Do", "you", "have", "something", "to", "write", "with", "?"], grammarTag: "to + 動詞の原形「〜するための」", explanation: "write with something なので、前置詞 with が必要です。" },
   { id: "g2u3s34", japaneseQuestion: "他人を助けることは重要です。", words: ["It", "is", "important", "to", "help", "other", "people", "."], grammarTag: "It is ... to 〜. の文", explanation: "一般的な真理や価値観を述べます。" },
-  { id: "g2u3s35", japaneseQuestion: "彼はテニスをすることを楽しみます。", words: ["He", "enjoys", "to", "play", "tennis", "."], grammarTag: "to + 動詞の原形「〜すること」", explanation: "enjoy は通常動名詞を目的語に取りますが、文脈により不定詞も可（ただし動名詞が一般的）。" },
+  { id: "g2u3s35", japaneseQuestion: "彼はテニスをすることが好きです。", words: ["He", "likes", "to", "play", "tennis", "."], grammarTag: "to + 動詞の原形「〜すること」", explanation: "like の目的語として to不定詞を使い、好きなことを表します。" },
   { id: "g2u3s36", japaneseQuestion: "私は良い成績を取るために、もっと勉強しなければなりません。", words: ["I", "have", "to", "study", "more", "to", "get", "good", "grades", "."], grammarTag: "to + 動詞の原形「〜するために」", explanation: "目的を表すために have to と組み合わせています。" },
   { id: "g2u3s37", japaneseQuestion: "その美しい景色を見て、私たちは興奮しました。", words: ["We", "were", "excited", "to", "see", "the", "beautiful", "scenery", "."], grammarTag: "to + 動詞の原形「～して」", explanation: "感情の原因を表します。" },
   { id: "g2u3s38", japaneseQuestion: "彼女は着るべきドレスを選んでいます。", words: ["She", "is", "choosing", "a", "dress", "to", "wear", "."], grammarTag: "to + 動詞の原形「〜するための」", explanation: "名詞 dress を修飾します。" },
@@ -206,7 +206,7 @@ export const GRADE_2_UNIT_3_SENTENCES: Grade['units'][0]['sentences'] = [
   { id: "g2u3s42", japaneseQuestion: "あなたにまた会えてとても嬉しいです。", words: ["I", "am", "very", "happy", "to", "see", "you", "again", "."], grammarTag: "to + 動詞の原形「～して」", explanation: "感情の原因を強調して表します。" },
   { id: "g2u3s43", japaneseQuestion: "私は何か温かい飲み物が欲しいです。", words: ["I", "want", "something", "hot", "to", "drink", "."], grammarTag: "to + 動詞の原形「〜するための」", explanation: "something hot を修飾します。" },
   { id: "g2u3s44", japaneseQuestion: "英語で手紙を書くことは私にとって難しいです。", words: ["It", "is", "difficult", "for", "me", "to", "write", "a", "letter", "in", "English", "."], grammarTag: "It is ... for (人) to 〜.", explanation: "不定詞の意味上の主語を for ... で示します。" },
-  { id: "g2u3s45", japaneseQuestion: "彼女は歌手になることを夢見ています。", words: ["She", "dreams", "to", "be", "a", "singer", "."], grammarTag: "to + 動詞の原形「〜すること」", explanation: "名詞的用法ですが、dream of being... の方が一般的です。" },
+  { id: "g2u3s45", japaneseQuestion: "彼女は歌手になりたいと思っています。", words: ["She", "hopes", "to", "be", "a", "singer", "."], grammarTag: "hope to 〜", explanation: "hope to＋動詞の原形で、将来実現してほしいことを表します。" },
   { id: "g2u3s46", japaneseQuestion: "健康を維持するために、私はジョギングをします。", words: ["I", "jog", "to", "stay", "healthy", "."], grammarTag: "to + 動詞の原形「〜するために」", explanation: "目的を表す副詞的用法です。" },
   { id: "g2u3s47", japaneseQuestion: "試験に合格して彼はほっとしました。", words: ["He", "was", "relieved", "to", "pass", "the", "exam", "."], grammarTag: "to + 動詞の原形「～して」", explanation: "感情の原因を表します。" },
   { id: "g2u3s48", japaneseQuestion: "これは訪問すべき面白い場所です。", words: ["This", "is", "an", "interesting", "place", "to", "visit", "."], grammarTag: "to + 動詞の原形「〜するための」", explanation: "名詞 place を修飾します。" },
@@ -260,7 +260,7 @@ export const GRADE_2_UNIT_4_SENTENCES: Grade['units'][0]['sentences'] = [
   { id: "g2u4s43", japaneseQuestion: "彼は泳ぐことが上手ではありません。", words: ["He", "is", "not", "good", "at", "swimming", "."], grammarTag: "動名詞", explanation: "be good at の否定形です。" },
   { id: "g2u4s44", japaneseQuestion: "彼女は昨日、働く必要はありませんでした。", words: ["She", "didn't", "have", "to", "work", "yesterday", "."], grammarTag: "didn't have to 〜. の文", explanation: "過去の不必要の表現です。" },
   { id: "g2u4s45", japaneseQuestion: "あなたは今すぐ出発しなければなりませんか？", words: ["Must", "you", "leave", "right", "now", "?"], grammarTag: "Must you 〜?", explanation: "mustは疑問文ではあまり使われませんが、強い必要性を問う時に使われます。" },
-  { id: "g2u4s46", japaneseQuestion: "彼の仕事は車を運転することです。", words: ["His", "job", "is", "to", "drive", "cars", "."], grammarTag: "to不定詞", explanation: "to drive cars で「車を運転すること」という意味です。" },
+  { id: "g2u4s46", japaneseQuestion: "彼の仕事は車を運転することです。", words: ["His", "job", "is", "driving", "cars", "."], grammarTag: "動名詞", explanation: "driving cars が補語となり、仕事の内容を表します。" },
   { id: "g2u4s47", japaneseQuestion: "私は新しいコンピューターを買わなければなりません。", words: ["I", "have", "to", "buy", "a", "new", "computer", "."], grammarTag: "I have to 〜. の文", explanation: "個人的な必要性を表します。" },
   { id: "g2u4s48", japaneseQuestion: "テレビを見すぎるのは良くないです。", words: ["Watching", "TV", "too", "much", "is", "not", "good", "."], grammarTag: "動名詞", explanation: "動名詞句が文の主語になっています。" },
   { id: "g2u4s49", japaneseQuestion: "彼女は一人でそこへ行く必要はありません。", words: ["She", "doesn't", "have", "to", "go", "there", "alone", "."], grammarTag: "I have to 〜. の否定文", explanation: "三人称単数での不必要の表現です。"},
@@ -370,7 +370,7 @@ export const GRADE_2_UNIT_6_SENTENCES: Grade['units'][0]['sentences'] = [
   { id: "g2u6s47", japaneseQuestion: "どちらがより重いですか、この箱ですか、それともあの箱ですか？", words: ["Which", "is", "heavier", ",", "this", "box", "or", "that", "one", "?"], grammarTag: "比較級 (-er) の疑問文", explanation: "二つのものを比べてどちらがより〜か尋ねます。" },
   { id: "g2u6s48", japaneseQuestion: "すべての動物の中で、私は犬が一番好きです。", words: ["I", "like", "dogs", "the", "best", "of", "all", "animals", "."], grammarTag: "like ... the best", explanation: "「…が一番好きだ」という好みを表す表現です。" },
   { id: "g2u6s49", japaneseQuestion: "東京の人口は大阪の人口より多いです。", words: ["The", "population", "of", "Tokyo", "is", "larger", "than", "that", "of", "Osaka", "."], grammarTag: "比較級 (-er)", explanation: "that of ... で population of ... の繰り返しを避けます。" },
-  { id: "g2u6s50", japaneseQuestion: "これは私が今まで作った中で一番おいしいケーキです。", words: ["This", "is", "the", "most", "delicious", "cake", "I", "have", "ever", "made", "."], grammarTag: "最上級 (most)", explanation: "経験と最上級を組み合わせた表現です。" }
+  { id: "g2u6s50", japaneseQuestion: "これはこの店で一番おいしいケーキです。", words: ["This", "is", "the", "most", "delicious", "cake", "in", "this", "shop", "."], grammarTag: "最上級 (most)", explanation: "the most delicious＋名詞で、ある範囲の中で一番だと表します。" }
 ];
 
 export const GRADE_2_UNIT_7_SENTENCES: Grade['units'][0]['sentences'] = [
@@ -393,7 +393,7 @@ export const GRADE_2_UNIT_7_SENTENCES: Grade['units'][0]['sentences'] = [
   { id: "g2u7s17", japaneseQuestion: "金閣寺は多くの観光客に訪れられます。", words: ["Kinkaku-ji", "is", "visited", "by", "many", "tourists", "."], grammarTag: "受け身 (by 〜)", explanation: "有名な場所が主語になる受け身の文です。" },
   { id: "g2u7s18", japaneseQuestion: "ピラミッドは古代エジプト人によって建設されました。", words: ["The", "pyramids", "were", "built", "by", "ancient", "Egyptians", "."], grammarTag: "受け身 (by 〜)", explanation: "主語が複数なのでwereを使います。" },
   { id: "g2u7s19", japaneseQuestion: "その壁画はいつ発見されましたか？", words: ["When", "were", "the", "murals", "discovered", "?"], grammarTag: "受け身の疑問文 (疑問詞)", explanation: "mural（壁画）は複数形なのでwereを使います。" },
-  { id: "g2u7s20", japaneseQuestion: "その遺跡は一般公開されていません。", words: ["The", "ruins", "are", "not", "open", "to", "the", "public", "."], grammarTag: "受け身の否定文", explanation: "open to the public で「一般に公開されている」という意味です。" },
+  { id: "g2u7s20", japaneseQuestion: "その遺跡は一般公開されていません。", words: ["The", "ruins", "are", "not", "open", "to", "the", "public", "."], grammarTag: "be open to the public", explanation: "ここでの open は形容詞で、be open to the public は「一般公開されている」という意味です。" },
   { id: "g2u7s21", japaneseQuestion: "この本は３つの言語に翻訳されました。", words: ["This", "book", "was", "translated", "into", "three", "languages", "."], grammarTag: "受け身 (be + 過去分詞)", explanation: "translate into 〜で「〜に翻訳する」という意味です。" },
   { id: "g2u7s22", japaneseQuestion: "その知らせはすぐに忘れられました。", words: ["The", "news", "was", "soon", "forgotten", "."], grammarTag: "不規則動詞の過去分詞", explanation: "forgetの過去分詞はforgottenです。" },
   { id: "g2u7s23", japaneseQuestion: "チーズは牛乳から作られます。", words: ["Cheese", "is", "made", "from", "milk", "."], grammarTag: "受け身 (be made from)", explanation: "原料を表すときは be made from 〜 を使います。" },
@@ -406,7 +406,7 @@ export const GRADE_2_UNIT_7_SENTENCES: Grade['units'][0]['sentences'] = [
   { id: "g2u7s30", japaneseQuestion: "そのお金は昨日盗まれました。", words: ["The", "money", "was", "stolen", "yesterday", "."], grammarTag: "不規則動詞の過去分詞", explanation: "stealの過去分詞はstolenです。" },
   { id: "g2u7s31", japaneseQuestion: "この料理には何が使われていますか？", words: ["What", "is", "used", "in", "this", "dish", "?"], grammarTag: "受け身の疑問文 (疑問詞)", explanation: "材料を尋ねる疑問文です。" },
   { id: "g2u7s32", japaneseQuestion: "そのケーキは、母によって私のために作られました。", words: ["The", "cake", "was", "made", "for", "me", "by", "my", "mother", "."], grammarTag: "受け身 (by 〜)", explanation: "was made by ... で「〜によって作られました」という意味です。" },
-  { id: "g2u7s33", japaneseQuestion: "ダイヤモンドは地球上で最も硬い物質として知られています。", words: ["Diamond", "is", "known", "as", "the", "hardest", "substance", "on", "earth", "."], grammarTag: "受け身 (be known as)", explanation: "事実を述べる受け身の文です。" },
+  { id: "g2u7s33", japaneseQuestion: "ダイヤモンドは地球上で最も硬い天然物質として知られています。", words: ["Diamond", "is", "known", "as", "the", "hardest", "natural", "substance", "on", "Earth", "."], grammarTag: "受け身 (be known as)", explanation: "be known as ... で「…として知られている」と表します。" },
   { id: "g2u7s34", japaneseQuestion: "その新しい法律は議会で議論されました。", words: ["The", "new", "law", "was", "discussed", "in", "parliament", "."], grammarTag: "受け身 (be + 過去分詞)", explanation: "in parliament で「議会で」という意味です。" },
   { id: "g2u7s35", japaneseQuestion: "その歌は彼女によって歌われませんでした。", words: ["The", "song", "was", "not", "sung", "by", "her", "."], grammarTag: "受け身の否定文", explanation: "singの過去分詞はsungです。" },
   { id: "g2u7s36", japaneseQuestion: "その情報はウェブサイトで見つけられました。", words: ["The", "information", "was", "found", "on", "the", "website", "."], grammarTag: "不規則動詞の過去分詞", explanation: "findの過去分詞はfoundです。" },
