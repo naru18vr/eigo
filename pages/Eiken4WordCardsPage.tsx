@@ -7,10 +7,19 @@ import { useEiken4Session } from '../contexts/Eiken4SessionContext';
 
 const CARD_COUNT = 10;
 
+const shuffleArray = <T,>(array: T[]): T[] => {
+  const next = [...array];
+  for (let i = next.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [next[i], next[j]] = [next[j], next[i]];
+  }
+  return next;
+};
+
 const Eiken4WordCardsPage: React.FC = () => {
   const navigate = useNavigate();
   const { completeWords } = useEiken4Session();
-  const words = useMemo(() => eiken4Words.slice(0, CARD_COUNT), []);
+  const words = useMemo(() => shuffleArray(eiken4Words).slice(0, CARD_COUNT), []);
   const [index, setIndex] = useState(0);
   const [showMeaning, setShowMeaning] = useState(false);
   const [knownCount, setKnownCount] = useState(0);
