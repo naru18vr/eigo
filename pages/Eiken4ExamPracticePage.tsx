@@ -13,6 +13,8 @@ const Eiken4ExamPracticePage: React.FC = () => {
   const [progress, setProgress] = useState(loadExamPractice);
   const [selected, setSelected] = useState('');
   const [checked, setChecked] = useState(false);
+  const [attempts, setAttempts] = useState(0);
+  const [retrying, setRetrying] = useState(false);
   const index = Object.keys(progress.answers).length;
   const complete = index >= questions.length;
   const current = questions[Math.min(index, questions.length - 1)];
@@ -20,7 +22,10 @@ const Eiken4ExamPracticePage: React.FC = () => {
 
   const checkAnswer = () => {
     if (isSoundEnabled) (correct ? playCorrectSound : playIncorrectSound)();
-    setChecked(true);
+    const nextAttempts = attempts + 1;
+    setAttempts(nextAttempts);
+    if (correct || nextAttempts >= 3) setChecked(true);
+    else setRetrying(true);
   };
 
   const next = () => {
@@ -30,6 +35,8 @@ const Eiken4ExamPracticePage: React.FC = () => {
     setProgress(nextProgress);
     setSelected('');
     setChecked(false);
+    setAttempts(0);
+    setRetrying(false);
   };
 
   if (complete) {
@@ -43,8 +50,8 @@ const Eiken4ExamPracticePage: React.FC = () => {
     <section className="mt-3 rounded-xl bg-white shadow-lg p-5">
       <h1 className="text-xl font-bold whitespace-pre-line leading-8">{current.prompt}</h1>
       {current.translation && <p className="text-sm text-slate-500 mt-2">{current.translation}</p>}
-      <div className="grid gap-3 mt-5">{current.choices.map(choice => <button key={choice} disabled={checked} onClick={() => setSelected(choice)} className={`rounded-xl border-2 p-3 text-left font-semibold ${checked && choice === current.answer ? 'border-emerald-500 bg-emerald-50' : checked && choice === selected ? 'border-rose-500 bg-rose-50' : selected === choice ? 'border-indigo-500 bg-indigo-50' : 'border-slate-200'}`}>{choice}</button>)}</div>
-      {checked ? <div className="mt-5 rounded-xl bg-slate-50 p-4"><p className="font-bold">{correct ? '正解！' : `正解：${current.answer}`}</p><p className="text-sm mt-2">{current.explanation}</p><Button onClick={next} className="w-full mt-4">次の問題</Button></div> : <Button onClick={checkAnswer} disabled={!selected} className="w-full mt-5">答え合わせ</Button>}
+      <div className="grid gap-3 mt-5">{current.choices.map(choice => <button key={choice} disabled={checked || retrying} onClick={() => setSelected(choice)} className={`rounded-xl border-2 p-3 text-left font-semibold ${checked && choice === current.answer ? 'border-emerald-500 bg-emerald-50' : (checked || retrying) && choice === selected && !correct ? 'border-rose-500 bg-rose-50' : selected === choice ? 'border-indigo-500 bg-indigo-50' : 'border-slate-200'}`}>{choice}</button>)}</div>
+      {checked ? <div className="mt-5 rounded-xl bg-slate-50 p-4"><p className="font-bold">{correct ? '正解！' : `3回間違えました。正解：${current.answer}`}</p><p className="text-sm mt-2">{current.explanation}</p><Button onClick={next} className="w-full mt-4">次の問題</Button></div> : retrying ? <div className="mt-5 rounded-xl bg-amber-50 p-4"><p className="font-bold text-amber-800">不正解。答えはまだ見せません（{attempts}/3回）</p><Button onClick={() => { setSelected(''); setRetrying(false); }} variant="secondary" className="w-full mt-3">もう一度</Button></div> : <Button onClick={checkAnswer} disabled={!selected} className="w-full mt-5">答え合わせ</Button>}
     </section>
   </div>;
 };
