@@ -32,7 +32,7 @@ const GuidePage: React.FC = () => {
     <header className="mt-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-blue-600 text-white p-6 shadow-lg text-center">
       <p className="text-sm font-bold opacity-90">英検4級まで、毎日少しずつ</p>
       <h1 className="text-3xl font-bold mt-2">このアプリの使い方</h1>
-      <p className="mt-3 text-sm leading-6 opacity-95">迷ったら「今日の15分」から始めればOK！<br/>全部を一度にやらなくても大丈夫です。</p>
+      <p className="mt-3 text-sm leading-6 opacity-95">迷ったら「今日の学習コース」を開いて、上から順番に進めればOK！<br/>全部を一度にやらなくても大丈夫です。</p>
     </header>
 
     <section className="mt-6"><h2 className="text-2xl font-bold text-slate-800">毎日はこの順番</h2><div className="mt-4 space-y-3">
