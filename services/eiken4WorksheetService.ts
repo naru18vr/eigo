@@ -8,6 +8,32 @@ import type { ReadingProgress } from './eiken4ReadingService';
 export type WorksheetShareData = Pick<DailyProgress, 'date' | 'questionIds' | 'answers'> & { reading?: ReadingProgress };
 export type SharedWorksheet = { progress: DailyProgress; reading?: ReadingProgress };
 
+export const copyTextToClipboard = async (text: string) => {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch { /* use the Android-compatible fallback below */ }
+  try {
+    const area = document.createElement('textarea');
+    area.value = text;
+    area.setAttribute('readonly', '');
+    area.style.position = 'fixed';
+    area.style.left = '-9999px';
+    area.style.top = '0';
+    document.body.appendChild(area);
+    area.focus();
+    area.select();
+    area.setSelectionRange(0, area.value.length);
+    const copied = document.execCommand('copy');
+    area.remove();
+    return copied;
+  } catch {
+    return false;
+  }
+};
+
 export const createWorksheetShareLink = (progress: DailyProgress, reading?: ReadingProgress) => {
   const data: WorksheetShareData = { date: progress.date, questionIds: progress.questionIds, answers: progress.answers, ...(reading?.completedAt ? { reading } : {}) };
   const encoded = btoa(JSON.stringify(data));
@@ -139,10 +165,12 @@ export const downloadDailyWorksheet = async (progress: DailyProgress, readingPro
   const { jsPDF } = await import('jspdf');
   const questions = makeWorksheet(progress);
   const pages: HTMLCanvasElement[] = [];
-  const sourceReading = readingProgress?.completedAt ? eiken4Readings.find(item => item.id === readingProgress.readingId) : undefined;
+  const sourceReading = readingProgress?.completedAt
+    ? eiken4Readings.find(item => item.id === readingProgress.readingId)
+    : eiken4Readings[hash(`${progress.date}-reading`) % eiken4Readings.length];
   const similarReadings = sourceReading ? eiken4Readings.filter(item => item.id !== sourceReading.id && item.type === sourceReading.type) : [];
   const similarReading = sourceReading ? (similarReadings[hash(`${progress.date}-${sourceReading.id}`) % Math.max(similarReadings.length, 1)] || eiken4Readings.find(item => item.id !== sourceReading.id)) : undefined;
-  const pageCount = similarReading ? 5 : 4;
+  const pageCount = 5;
 
   for (let pageIndex = 0; pageIndex < 3; pageIndex++) {
     const { canvas, context } = createPage();
