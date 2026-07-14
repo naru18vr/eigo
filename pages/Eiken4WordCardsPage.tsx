@@ -97,15 +97,11 @@ const Eiken4WordCardsPage: React.FC = () => {
             </div>
 
             <div className="space-y-3">
-              <Button onClick={() => navigate('/eiken4/daily')} variant="primary" size="lg" className="w-full">
-                次は紙のプリントへ
+              <Button onClick={() => navigate('/eiken4/words/quiz')} variant="primary" size="lg" className="w-full">
+                同じ8語の確認テストへ
               </Button>
-              <Button onClick={() => navigate('/eiken4/words/quiz')} variant="secondary" size="lg" className="w-full">余裕があれば単語テスト</Button>
               <Button onClick={restartCards} variant="secondary" size="lg" className="w-full">
                 もう一度カードを見る
-              </Button>
-              <Button onClick={() => navigate('/eiken4/result')} variant="ghost" size="lg" className="w-full">
-                結果を見る
               </Button>
             </div>
           </section>
