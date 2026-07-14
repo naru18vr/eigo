@@ -13,6 +13,7 @@ import { Sentence, Grade, Unit } from '../types';
 import { SENTENCES_PER_SET } from '../constants';
 import { incrementSetAttemptCount, recordSetAnswer, addDailyLogEntry } from '../localStorageService';
 import SoundToggle from '../components/SoundToggle';
+import { getCurriculumLabels, getSentenceDifficulty } from '../services/sentenceLearningService';
 
 const BuilderPage: React.FC = () => {
   const { gradeId, unitId, setIndex: setIndexParam } = useParams<{ gradeId: string; unitId: string; setIndex: string }>();
@@ -88,9 +89,13 @@ const BuilderPage: React.FC = () => {
       return;
     }
 
+    const difficultyOrder = { '基本': 0, '標準': 1, '応用': 2 } as const;
+    const orderedSentences = [...allStaticSentences].sort(
+      (a, b) => difficultyOrder[getSentenceDifficulty(a)] - difficultyOrder[getSentenceDifficulty(b)],
+    );
     const startIndex = setIndex * SENTENCES_PER_SET;
     const endIndex = startIndex + SENTENCES_PER_SET;
-    const slicedSentences = allStaticSentences.slice(startIndex, endIndex);
+    const slicedSentences = orderedSentences.slice(startIndex, endIndex);
 
     if (slicedSentences.length === 0 && allStaticSentences.length > 0) {
       setSentenceError(`問題セット ${setIndex + 1} には問題がありません。`);
@@ -247,6 +252,12 @@ const BuilderPage: React.FC = () => {
               <p className="text-center text-3xl md:text-4xl font-bold text-blue-600 mb-6">
                   {sentenceBuilderState.currentSentence.japaneseQuestion}
               </p>
+              <div className="flex flex-wrap justify-center gap-2 mb-5 text-xs font-bold">
+                <span className="rounded-full bg-violet-100 text-violet-800 px-3 py-1">{getSentenceDifficulty(sentenceBuilderState.currentSentence)}</span>
+                {gradeId && unitId && getCurriculumLabels(gradeId, unitId, sentenceBuilderState.currentSentence).map(label => (
+                  <span key={label} className="rounded-full bg-emerald-100 text-emerald-800 px-3 py-1">{label}</span>
+                ))}
+              </div>
               <SentenceConstructionArea builtWords={sentenceBuilderState.builtWords} onWordClick={removeWordFromBuilt} />
               <WordBank words={sentenceBuilderState.wordBank.map(wb => wb.word)} onWordClick={addWordToBuilt} />
           </div>
