@@ -19,6 +19,7 @@ interface ResultModalProps {
   userSentence: string;
   onNext: () => void;
   isLastSentence: boolean;
+  wrongAttempts: number;
 }
 
 const ResultModal: React.FC<ResultModalProps> = ({
@@ -28,6 +29,7 @@ const ResultModal: React.FC<ResultModalProps> = ({
   sentence,
   onNext,
   isLastSentence
+  , wrongAttempts
 }) => {
   const [internalShow, setInternalShow] = useState(false);
   const { isSoundEnabled } = useAppContext();
@@ -117,6 +119,7 @@ const ResultModal: React.FC<ResultModalProps> = ({
       </div>
     );
   } else {
+    const forcedNext = wrongAttempts >= 3;
     // Incorrect Answer View
     return (
       <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex justify-center items-center p-4 z-50">
@@ -130,17 +133,18 @@ const ResultModal: React.FC<ResultModalProps> = ({
           <div className="flex flex-col items-center text-center">
             <XCircleIcon className="w-16 h-16 text-red-500 mb-4" />
             <h2 className="text-3xl font-bold text-red-600 mb-2">不正解！</h2>
-            <p className="text-slate-600 mb-6">もう一度挑戦してみましょう。</p>
+            <p className="text-slate-600 mb-6">{forcedNext ? '3回間違えたので、解説を確認して次へ進みます。' : `答えはまだ見せません（${wrongAttempts}/3回）`}</p>
           </div>
 
-          <div className="rounded-lg bg-amber-50 border border-amber-200 p-4 text-sm text-amber-900">
+          {forcedNext && <div className="rounded-lg bg-amber-50 border border-amber-200 p-4 text-sm text-amber-900">
+            <p className="font-bold mb-2">正解：{correctSentenceText}</p>
             <p className="font-bold">見直すポイント：{classifyWeakness(sentence)}</p>
             <p className="mt-1">{sentence.explanation}</p>
-          </div>
+          </div>}
 
           <div className="flex justify-center mt-8">
-            <Button onClick={onClose} variant="secondary" className="w-full sm:w-auto">
-              もう一度挑戦
+            <Button onClick={forcedNext ? onNext : onClose} variant={forcedNext ? 'primary' : 'secondary'} className="w-full sm:w-auto">
+              {forcedNext ? (isLastSentence ? '結果を見る' : '次の問題へ') : 'もう一度挑戦'}
             </Button>
           </div>
         </div>
