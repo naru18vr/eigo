@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import ArrowLeftIcon from '../components/shared/ArrowLeftIcon';
 import SpeakerWaveIcon from '../components/shared/SpeakerWaveIcon';
-import { getWeeklyMock, loadMockResult, saveMockResult, weekKey } from '../services/eiken4MockService';
+import { clearMockAttempt, getWeeklyMock, loadMockAttempt, loadMockResult, saveMockAttempt, saveMockResult, weekKey } from '../services/eiken4MockService';
 import { speakText } from '../services/speechService';
 
 const LIMIT = 10 * 60;
@@ -12,12 +12,13 @@ const Eiken4MockPage: React.FC = () => {
   const navigate = useNavigate();
   const questions = useMemo(getWeeklyMock, []);
   const previous = loadMockResult();
-  const [started, setStarted] = useState(false);
+  const savedAttempt = useMemo(loadMockAttempt, []);
+  const [started, setStarted] = useState(Boolean(savedAttempt));
   const [finished, setFinished] = useState(false);
-  const [index, setIndex] = useState(0);
-  const [remaining, setRemaining] = useState(LIMIT);
-  const [answers, setAnswers] = useState<Record<string, string>>({});
-  const [plays, setPlays] = useState<Record<string, number>>({});
+  const [index, setIndex] = useState(savedAttempt?.index || 0);
+  const [remaining, setRemaining] = useState(savedAttempt?.remaining || LIMIT);
+  const [answers, setAnswers] = useState<Record<string, string>>(savedAttempt?.answers || {});
+  const [plays, setPlays] = useState<Record<string, number>>(savedAttempt?.plays || {});
 
   const finish = () => {
     const score = questions.filter(q => answers[q.id] === q.answer).length;
@@ -32,11 +33,18 @@ const Eiken4MockPage: React.FC = () => {
     return () => window.clearInterval(timer);
   }, [started, finished, remaining]);
 
+  useEffect(() => {
+    if (started && !finished) saveMockAttempt({ week: weekKey(), index, remaining, answers, plays });
+  }, [started, finished, index, remaining, answers, plays]);
+
+  const restart = () => { clearMockAttempt(); setIndex(0); setRemaining(LIMIT); setAnswers({}); setPlays({}); setStarted(true); };
+
   if (!started) return <div className="flex-grow container mx-auto p-4 sm:p-6 max-w-xl">
     <Button onClick={() => navigate('/eiken4')} variant="ghost" size="sm"><ArrowLeftIcon className="h-5 w-5 mr-2"/>英検4級に戻る</Button>
     <div className="mt-8 rounded-2xl bg-white shadow-xl border border-violet-100 p-7 text-center"><p className="text-violet-700 font-bold">週1回</p><h1 className="text-3xl font-bold text-slate-800 mt-2">10分ミニ模試</h1><p className="text-slate-600 mt-3">単語5問・文法4問・リスニング2問・長文2問</p><p className="text-sm text-slate-500 mt-2">開始後は途中で答えを表示しません。</p>
       {previous && <div className="mt-5 rounded-xl bg-slate-50 p-3"><p className="text-sm text-slate-500">前回の結果</p><p className="text-xl font-bold">{previous.score} / {previous.total}問</p></div>}
-      <Button onClick={() => setStarted(true)} className="w-full mt-6">模試を始める</Button></div>
+      <Button onClick={() => setStarted(true)} className="w-full mt-6">模試を始める</Button>
+      {savedAttempt && <Button onClick={restart} variant="ghost" className="w-full mt-2">保存した模試を最初からやり直す</Button>}</div>
   </div>;
 
   if (finished) {
