@@ -17,6 +17,9 @@ const Eiken4DailyPage: React.FC = () => {
   const { isSoundEnabled } = useAppContext();
   const [progress, setProgress] = useState(loadDailyProgress);
   const [selected, setSelected] = useState<string | null>(null);
+  const [attempts, setAttempts] = useState(0);
+  const [retrying, setRetrying] = useState(false);
+  const [resolved, setResolved] = useState(false);
   const [playCount, setPlayCount] = useState(0);
   const [slow, setSlow] = useState(false);
   const [audioStatus, setAudioStatus] = useState<'idle' | 'loading' | 'playing' | 'error'>('idle');
@@ -41,6 +44,9 @@ const Eiken4DailyPage: React.FC = () => {
     setSlow(false);
     setAudioStatus('idle');
     setAudioMessage('');
+    setAttempts(0);
+    setRetrying(false);
+    setResolved(false);
     if ('speechSynthesis' in window) window.speechSynthesis.cancel();
   }, [currentId]);
 
@@ -66,7 +72,7 @@ const Eiken4DailyPage: React.FC = () => {
   };
 
   const next = () => {
-    if (!selected || !current) return;
+    if (!selected || !current || !resolved) return;
     const correct = selected === current.answer;
     if (current.id.startsWith('word-')) recordWordMastery(current.id, correct);
     recordReviewAnswer(current.id, correct, isRetry);
@@ -83,6 +89,9 @@ const Eiken4DailyPage: React.FC = () => {
     saveDailyProgress(nextProgress);
     setProgress(nextProgress);
     setSelected(null);
+    setAttempts(0);
+    setRetrying(false);
+    setResolved(false);
   };
 
   if (complete || !current) {
@@ -139,9 +148,14 @@ const Eiken4DailyPage: React.FC = () => {
 
   const answeredCorrectly = selected === current.answer;
   const selectAnswer = (choice: string) => {
-    if (selected) return;
-    if (isSoundEnabled) (choice === current.answer ? playCorrectSound : playIncorrectSound)();
+    if (selected || retrying || resolved) return;
+    const correct = choice === current.answer;
+    if (isSoundEnabled) (correct ? playCorrectSound : playIncorrectSound)();
+    const nextAttempts = attempts + 1;
+    setAttempts(nextAttempts);
     setSelected(choice);
+    if (correct || nextAttempts >= 3) setResolved(true);
+    else setRetrying(true);
   };
   return (
     <div className="flex-grow container mx-auto p-4 sm:p-6 max-w-xl">
@@ -170,13 +184,14 @@ const Eiken4DailyPage: React.FC = () => {
         <p className="text-sm text-slate-500 mt-2">{current.detail}</p>
         <div className="grid gap-3 mt-6">
           {current.choices.map(choice => {
-            const showCorrect = selected && choice === current.answer;
-            const showWrong = selected === choice && choice !== current.answer;
+            const showCorrect = resolved && choice === current.answer;
+            const showWrong = (resolved || retrying) && selected === choice && choice !== current.answer;
             return <button key={choice} onClick={() => selectAnswer(choice)} className={`p-4 rounded-xl border-2 text-left font-semibold transition-colors ${showCorrect ? 'border-emerald-500 bg-emerald-50 text-emerald-800' : showWrong ? 'border-rose-500 bg-rose-50 text-rose-800' : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-300'}`}>{choice}</button>;
           })}
         </div>
-        {selected && <div className={`mt-5 p-4 rounded-xl ${answeredCorrectly ? 'bg-emerald-50' : 'bg-amber-50'}`}>
-          <p className="font-bold">{answeredCorrectly ? '正解！' : `正解：${current.answer}`}</p>
+        {retrying && <div className="mt-5 p-4 rounded-xl bg-amber-50"><p className="font-bold text-amber-800">不正解。答えはまだ見せません（{attempts}/3回）</p><Button onClick={() => { setSelected(null); setRetrying(false); }} variant="secondary" className="mt-3 w-full">もう一度</Button></div>}
+        {resolved && selected && <div className={`mt-5 p-4 rounded-xl ${answeredCorrectly ? 'bg-emerald-50' : 'bg-amber-50'}`}>
+          <p className="font-bold">{answeredCorrectly ? '正解！' : `3回間違えました。正解：${current.answer}`}</p>
           {current.transcript && <div className="mt-3 border-t border-slate-200 pt-3"><p className="text-xs font-bold text-slate-500">聞こえた英文</p><p className="text-sm whitespace-pre-line mt-1">{current.transcript}</p><p className="text-xs font-bold text-slate-500 mt-3">日本語</p><p className="text-sm whitespace-pre-line mt-1">{current.translation}</p></div>}
           {current.explanation && <p className="text-sm text-slate-700 mt-2">{current.explanation}</p>}
           {!isListening && <button onClick={() => speakText(current.id.startsWith('word-') ? current.prompt : current.answer, 'en-US', 0.82)} className="mt-3 inline-flex items-center rounded-full bg-white text-indigo-700 font-bold px-4 py-2 border border-indigo-200">
