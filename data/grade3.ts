@@ -1,4 +1,5 @@
 import { Grade } from '../types';
+import { expandUnitToFifty } from './expandUnitSentences';
 import { GRADE_2_UNITS } from './grade2';
 
 const GRADE_3_UNIT_0_PASSIVE_REVIEW: Grade['units'][0]['sentences'] = [
@@ -114,12 +115,12 @@ const GRADE_3_UNIT_1_BASE_SENTENCES: Grade['units'][0]['sentences'] = [
 ];
 
 // 2025年度版 Unit 1：現在完了（経験）、SVOC（C=形容詞）、SVOO（that節）。
-export const GRADE_3_UNIT_1_SENTENCES = GRADE_3_UNIT_1_BASE_SENTENCES.filter(sentence =>
+export const GRADE_3_UNIT_1_SENTENCES = expandUnitToFifty(GRADE_3_UNIT_1_BASE_SENTENCES.filter(sentence =>
   sentence.grammarTag.includes('現在完了形「経験」')
   || sentence.grammarTag === 'make A B'
   || sentence.grammarTag === 'keep A B'
   || sentence.grammarTag === 'tell + 人 + that 〜',
-);
+), 'g3u1');
 
 export const GRADE_3_UNIT_2_SENTENCES: Grade['units'][0]['sentences'] = [
   { id: "g3u2s1", japaneseQuestion: "私はちょうど昼食を食べ終えたところです。", words: ["I", "have", "just", "finished", "lunch", "."], grammarTag: "現在完了形「完了」", explanation: "justを使って「ちょうど〜したところだ」という完了を表します。" },
@@ -228,13 +229,13 @@ const GRADE_3_UNIT_3_BASE_SENTENCES: Grade['units'][0]['sentences'] = [
 ];
 
 // 現行Unit 3：It is ... (for 人) to / want 人 to / let・help 人＋動詞原形。
-export const GRADE_3_UNIT_3_SENTENCES = GRADE_3_UNIT_3_BASE_SENTENCES.filter(sentence =>
+export const GRADE_3_UNIT_3_SENTENCES = expandUnitToFifty(GRADE_3_UNIT_3_BASE_SENTENCES.filter(sentence =>
   sentence.grammarTag === 'It is ... for (人) to 〜'
   || sentence.grammarTag === 'want + 人 + to 〜'
   || sentence.grammarTag === '原形不定詞 (let)'
   || sentence.grammarTag === '原形不定詞 (help)'
   || sentence.grammarTag === 'help + 人 + to 〜',
-);
+), 'g3u3');
 
 const GRADE_3_UNIT_4_BASE_SENTENCES: Grade['units'][0]['sentences'] = [
   { id: "g3u4s1", japaneseQuestion: "私は彼が何を欲しがっているか知りません。", words: ["I", "don't", "know", "what", "he", "wants", "."], grammarTag: "間接疑問文", explanation: "疑問詞の文が他の文の一部になる形で、語順が「疑問詞+主語+動詞」になります。" },
@@ -290,11 +291,11 @@ const GRADE_3_UNIT_4_BASE_SENTENCES: Grade['units'][0]['sentences'] = [
 ];
 
 // 現行Unit 4：間接疑問文、SVOO（what節）、現在分詞・過去分詞の後置修飾。
-export const GRADE_3_UNIT_4_SENTENCES = GRADE_3_UNIT_4_BASE_SENTENCES.filter(sentence =>
+export const GRADE_3_UNIT_4_SENTENCES = expandUnitToFifty(GRADE_3_UNIT_4_BASE_SENTENCES.filter(sentence =>
   sentence.grammarTag === '間接疑問文'
   || sentence.grammarTag === '名詞を修飾する-ing'
   || sentence.grammarTag === '名詞を修飾する過去分詞',
-);
+), 'g3u4');
 
 const GRADE_3_UNIT_5_BASE_SENTENCES: Grade['units'][0]['sentences'] = [
   { id: "g3u5s1", japaneseQuestion: "これは私が昨日買った本です。", words: ["This", "is", "the", "book", "I", "bought", "yesterday", "."], grammarTag: "関係代名詞 (目的格省略)", explanation: "bookの後に目的格の関係代名詞that/whichが省略されています。" },
@@ -350,14 +351,14 @@ const GRADE_3_UNIT_5_BASE_SENTENCES: Grade['units'][0]['sentences'] = [
 ];
 
 // 現行Unit 5：接触節、who、that / which（主格・目的格）。
-export const GRADE_3_UNIT_5_SENTENCES = GRADE_3_UNIT_5_BASE_SENTENCES.filter(sentence =>
+export const GRADE_3_UNIT_5_SENTENCES = expandUnitToFifty(GRADE_3_UNIT_5_BASE_SENTENCES.filter(sentence =>
   sentence.grammarTag === '関係代名詞 (目的格省略)'
   || sentence.grammarTag === '関係代名詞 who (主格)'
   || sentence.grammarTag === '関係代名詞 that (主格)'
   || sentence.grammarTag === '関係代名詞 that (目的格)'
   || sentence.grammarTag === '関係代名詞 which (主格)'
   || sentence.grammarTag === '関係代名詞 which (目的格)',
-);
+), 'g3u5');
 
 export const GRADE_3_UNIT_6_SENTENCES: Grade['units'][0]['sentences'] = [
   { id: "g3u6s1", japaneseQuestion: "私が鳥だったらなあ。", words: ["I", "wish", "I", "were", "a", "bird", "."], grammarTag: "仮定法 (I wish)", explanation: "現在の事実とは異なる願望を表します。be動詞は主語に関わらずwereを使います。" },
