@@ -1,3 +1,6 @@
+Warning: truncated output (original token count: 34845)
+Total output lines: 649
+
 import { Grade } from '../types';
 
 export const GRADE_1_UNIT_1_SENTENCES: Grade['units'][0]['sentences'] = [
@@ -268,87 +271,7 @@ export const GRADE_1_UNIT_5_SENTENCES: Grade['units'][0]['sentences'] = [
   { id: "g1u5s45", japaneseQuestion: "その質問は難しかったですか？", words: ["Was", "the", "question", "difficult", "?"], grammarTag: "be 動詞の過去形の文", explanation: "過去の難易度を尋ねます。" },
   { id: "g1u5s46", japaneseQuestion: "私たちは昨日、たくさん話しました。", words: ["We", "talked", "a", "lot", "yesterday", "."], grammarTag: "過去形の文①（-ed）", explanation: "talkの過去形はtalkedです。" },
   { id: "g1u5s47", japaneseQuestion: "コーヒーを飲みましょう。", words: ["Let's", "drink", "coffee", "."], grammarTag: "Let's ~. の文", explanation: "コーヒーを飲むことを提案します。" },
-  { id: "g1u5s48", japaneseQuestion: "彼はその時、とても疲れていました。", words: ["He", "was", "very", "tired", "then", "."], grammarTag: "be 動詞の過去形の文", explanation: "過去の疲労状態を表します。" },
-  { id: "g1u5s49", japaneseQuestion: "私たちはその答えを知りませんでした。", words: ["We", "did", "not", "know", "the", "answer", "."], grammarTag: "過去形の文（否定文）", explanation: "did not の後ろでは動詞を原形にします。" },
-  { id: "g1u5s50", japaneseQuestion: "私は昨日、公園で写真を撮りました。", words: ["I", "took", "pictures", "in", "the", "park", "yesterday", "."], grammarTag: "過去形の文②（不規則動詞）", explanation: "takeの過去形はtookです。" },
-];
-
-export const GRADE_1_UNIT_6_SENTENCES: Grade['units'][0]['sentences'] = [
-  { id: "g1u6s1", japaneseQuestion: "私の兄は野球をします。", words: ["My", "brother", "plays", "baseball", "."], grammarTag: "主語が三人称単数の文①（一般動詞）", explanation: "主語が三人称単数で現在の習慣を表すとき、動詞にsをつけます。" },
-  { id: "g1u6s2", japaneseQuestion: "彼女は毎日ピアノを弾きます。", words: ["She", "plays", "the", "piano", "every", "day", "."], grammarTag: "主語が三人称単数の文①（一般動詞）", explanation: "Sheは三人称単数なので、playにsがつきます。" },
-  { id: "g1u6s3", japaneseQuestion: "トムは英語を話します。", words: ["Tom", "speaks", "English", "."], grammarTag: "主語が三人称単数の文①（一般動詞）", explanation: "Tomは三人称単数なので、speakにsがつきます。" },
-  { id: "g1u6s4", japaneseQuestion: "あなたの妹は音楽が好きですか？", words: ["Does", "your", "sister", "like", "music", "?"], grammarTag: "主語が三人称単数の文②（一般動詞の疑問文）", explanation: "三人称単数の疑問文はDoesで始め、動詞は原形です。" },
-  { id: "g1u6s5", japaneseQuestion: "彼はサッカーをしますか？", words: ["Does", "he", "play", "soccer", "?"], grammarTag: "主語が三人称単数の文②（一般動詞の疑問文）", explanation: "Doesで始まる三人称単数の疑問文です。" },
-  { id: "g1u6s6", japaneseQuestion: "彼女は犬が好きではありません。", words: ["She", "does", "not", "like", "dogs", "."], grammarTag: "主語が三人称単数の文③（一般動詞の否定文）", explanation: "三人称単数の否定文はdoes not (doesn't) を使い、動詞は原形です。" },
-  { id: "g1u6s7", japaneseQuestion: "私の父はテレビを見ません。", words: ["My", "father", "does", "not", "watch", "TV", "."], grammarTag: "主語が三人称単数の文③（一般動詞の否定文）", explanation: "does not watchで「見ない」という意味です。" },
-  { id: "g1u6s8", japaneseQuestion: "入ってもいいですか？", words: ["May", "I", "come", "in", "?"], grammarTag: "May I ～? の文", explanation: "許可を求めるときに使う丁寧な表現です。" },
-  { id: "g1u6s9", japaneseQuestion: "このコンピューターを使ってもいいですか？", words: ["May", "I", "use", "this", "computer", "?"], grammarTag: "May I ～? の文", explanation: "物を使う許可を求めるときにも使います。" },
-  { id: "g1u6s10", japaneseQuestion: "彼は学校へ行きます。", words: ["He", "goes", "to", "school", "."], grammarTag: "主語が三人称単数の文①（一般動詞）", explanation: "goはesをつけてgoesになります。" },
-  { id: "g1u6s11", japaneseQuestion: "その猫は魚を食べます。", words: ["The", "cat", "eats", "fish", "."], grammarTag: "主語が三人称単数の文①（一般動詞）", explanation: "The catは三人称単数です。" },
-  { id: "g1u6s12", japaneseQuestion: "彼女は朝食を作りますか？", words: ["Does", "she", "make", "breakfast", "?"], grammarTag: "主語が三人称単数の文②（一般動詞の疑問文）", explanation: "料理をするかどうかを尋ねています。" },
-  { id: "g1u6s13", japaneseQuestion: "彼は早く起きません。", words: ["He", "does", "not", "get", "up", "early", "."], grammarTag: "主語が三人称単数の文③（一般動詞の否定文）", explanation: "早起きの習慣がないことを表します。" },
-  { id: "g1u6s14", japaneseQuestion: "質問してもいいですか？", words: ["May", "I", "ask", "a", "question", "?"], grammarTag: "May I ～? の文", explanation: "質問する許可を求めます。" },
-  { id: "g1u6s15", japaneseQuestion: "私の母は花が好きです。", words: ["My", "mother", "likes", "flowers", "."], grammarTag: "主語が三人称単数の文①（一般動詞）", explanation: "My motherは三人称単数です。" },
-  { id: "g1u6s16", japaneseQuestion: "あなたの犬は走りますか？", words: ["Does", "your", "dog", "run", "?"], grammarTag: "主語が三人称単数の文②（一般動詞の疑問文）", explanation: "犬が走るかどうかを尋ねています。" },
-  { id: "g1u6s17", japaneseQuestion: "彼はその歌を知りません。", words: ["He", "does", "not", "know", "the", "song", "."], grammarTag: "主語が三人称単数の文③（一般動詞の否定文）", explanation: "歌を知らないことを表します。" },
-  { id: "g1u6s18", japaneseQuestion: "窓を開けてもいいですか？", words: ["May", "I", "open", "the", "window", "?"], grammarTag: "May I ～? の文", explanation: "窓を開ける許可を求めます。" },
-  { id: "g1u6s19", japaneseQuestion: "その鳥は美しく歌います。", words: ["The", "bird", "sings", "beautifully", "."], grammarTag: "主語が三人称単数の文①（一般動詞）", explanation: "The birdは三人称単数です。" },
-  { id: "g1u6s20", japaneseQuestion: "彼は毎日牛乳を飲みますか？", words: ["Does", "he", "drink", "milk", "every", "day", "?"], grammarTag: "主語が三人称単数の文②（一般動詞の疑問文）", explanation: "毎日の習慣について尋ねています。" },
-  { id: "g1u6s21", japaneseQuestion: "彼女は速く泳ぎません。", words: ["She", "does", "not", "swim", "fast", "."], grammarTag: "主語が三人称単数の文③（一般動詞の否定文）", explanation: "速く泳げない、または泳がないことを表します。" },
-  { id: "g1u6s22", japaneseQuestion: "あなたのペンを借りてもいいですか？", words: ["May", "I", "borrow", "your", "pen", "?"], grammarTag: "May I ～? の文", explanation: "物を借りる許可を求めます。" },
-  { id: "g1u6s23", japaneseQuestion: "このバスは駅へ行きます。", words: ["This", "bus", "goes", "to", "the", "station", "."], grammarTag: "主語が三人称単数の文①（一般動詞）", explanation: "This busは三人称単数です。" },
-  { id: "g1u6s24", japaneseQuestion: "彼女は何を勉強しますか？", words: ["What", "does", "she", "study", "?"], grammarTag: "主語が三人称単数の文②（一般動詞の疑問文）＋疑問詞", explanation: "何を勉強するかを尋ねています。" },
-  { id: "g1u6s25", japaneseQuestion: "トムはここに住んでいません。", words: ["Tom", "does", "not", "live", "here", "."], grammarTag: "主語が三人称単数の文③（一般動詞の否定文）", explanation: "Tomがここに住んでいないことを表します。" },
-  { id: "g1u6s26", japaneseQuestion: "この席に座ってもいいですか？", words: ["May", "I", "sit", "here", "?"], grammarTag: "May I ～? の文", explanation: "席に座る許可を求めます。" },
-  { id: "g1u6s27", japaneseQuestion: "私の姉は毎週手紙を書きます。", words: ["My", "sister", "writes", "a", "letter", "every", "week", "."], grammarTag: "主語が三人称単数の文①（一般動詞）", explanation: "writeにsがつきます。" },
-  { id: "g1u6s28", japaneseQuestion: "彼はいつ起きますか？", words: ["When", "does", "he", "get", "up", "?"], grammarTag: "主語が三人称単数の文②（一般動詞の疑問文）＋疑問詞", explanation: "起きる時間を尋ねています。" },
-  { id: "g1u6s29", japaneseQuestion: "その店は日曜日に開きません。", words: ["The", "store", "does", "not", "open", "on", "Sundays", "."], grammarTag: "主語が三人称単数の文③（一般動詞の否定文）", explanation: "店が日曜日に営業していないことを表します。" },
-  { id: "g1u6s30", japaneseQuestion: "あなたのお母さんは料理をしますか？", words: ["Does", "your", "mother", "cook", "?"], grammarTag: "主語が三人称単数の文②（一般動詞の疑問文）", explanation: "母親が料理をするか尋ねます。" },
-  { id: "g1u6s31", japaneseQuestion: "この犬はよく吠えます。", words: ["This", "dog", "barks", "often", "."], grammarTag: "主語が三人称単数の文①（一般動詞）", explanation: "barkにsがつきます。" },
-  { id: "g1u6s32", japaneseQuestion: "あなたの父は車を運転しますか？", words: ["Does", "your", "father", "drive", "a", "car", "?"], grammarTag: "主語が三人称単数の文②（一般動詞の疑問文）", explanation: "父親が運転するかを尋ねます。" },
-  { id: "g1u6s33", japaneseQuestion: "彼女はコーヒーを飲みません。", words: ["She", "does", "not", "drink", "coffee", "."], grammarTag: "主語が三人称単数の文③（一般動詞の否定文）", explanation: "コーヒーを飲まない習慣を表します。" },
-  { id: "g1u6s34", japaneseQuestion: "あなたの写真を見てもいいですか？", words: ["May", "I", "see", "your", "picture", "?"], grammarTag: "May I ～? の文", explanation: "写真を見る許可を求めます。" },
-  { id: "g1u6s35", japaneseQuestion: "彼はいつも宿題をします。", words: ["He", "always", "does", "his", "homework", "."], grammarTag: "主語が三人称単数の文①（一般動詞）", explanation: "doはdoesになります。" },
-  { id: "g1u6s36", japaneseQuestion: "その赤ちゃんはよく泣きますか？", words: ["Does", "the", "baby", "cry", "often", "?"], grammarTag: "主語が三人称単数の文②（一般動詞の疑問文）", explanation: "赤ちゃんがよく泣くか尋ねます。" },
-  { id: "g1u6s37", japaneseQuestion: "私の祖父は新聞を読みません。", words: ["My", "grandfather", "does", "not", "read", "newspapers", "."], grammarTag: "主語が三人称単数の文③（一般動詞の否定文）", explanation: "新聞を読まない習慣を表します。" },
-  { id: "g1u6s38", japaneseQuestion: "トイレをお借りしてもいいですか？", words: ["May", "I", "use", "the", "restroom", "?"], grammarTag: "May I ～? の文", explanation: "トイレを使う許可を丁寧に求めます。" },
-  { id: "g1u6s39", japaneseQuestion: "彼女は時々公園へ行きます。", words: ["She", "sometimes", "goes", "to", "the", "park", "."], grammarTag: "主語が三人称単数の文①（一般動詞）", explanation: "sometimesは頻度を表す副詞です。" },
-  { id: "g1u6s40", japaneseQuestion: "あなたのおじはどこで働いていますか？", words: ["Where", "does", "your", "uncle", "work", "?"], grammarTag: "主語が三人称単数の文②（一般動詞の疑問文）＋疑問詞", explanation: "主語が三人称単数なので、does の後ろでは動詞を原形にします。" },
-  { id: "g1u6s41", japaneseQuestion: "その鳥は高く飛びません。", words: ["The", "bird", "does", "not", "fly", "high", "."], grammarTag: "主語が三人称単数の文③（一般動詞の否定文）", explanation: "高く飛ばないことを表します。" },
-  { id: "g1u6s42", japaneseQuestion: "あなたと一緒に行ってもいいですか？", words: ["May", "I", "go", "with", "you", "?"], grammarTag: "May I ～? の文", explanation: "同行する許可を求めます。" },
-  { id: "g1u6s43", japaneseQuestion: "彼は音楽を教えています。", words: ["He", "teaches", "music", "."], grammarTag: "主語が三人称単数の文①（一般動詞）", explanation: "teachはteachesになります。" },
-  { id: "g1u6s44", japaneseQuestion: "彼女はどんな食べ物が好きですか？", words: ["What", "food", "does", "she", "like", "?"], grammarTag: "主語が三人称単数の文②（一般動詞の疑問文）＋疑問詞", explanation: "好きな食べ物を尋ねます。" },
-  { id: "g1u6s45", japaneseQuestion: "その猫はあまり食べません。", words: ["The", "cat", "does", "not", "eat", "much", "."], grammarTag: "主語が三人称単数の文③（一般動詞の否定文）", explanation: "あまり食べないことを表します。" },
-  { id: "g1u6s46", japaneseQuestion: "もう帰ってもいいですか？", words: ["May", "I", "go", "home", "now", "?"], grammarTag: "May I ～? の文", explanation: "帰宅の許可を求めます。" },
-  { id: "g1u6s47", japaneseQuestion: "私の犬はボールで遊びます。", words: ["My", "dog", "plays", "with", "a", "ball", "."], grammarTag: "主語が三人称単数の文①（一般動詞）", explanation: "My dogは三人称単数です。" },
-  { id: "g1u6s48", japaneseQuestion: "彼は何時に寝ますか？", words: ["What", "time", "does", "he", "go", "to", "bed", "?"], grammarTag: "主語が三人称単数の文②（一般動詞の疑問文）＋疑問詞", explanation: "寝る時間を尋ねます。" },
-  { id: "g1u6s49", japaneseQuestion: "彼女は映画を見ません。", words: ["She", "does", "not", "watch", "movies", "."], grammarTag: "主語が三人称単数の文③（一般動詞の否定文）", explanation: "映画を見ない習慣を表します。" },
-  { id: "g1u6s50", japaneseQuestion: "ここに来てもいいですか？", words: ["May", "I", "come", "here", "?"], grammarTag: "May I ~? の文", explanation: "ここに来る許可を求めます。" },
-];
-
-export const GRADE_1_UNIT_7_SENTENCES: Grade['units'][0]['sentences'] = [
-  { id: "g1u7s1", japaneseQuestion: "私は彼をよく知っています。", words: ["I", "know", "him", "well", "."], grammarTag: "him ／ her などの使い方（目的格）", explanation: "「彼を」のように目的語になる人称代名詞です。" },
-  { id: "g1u7s2", japaneseQuestion: "彼女は私を手伝ってくれます。", words: ["She", "helps", "me", "."], grammarTag: "him ／ her などの使い方（目的格）", explanation: "「私を」はmeです。" },
-  { id: "g1u7s3", japaneseQuestion: "私たちは彼らが好きです。", words: ["We", "like", "them", "."], grammarTag: "him ／ her などの使い方（目的格）", explanation: "「彼らを」や「彼女らを」はthemです。" },
-  { id: "g1u7s4", japaneseQuestion: "どちらのペンがあなたのですか？", words: ["Which", "pen", "is", "yours", "?"], grammarTag: "Which 〜? の文", explanation: "「どちらの〜」と選択肢の中から特定の一つを尋ねます。" },
-  { id: "g1u7s5", japaneseQuestion: "あなたはりんごとオレンジ、どちらの方が好きですか？", words: ["Which", "do", "you", "like", "better", ",", "apples", "or", "oranges", "?"], grammarTag: "Which 〜? の文", explanation: "二つのものからどちらのほうが好きか尋ねます。より比較のニュアンスが明確になります。" },
-  { id: "g1u7s6", japaneseQuestion: "なぜあなたは怒っているのですか？", words: ["Why", "are", "you", "angry", "?"], grammarTag: "Why 〜? の文", explanation: "理由を尋ねるときに使います。" },
-  { id: "g1u7s7", japaneseQuestion: "なぜ彼は遅刻したのですか？", words: ["Why", "was", "he", "late", "?"], grammarTag: "Why 〜? の文", explanation: "遅刻の理由を尋ねています。" },
-  { id: "g1u7s8", japaneseQuestion: "これは誰のかばんですか？", words: ["Whose", "bag", "is", "this", "?"], grammarTag: "Whose 〜? の文", explanation: "「誰の〜」と持ち主を尋ねるときに使います。" },
-  { id: "g1u7s9", japaneseQuestion: "あれは誰の自転車ですか？", words: ["Whose", "bicycle", "is", "that", "?"], grammarTag: "Whose 〜? の文", explanation: "自転車の持ち主を尋ねています。" },
-  { id: "g1u7s10", japaneseQuestion: "私は彼女にプレゼントをあげます。", words: ["I", "give", "her", "a", "present", "."], grammarTag: "him ／ her などの使い方（目的格）", explanation: "「彼女に」はherです。" },
-  { id: "g1u7s11", japaneseQuestion: "彼は私たちに話しかけました。", words: ["He", "talked", "to", "us", "."], grammarTag: "him ／ her などの使い方（目的格）", explanation: "「私たちに」はusです。toなどの前置詞の後にも使います。" },
-  { id: "g1u7s12", japaneseQuestion: "どちらの色が好きですか、赤ですか青ですか？", words: ["Which", "color", "do", "you", "like", ",", "red", "or", "blue", "?"], grammarTag: "Which 〜? の文", explanation: "色の好みを選択肢から尋ねます。" },
-  { id: "g1u7s13", japaneseQuestion: "なぜあなたはそんなに幸せなのですか？", words: ["Why", "are", "you", "so", "happy", "?"], grammarTag: "Why 〜? の文", explanation: "幸せな理由を尋ねています。" },
-  { id: "g1u7s14", japaneseQuestion: "この帽子は誰のですか？", words: ["Whose", "cap", "is", "this", "?"], grammarTag: "Whose 〜? の文", explanation: "帽子の持ち主を尋ねています。" },
-  { id: "g1u7s15", japaneseQuestion: "彼は彼女を知っていますか？", words: ["Does", "he", "know", "her", "?"], grammarTag: "him ／ her などの使い方（目的格）", explanation: "「彼女を」はherです。" },
-  { id: "g1u7s16", japaneseQuestion: "どちらの道が駅へ行きますか？", words: ["Which", "way", "goes", "to", "the", "station", "?"], grammarTag: "Which 〜? の文", explanation: "駅へ行く道を尋ねています。" },
-  { id: "g1u7s17", japaneseQuestion: "なぜ彼女は泣いているのですか？", words: ["Why", "is", "she", "crying", "?"], grammarTag: "Why 〜? の文", explanation: "泣いている理由を尋ねています。" },
-  { id: "g1u7s18", japaneseQuestion: "これらの本は誰のですか？", words: ["Whose", "books", "are", "these", "?"], grammarTag: "Whose 〜? の文", explanation: "複数のものの持ち主を尋ねています。" },
-  { id: "g1u7s19", japaneseQuestion: "あなたのお母さんはあなたを愛しています。", words: ["Your", "mother", "loves", "you", "."], grammarTag: "him ／ her などの使い方（目的格）", explanation: "「あなたを」はyouです。" },
-  { id: "g1u7s20", japaneseQuestion: "どちらの科目が一番好きですか？", words: ["Which", "subject", "do", "you", "like", "the", "best", "?"], grammarTag: "Which 〜? の文", explanation: "一番好きな科目を尋ねています。" },
-  { id: "g1u7s21", japaneseQuestion: "なぜあなたは昨日学校を休んだのですか？", words: ["Why", "were", "you", "absent", "from", "school", "yesterday", "?"], grammarTag: "Why 〜? の文", explanation: "欠席の理由を尋ねています。" },
-  { id: "g1u7s22", japaneseQuestion: "あの傘は誰のですか？", words: ["Whose", "umbrella", "is", "that", "?"], grammarTag: "Whose 〜? の文", explanation: "傘の持ち主を尋ねています。" },
+  { id: "g1u5s48", japaneseQuestion: "彼はその時、とても疲れていました。", words: ["He", "was", "very", "tired", "then", "."], grammarTag: "be 動詞の過去形の文", explanation: "過去の疲労状…4845 tokens truncated…の持ち主を尋ねています。" },
   { id: "g1u7s23", japaneseQuestion: "私は彼らに手紙を書きます。", words: ["I", "write", "them", "a", "letter", "."], grammarTag: "him ／ her などの使い方（目的格）", explanation: "「彼らに」はthemです。" },
   { id: "g1u7s24", japaneseQuestion: "どちらの映画を見たいですか？", words: ["Which", "movie", "do", "you", "want", "to", "watch", "?"], grammarTag: "Which 〜? の文", explanation: "見たい映画を選択肢から尋ねます（ここでは選択肢は省略）。" },
   { id: "g1u7s25", japaneseQuestion: "なぜ彼はそんなに一生懸命勉強するのですか？", words: ["Why", "does", "he", "study", "so", "hard", "?"], grammarTag: "Why 〜? の文", explanation: "一生懸命勉強する理由を尋ねています。" },
@@ -591,16 +514,59 @@ export const GRADE_1_UNIT_11_SENTENCES: Grade['units'][0]['sentences'] = [
   { id: "g1u11s50", japaneseQuestion: "あなたはその時、何を探していましたか？", words: ["What", "were", "you", "looking", "for", "then", "?"], grammarTag: "過去進行形の疑問文・否定文", explanation: "過去の行動を尋ねます。" },
 ];
 
+// 令和7年度（2025年度）版 NEW HORIZON English Course 1 の文法配列。
+// 旧版用に作成した問題を、現行版の各Unitへ文法タグで再配置する。
+const tags = (sentences: Grade['units'][0]['sentences'], patterns: RegExp[]) =>
+  sentences.filter(sentence => patterns.some(pattern => pattern.test(sentence.grammarTag)));
+
 export const GRADE_1_UNITS: Grade['units'] = [
-    { id: 'u1', title: 'Unit 1: 新しい友達', sentences: GRADE_1_UNIT_1_SENTENCES },
-    { id: 'u2', title: 'Unit 2: これは何ですか？', sentences: GRADE_1_UNIT_2_SENTENCES },
-    { id: 'u3', title: 'Unit 3: 〜したいこと', sentences: GRADE_1_UNIT_3_SENTENCES },
-    { id: 'u4', title: 'Unit 4: 指示とお願い', sentences: GRADE_1_UNIT_4_SENTENCES },
-    { id: 'u5', title: 'Unit 5: 過去形の基礎', sentences: GRADE_1_UNIT_5_SENTENCES },
-    { id: 'u6', title: 'Unit 6: ３人目の話', sentences: GRADE_1_UNIT_6_SENTENCES },
-    { id: 'u7', title: 'Unit 7: 誰の？なぜ？どちら？', sentences: GRADE_1_UNIT_7_SENTENCES },
-    { id: 'u8', title: 'Unit 8: 今していること', sentences: GRADE_1_UNIT_8_SENTENCES },
-    { id: 'u9', title: 'Unit 9: 欲しいもの、したいこと', sentences: GRADE_1_UNIT_9_SENTENCES },
-    { id: 'u10', title: 'Unit 10: 過去形の疑問文・否定文', sentences: GRADE_1_UNIT_10_SENTENCES },
-    { id: 'u11', title: 'Unit 11: 過去の様子', sentences: GRADE_1_UNIT_11_SENTENCES },
+  {
+    id: 'u1', title: 'Unit 1: Hello, Everyone!',
+    sentences: GRADE_1_UNIT_1_SENTENCES.filter(sentence => !/can|cannot|Can you/.test(sentence.grammarTag)),
+  },
+  {
+    id: 'u2', title: 'Unit 2: Our New Teacher',
+    sentences: [
+      ...tags(GRADE_1_UNIT_2_SENTENCES, [/^(He|She) is/, /^Is (he|she)/, /^(This|That) is/, /^Is (this|that)/]),
+      ...tags(GRADE_1_UNIT_1_SENTENCES, [/can/i]),
+    ],
+  },
+  {
+    id: 'u3', title: 'Unit 3: Our School',
+    sentences: [
+      ...tags(GRADE_1_UNIT_2_SENTENCES, [/^What/, /^Who/, /^How/]),
+      ...tags(GRADE_1_UNIT_3_SENTENCES, [/^Where ~\? の文$/, /^When ~\? の文$/]),
+    ],
+  },
+  {
+    id: 'u4', title: 'Unit 4: Friends in New Zealand',
+    sentences: [
+      ...tags(GRADE_1_UNIT_3_SENTENCES, [/^How many ~\? の文$/, /^How many ~\? の文 \(be動詞\)$/]),
+      ...tags(GRADE_1_UNIT_4_SENTENCES, [/命令文/, /^What \+ 名詞/]),
+    ],
+  },
+  {
+    id: 'u5', title: 'Unit 5: My Brother in Hawaii',
+    sentences: tags(GRADE_1_UNIT_6_SENTENCES, [/^主語が三人称単数/]),
+  },
+  {
+    id: 'u6', title: 'Unit 6: A Rakugo Performer from the U.K.',
+    sentences: tags(GRADE_1_UNIT_7_SENTENCES, [/目的格/, /^Whose/, /^Which/]),
+  },
+  {
+    id: 'u7', title: 'Unit 7: An Online Tour of the U.K.',
+    sentences: GRADE_1_UNIT_8_SENTENCES,
+  },
+  {
+    id: 'u8', title: 'Unit 8: Think Globally, Act Locally',
+    sentences: GRADE_1_UNIT_9_SENTENCES.filter(sentence => !/過去形/.test(sentence.grammarTag)),
+  },
+  {
+    id: 'u9', title: 'Unit 9: Winter Vacation',
+    sentences: GRADE_1_UNIT_10_SENTENCES,
+  },
+  {
+    id: 'u10', title: "Unit 10: This Year's Memories",
+    sentences: GRADE_1_UNIT_11_SENTENCES,
+  },
 ];
