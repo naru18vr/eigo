@@ -3,6 +3,27 @@ import { eiken4ListeningQuestions } from '../data/eiken4Listening';
 import { eiken4Words } from '../data/eiken4Words';
 import { DailyProgress, getQuestionById } from './eiken4DailyService';
 
+export type WorksheetShareData = Pick<DailyProgress, 'date' | 'questionIds' | 'answers'>;
+
+export const createWorksheetShareLink = (progress: DailyProgress) => {
+  const data: WorksheetShareData = { date: progress.date, questionIds: progress.questionIds, answers: progress.answers };
+  const encoded = btoa(JSON.stringify(data));
+  return `${window.location.href.split('#')[0]}#/eiken4/worksheet?data=${encodeURIComponent(encoded)}`;
+};
+
+export const parseWorksheetShareData = (encoded: string | null): DailyProgress | null => {
+  if (!encoded) return null;
+  try {
+    const data = JSON.parse(atob(decodeURIComponent(encoded))) as WorksheetShareData;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(data.date) || !Array.isArray(data.questionIds) || !Array.isArray(data.answers)) return null;
+    if (data.questionIds.length < 1 || data.questionIds.length > 20) return null;
+    if (data.questionIds.some(id => typeof id !== 'string' || !getQuestionById(id, data.date))) return null;
+    return { ...data, retryIds: [], retryAnswers: [], completedAt: data.date };
+  } catch {
+    return null;
+  }
+};
+
 type WorksheetQuestion = {
   id: string;
   kind: string;
