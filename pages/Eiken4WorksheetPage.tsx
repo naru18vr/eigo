@@ -29,6 +29,7 @@ const Eiken4WorksheetPage: React.FC = () => {
       <h1 className="text-4xl font-bold text-slate-800 mt-2">{correct} / {progress.questionIds.length}問</h1>
       <p className="text-slate-500 mt-2">{progress.date.replaceAll('-', '/')}</p>
       {reading && <p className="text-sky-700 font-bold mt-2">ミニ長文も完了済み・類似長文つき</p>}
+      {!reading && <p className="text-sky-700 font-bold mt-2">復習用の類似長文つき</p>}
       <div className="mt-5 rounded-xl bg-amber-50 border border-amber-200 p-4 text-left">
         <p className="font-bold text-amber-900">復習する分野</p>
         <p className="text-sm text-amber-900 mt-1">{weakKinds.length ? weakKinds.join('・') : '全問正解です。今日の範囲をもう一度定着させます。'}</p>
