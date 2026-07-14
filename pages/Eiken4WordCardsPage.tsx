@@ -9,8 +9,9 @@ import { speakText } from '../services/speechService';
 import { useAppContext } from '../contexts/AppContext';
 import { playCorrectSound, playIncorrectSound } from '../services/soundService';
 import { recordWordMastery } from '../services/eiken4WordMasteryService';
+import { loadWordMastery, masteryLevel } from '../services/eiken4WordMasteryService';
 
-const CARD_COUNT = 10;
+const CARD_COUNT = 8;
 
 const shuffleArray = <T,>(array: T[]): T[] => {
   const next = [...array];
@@ -25,7 +26,11 @@ const Eiken4WordCardsPage: React.FC = () => {
   const navigate = useNavigate();
   const { completeWords } = useEiken4Session();
   const { isSoundEnabled } = useAppContext();
-  const words = useMemo(() => shuffleArray(eiken4Words).slice(0, CARD_COUNT), []);
+  const words = useMemo(() => {
+    const mastery = loadWordMastery();
+    const rank = { new: 0, learning: 1, consolidating: 2, mastered: 3 };
+    return shuffleArray(eiken4Words).sort((a, b) => rank[masteryLevel(mastery[a.id])] - rank[masteryLevel(mastery[b.id])]).slice(0, CARD_COUNT);
+  }, []);
   const [index, setIndex] = useState(0);
   const [showMeaning, setShowMeaning] = useState(false);
   const [knownCount, setKnownCount] = useState(0);
