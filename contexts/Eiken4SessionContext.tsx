@@ -3,6 +3,7 @@ import React, { createContext, ReactNode, useContext, useMemo, useState } from '
 export type Eiken4ResultData = {
   wordTotal: number;
   wordKnown: number;
+  wordIds: string[];
   wordQuizTotal: number;
   wordQuizCorrect: number;
   wordQuizWrongWords: string[];
@@ -16,7 +17,7 @@ export type Eiken4ResultData = {
 type Eiken4SessionContextType = {
   result: Eiken4ResultData;
   resetSession: () => void;
-  completeWords: (wordTotal: number, wordKnown: number, weakPoints: string[]) => void;
+  completeWords: (wordTotal: number, wordKnown: number, weakPoints: string[], wordIds: string[]) => void;
   completeWordQuiz: (wordQuizTotal: number, wordQuizCorrect: number, wrongWords: string[]) => void;
   completeSentences: (sentenceTotal: number, sentenceCorrect: number, weakPoints: string[]) => void;
 };
@@ -24,6 +25,7 @@ type Eiken4SessionContextType = {
 const initialResult = (): Eiken4ResultData => ({
   wordTotal: 0,
   wordKnown: 0,
+  wordIds: [],
   wordQuizTotal: 0,
   wordQuizCorrect: 0,
   wordQuizWrongWords: [],
@@ -51,12 +53,13 @@ export const Eiken4SessionProvider: React.FC<{ children: ReactNode }> = ({ child
     return {
       result,
       resetSession: () => setResult(initialResult()),
-      completeWords: (wordTotal, wordKnown, weakPoints) => {
+      completeWords: (wordTotal, wordKnown, weakPoints, wordIds) => {
         setResult(current =>
           withDuration({
             ...current,
             wordTotal,
             wordKnown,
+            wordIds,
             weakPoints: uniqueFirstThree([...weakPoints, ...current.weakPoints]),
           })
         );
