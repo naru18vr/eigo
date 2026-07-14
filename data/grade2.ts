@@ -1,5 +1,6 @@
 
 import { Grade } from '../types';
+import { expandUnitToFifty } from './expandUnitSentences';
 
 // Grade 2 Sentences
 export const GRADE_2_UNIT_0_SENTENCES: Grade['units'][0]['sentences'] = [
@@ -109,9 +110,9 @@ const GRADE_2_UNIT_1_BASE_SENTENCES: Grade['units'][0]['sentences'] = [
 ];
 
 // 2025年度版 Unit 1 は未来表現・SVOO・SVOC（C=名詞）が中心。
-export const GRADE_2_UNIT_1_SENTENCES = GRADE_2_UNIT_1_BASE_SENTENCES.filter(
+export const GRADE_2_UNIT_1_SENTENCES = expandUnitToFifty(GRADE_2_UNIT_1_BASE_SENTENCES.filter(
   sentence => !['g2u1s12', 'g2u1s24', 'g2u1s28', 'g2u1s32', 'g2u1s36', 'g2u1s39', 'g2u1s44', 'g2u1s48'].includes(sentence.id),
-);
+), 'g2u1');
 
 const GRADE_2_UNIT_2_BASE_SENTENCES: Grade['units'][0]['sentences'] = [
   { id: "g2u2s1", japaneseQuestion: "私が帰宅したとき、母は料理をしていました。", words: ["When", "I", "came", "home", ",", "my", "mother", "was", "cooking", "."], grammarTag: "when 〜 の文", explanation: "「〜とき」と時を表す接続詞です。" },
@@ -167,11 +168,11 @@ const GRADE_2_UNIT_2_BASE_SENTENCES: Grade['units'][0]['sentences'] = [
 ];
 
 // 現行Unit 2の学習事項（when / if / because / that）だけを出題する。
-export const GRADE_2_UNIT_2_SENTENCES = GRADE_2_UNIT_2_BASE_SENTENCES.filter(
+export const GRADE_2_UNIT_2_SENTENCES = expandUnitToFifty(GRADE_2_UNIT_2_BASE_SENTENCES.filter(
   sentence => !sentence.grammarTag.includes('May I')
     && !sentence.grammarTag.includes('Could you')
     && !sentence.grammarTag.includes('過去完了'),
-);
+), 'g2u2');
 
 export const GRADE_2_UNIT_3_SENTENCES: Grade['units'][0]['sentences'] = [
   { id: "g2u3s1", japaneseQuestion: "私は本を借りるために図書館へ行きました。", words: ["I", "went", "to", "the", "library", "to", "borrow", "some", "books", "."], grammarTag: "to + 動詞の原形「〜するために」", explanation: "to borrow ... が、図書館へ行った目的を表します。" },
@@ -333,9 +334,9 @@ const GRADE_2_UNIT_5_BASE_SENTENCES: Grade['units'][0]['sentences'] = [
 ];
 
 // 中3範囲の現在完了と、現行Unit 5の型から外れる旧問題を除外する。
-export const GRADE_2_UNIT_5_SENTENCES = GRADE_2_UNIT_5_BASE_SENTENCES.filter(
+export const GRADE_2_UNIT_5_SENTENCES = expandUnitToFifty(GRADE_2_UNIT_5_BASE_SENTENCES.filter(
   sentence => !['g2u5s17', 'g2u5s48'].includes(sentence.id),
-);
+), 'g2u5');
 
 export const GRADE_2_UNIT_6_SENTENCES: Grade['units'][0]['sentences'] = [
   { id: "g2u6s1", japaneseQuestion: "ケンはトムより背が高いです。", words: ["Ken", "is", "taller", "than", "Tom", "."], grammarTag: "比較級 (-er)", explanation: "「〜より…だ」と二つのものを比べる表現です。" },
@@ -455,5 +456,5 @@ export const GRADE_2_UNITS: Grade['units'] = [
     { id: 'u4', title: 'Unit 4: What is important in a homestay?', sentences: GRADE_2_UNIT_4_SENTENCES },
     { id: 'u5', title: 'Unit 5: What design is good for everyone?', sentences: GRADE_2_UNIT_5_SENTENCES },
     { id: 'u6', title: 'Unit 6: How can we make a good presentation?', sentences: GRADE_2_UNIT_6_SENTENCES },
-    { id: 'u7', title: 'Unit 7: What are World Heritage sites and their problems?', sentences: GRADE_2_UNIT_7_SENTENCES },
+    { id: 'u7', title: 'Unit 7: What are World Heritage sites and their problems?', sentences: GRADE_2_UNIT_7_SENTENCES.slice(0, 50) },
 ];
