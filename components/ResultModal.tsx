@@ -9,6 +9,7 @@ import { speakText } from '../services/speechService';
 import { playCorrectSound, playIncorrectSound } from '../services/soundService';
 import { useAppContext } from '../contexts/AppContext';
 import SpeakerWaveIcon from './shared/SpeakerWaveIcon';
+import { classifyWeakness, getSentenceDifficulty } from '../services/sentenceLearningService';
 
 interface ResultModalProps {
   isOpen: boolean;
@@ -102,6 +103,7 @@ const ResultModal: React.FC<ResultModalProps> = ({
               <div>
                 <h4 className="text-md font-semibold text-sky-700 mb-1">{sentence.grammarTag}</h4>
                 <p className="text-sm text-sky-600">{sentence.explanation}</p>
+                <p className="text-xs font-semibold text-sky-800 mt-2">難易度：{getSentenceDifficulty(sentence)}</p>
               </div>
             </div>
           </div>
@@ -129,6 +131,11 @@ const ResultModal: React.FC<ResultModalProps> = ({
             <XCircleIcon className="w-16 h-16 text-red-500 mb-4" />
             <h2 className="text-3xl font-bold text-red-600 mb-2">不正解！</h2>
             <p className="text-slate-600 mb-6">もう一度挑戦してみましょう。</p>
+          </div>
+
+          <div className="rounded-lg bg-amber-50 border border-amber-200 p-4 text-sm text-amber-900">
+            <p className="font-bold">見直すポイント：{classifyWeakness(sentence)}</p>
+            <p className="mt-1">{sentence.explanation}</p>
           </div>
 
           <div className="flex justify-center mt-8">
