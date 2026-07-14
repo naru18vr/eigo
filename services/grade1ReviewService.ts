@@ -7,7 +7,6 @@ const SELECTION_KEY = 'grade1DailySelectionV1';
 export type Grade1ReviewProgress = { date: string; answers: boolean[]; completedAt?: string };
 export type Grade1Selection = { wordIndexes: number[]; grammarIndexes: number[] };
 
-const hash = (value: string) => [...value].reduce((result, character) => Math.imul(result ^ character.charCodeAt(0), 16777619) >>> 0, 2166136261);
 const coverage = () => { try { return JSON.parse(localStorage.getItem(COVERAGE_KEY) || '{}') as Record<string, number>; } catch { return {}; } };
 
 export const getGrade1DailyItems = (date = localDateKey()) => {
@@ -17,8 +16,8 @@ export const getGrade1DailyItems = (date = localDateKey()) => {
   } catch { /* choose again */ }
   const seen = typeof localStorage === 'undefined' ? {} : coverage();
   const pick = <T extends { word?: string; title?: string; question?: string }>(items: T[], count: number, prefix: string) => items
-    .map((item, index) => ({ item, index, count: seen[`${prefix}-${index}`] || 0, order: hash(`${date}-${prefix}-${index}`) }))
-    .sort((a, b) => a.count - b.count || a.order - b.order)
+    .map((item, index) => ({ item, index, count: seen[`${prefix}-${index}`] || 0 }))
+    .sort((a, b) => a.count - b.count || a.index - b.index)
     .slice(0, count);
   const result = { words: pick(grade1ReviewWords, 3, 'word'), grammar: pick(grade1GrammarTopics, 3, 'grammar') };
   if (typeof localStorage !== 'undefined') localStorage.setItem(SELECTION_KEY, JSON.stringify({ date, wordIndexes: result.words.map(item => item.index), grammarIndexes: result.grammar.map(item => item.index) }));
@@ -45,6 +44,8 @@ export const saveGrade1Review = (progress: Grade1ReviewProgress) => {
   if (!progress.completedAt) return;
   const items = getGrade1DailyItems(progress.date);
   const next = coverage();
-  [...items.words.map(item => `word-${item.index}`), ...items.grammar.map(item => `grammar-${item.index}`)].forEach(id => { next[id] = (next[id] || 0) + 1; });
+  [...items.words.map(item => `word-${item.index}`), ...items.grammar.map(item => `grammar-${item.index}`)].forEach((id, index) => {
+    if (progress.answers[index]) next[id] = (next[id] || 0) + 1;
+  });
   localStorage.setItem(COVERAGE_KEY, JSON.stringify(next));
 };
