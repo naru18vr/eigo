@@ -20,6 +20,7 @@ import Eiken4MockPage from './pages/Eiken4MockPage';
 import Eiken4ProgressPage from './pages/Eiken4ProgressPage';
 import Eiken4ExamPracticePage from './pages/Eiken4ExamPracticePage';
 import GuidePage from './pages/GuidePage';
+import Eiken4WorksheetPage from './pages/Eiken4WorksheetPage';
 
 const App: React.FC = () => {
   return (
@@ -45,6 +46,7 @@ const App: React.FC = () => {
             <Route path="/eiken4/words/quiz" element={<Eiken4WordQuizPage />} />
             <Route path="/eiken4/sentences" element={<Eiken4SentencesPage />} />
             <Route path="/eiken4/result" element={<Eiken4ResultPage />} />
+            <Route path="/eiken4/worksheet" element={<Eiken4WorksheetPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
