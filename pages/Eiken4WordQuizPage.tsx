@@ -6,6 +6,8 @@ import { eiken4Words, Eiken4Word } from '../data/eiken4Words';
 import { useEiken4Session } from '../contexts/Eiken4SessionContext';
 import SpeakerWaveIcon from '../components/shared/SpeakerWaveIcon';
 import { speakText } from '../services/speechService';
+import { useAppContext } from '../contexts/AppContext';
+import { playCorrectSound, playIncorrectSound } from '../services/soundService';
 
 const QUIZ_COUNT = 10;
 
@@ -28,6 +30,7 @@ const makeChoices = (target: Eiken4Word) => {
 const Eiken4WordQuizPage: React.FC = () => {
   const navigate = useNavigate();
   const { completeWordQuiz } = useEiken4Session();
+  const { isSoundEnabled } = useAppContext();
   const quizWords = useMemo(() => shuffleArray(eiken4Words).slice(0, QUIZ_COUNT), []);
   const [index, setIndex] = useState(0);
   const [choices, setChoices] = useState<string[]>(() => makeChoices(quizWords[0]));
@@ -42,6 +45,7 @@ const Eiken4WordQuizPage: React.FC = () => {
 
   const checkAnswer = () => {
     const correct = selected === current.meaning;
+    if (isSoundEnabled) (correct ? playCorrectSound : playIncorrectSound)();
     setIsCorrect(correct);
     setChecked(true);
   };
