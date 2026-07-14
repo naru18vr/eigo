@@ -9,6 +9,7 @@ import { isSpeechSupported, speakText } from '../services/speechService';
 import { useAppContext } from '../contexts/AppContext';
 import { playCorrectSound, playIncorrectSound } from '../services/soundService';
 import { createWorksheetShareLink, downloadDailyWorksheet } from '../services/eiken4WorksheetService';
+import { loadReadingProgress } from '../services/eiken4ReadingService';
 
 const Eiken4DailyPage: React.FC = () => {
   const navigate = useNavigate();
@@ -83,7 +84,7 @@ const Eiken4DailyPage: React.FC = () => {
     const downloadWorksheet = async () => {
       setPdfStatus('making');
       try {
-        await downloadDailyWorksheet(progress);
+        await downloadDailyWorksheet(progress, loadReadingProgress());
         setPdfStatus('idle');
       } catch {
         setPdfStatus('error');
@@ -91,7 +92,8 @@ const Eiken4DailyPage: React.FC = () => {
     };
     const copyParentMessage = async () => {
       const score = progress.answers.filter(answer => answer.correct).length;
-      const message = `今日の15分を完了しました！\n正解：${score} / ${progress.questionIds.length}問\n今日の類題プリントはこちら\n${createWorksheetShareLink(progress)}`;
+      const reading = loadReadingProgress();
+      const message = `今日の15分を完了しました！\n正解：${score} / ${progress.questionIds.length}問${reading.completedAt ? '\nミニ長文も完了しました！' : ''}\n今日の類題プリントはこちら\n${createWorksheetShareLink(progress, reading)}`;
       try {
         if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(message);
         else {
