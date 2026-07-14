@@ -27,7 +27,7 @@ export const GRADES_DATA: Grade[] = [
   },
   {
     id: 'grade3',
-    name: '中学3年生',
+    name: '中学3年生（NEW HORIZON 2025）',
     iconColor: 'bg-indigo-500',
     units: GRADE_3_UNITS,
     aiDefaultConfig: {
