@@ -4,6 +4,7 @@ import { recordEiken4Activity } from './eiken4ProgressService';
 
 const KEY = 'eiken4DailyReadingV1';
 const HISTORY_KEY = 'eiken4ReadingCoverageV1';
+const WEAK_KEY = 'eiken4ReadingWeakV1';
 export type ReadingProgress = { date: string; readingId: string; answers: string[]; completedAt?: string };
 
 export const getTodayReading = () => {
@@ -17,7 +18,17 @@ export const getTodayReading = () => {
   let history: string[] = [];
   if (typeof localStorage !== 'undefined') try { history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch { /* start fresh */ }
   const counts = history.reduce((result, id) => { result[id] = (result[id] || 0) + 1; return result; }, {} as Record<string, number>);
-  return eiken4Readings.map((reading, index) => ({ reading, index, count: counts[reading.id] || 0 })).sort((a, b) => a.count - b.count || a.index - b.index)[0].reading;
+  let weak: Record<string, number> = {};
+  if (typeof localStorage !== 'undefined') try { weak = JSON.parse(localStorage.getItem(WEAK_KEY) || '{}'); } catch { /* repair below */ }
+  return eiken4Readings.map((reading, index) => ({ reading, index, count: counts[reading.id] || 0, weak: weak[reading.id] || 0 })).sort((a, b) => b.weak - a.weak || a.count - b.count || a.index - b.index)[0].reading;
+};
+
+export const recordReadingAnswer = (readingId: string, correct: boolean) => {
+  if (typeof localStorage === 'undefined') return;
+  let weak: Record<string, number> = {};
+  try { weak = JSON.parse(localStorage.getItem(WEAK_KEY) || '{}'); } catch { /* start fresh */ }
+  weak[readingId] = correct ? Math.max(0, (weak[readingId] || 0) - 1) : Math.min(9, (weak[readingId] || 0) + 2);
+  localStorage.setItem(WEAK_KEY, JSON.stringify(weak));
 };
 
 export const loadReadingProgress = (): ReadingProgress => {
