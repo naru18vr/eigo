@@ -1,16 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import ArrowLeftIcon from '../components/shared/ArrowLeftIcon';
 import CheckCircleIcon from '../components/shared/CheckCircleIcon';
 import ChevronRightIcon from '../components/shared/ChevronRightIcon';
-import { loadGrade1Review } from '../services/grade1ReviewService';
-import { loadDailyProgress } from '../services/eiken4DailyService';
-import { loadReadingProgress } from '../services/eiken4ReadingService';
-import { isWordQuizDoneToday } from '../services/eiken4WordMasteryService';
+import { loadGrade1Review, resetTodayGrade1Review } from '../services/grade1ReviewService';
+import { loadDailyProgress, resetTodayDailyProgress } from '../services/eiken4DailyService';
+import { loadReadingProgress, resetTodayReadingProgress } from '../services/eiken4ReadingService';
+import { isWordQuizDoneToday, resetTodayWordCourse } from '../services/eiken4WordMasteryService';
+import { useEiken4Session } from '../contexts/Eiken4SessionContext';
 
 const Eiken4DailyCoursePage: React.FC = () => {
   const navigate = useNavigate();
+  const { resetSession } = useEiken4Session();
+  const [confirmReset, setConfirmReset] = useState(false);
+  const [, setResetVersion] = useState(0);
   const grade1Done = Boolean(loadGrade1Review().completedAt);
   const dailyDone = Boolean(loadDailyProgress().completedAt);
   const readingDone = Boolean(loadReadingProgress().completedAt);
@@ -25,6 +29,16 @@ const Eiken4DailyCoursePage: React.FC = () => {
   const nextIndex = steps.findIndex(step => !step.done);
   const next = steps[nextIndex < 0 ? steps.length - 1 : nextIndex];
   const completed = steps.slice(0, 4).filter(step => step.done).length;
+  const resetToday = () => {
+    if (!confirmReset) { setConfirmReset(true); return; }
+    resetTodayGrade1Review();
+    resetTodayDailyProgress();
+    resetTodayReadingProgress();
+    resetTodayWordCourse();
+    resetSession();
+    setConfirmReset(false);
+    setResetVersion(value => value + 1);
+  };
   return <div className="flex-grow container mx-auto p-4 sm:p-6 max-w-xl">
     <Button onClick={() => navigate('/eiken4')} variant="ghost" size="sm"><ArrowLeftIcon className="h-5 w-5 mr-2"/>英検4級に戻る</Button>
     <header className="mt-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white p-6 shadow-lg">
@@ -38,6 +52,8 @@ const Eiken4DailyCoursePage: React.FC = () => {
       </button>;
     })}</div>
     <Button onClick={() => navigate(next.path)} className="w-full mt-6" size="lg">{nextIndex === 4 ? '結果と印刷リンクを開く' : `次の「${next.title}」を始める`}</Button>
+    {completed > 0 && <Button onClick={resetToday} variant={confirmReset ? 'danger' : 'secondary'} className="w-full mt-3">{confirmReset ? '本当に今日のコースをやり直す' : '今日のコースをやり直す'}</Button>}
+    {confirmReset && <p className="text-xs text-center text-rose-600 mt-2">もう一度押すと今日の4ステップだけ未完了に戻ります。累積の定着記録は残ります。</p>}
     <p className="text-xs text-center text-slate-500 mt-3">本番形式10問とミニ模試は、余裕のある日だけで大丈夫です。</p>
   </div>;
 };
