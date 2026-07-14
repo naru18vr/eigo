@@ -33,6 +33,8 @@ const Eiken4SentencesPage: React.FC = () => {
   const [builtWords, setBuiltWords] = useState<string[]>([]);
   const [wordBank, setWordBank] = useState<string[]>(() => shuffleArray(questions[0].words));
   const [checked, setChecked] = useState(false);
+  const [attempts, setAttempts] = useState(0);
+  const [retrying, setRetrying] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [correctCount, setCorrectCount] = useState(0);
   const [weakPoints, setWeakPoints] = useState<string[]>([]);
@@ -55,9 +57,13 @@ const Eiken4SentencesPage: React.FC = () => {
   const checkAnswer = () => {
     const correct = builtWords.join(' ') === current.words.join(' ');
     if (isSoundEnabled) (correct ? playCorrectSound : playIncorrectSound)();
-    recordSentenceLearning('eiken4', 'sentences', current, correct);
+    const nextAttempts = attempts + 1;
+    setAttempts(nextAttempts);
     setIsCorrect(correct);
+    if (!correct && nextAttempts < 3) { setRetrying(true); return; }
+    recordSentenceLearning('eiken4', 'sentences', current, correct);
     setChecked(true);
+    setRetrying(false);
     if (correct) {
       setCorrectCount(prev => prev + 1);
     } else {
@@ -79,6 +85,8 @@ const Eiken4SentencesPage: React.FC = () => {
     setWordBank(shuffleArray(questions[nextIndex].words));
     setChecked(false);
     setIsCorrect(false);
+    setAttempts(0);
+    setRetrying(false);
   };
 
   return (
@@ -123,6 +131,8 @@ const Eiken4SentencesPage: React.FC = () => {
             <Button onClick={nextQuestion} variant="primary" size="lg" className="w-full sm:w-auto">
               {isLast ? '結果を見る' : '次の問題へ'}
             </Button>
+          ) : retrying ? (
+            <div className="rounded-xl bg-amber-50 p-4"><p className="font-bold text-amber-800">不正解。正解はまだ見せません（{attempts}/3回）</p><Button onClick={() => { setBuiltWords([]); setWordBank(shuffleArray(current.words)); setRetrying(false); }} variant="secondary" className="mt-3 w-full">もう一度並べる</Button></div>
           ) : (
             <Button onClick={checkAnswer} disabled={builtWords.length === 0} variant="primary" size="lg" className="w-full sm:w-auto">
               答え合わせ
