@@ -1,24 +1,28 @@
 import { eiken4CoreExamQuestions, eiken4CoreSentences } from '../data/eiken4Curriculum';
 import { eiken4ListeningQuestions } from '../data/eiken4Listening';
 import { eiken4Words } from '../data/eiken4Words';
+import { eiken4Readings } from '../data/eiken4Readings';
 import { DailyProgress, getQuestionById } from './eiken4DailyService';
+import type { ReadingProgress } from './eiken4ReadingService';
 
-export type WorksheetShareData = Pick<DailyProgress, 'date' | 'questionIds' | 'answers'>;
+export type WorksheetShareData = Pick<DailyProgress, 'date' | 'questionIds' | 'answers'> & { reading?: ReadingProgress };
+export type SharedWorksheet = { progress: DailyProgress; reading?: ReadingProgress };
 
-export const createWorksheetShareLink = (progress: DailyProgress) => {
-  const data: WorksheetShareData = { date: progress.date, questionIds: progress.questionIds, answers: progress.answers };
+export const createWorksheetShareLink = (progress: DailyProgress, reading?: ReadingProgress) => {
+  const data: WorksheetShareData = { date: progress.date, questionIds: progress.questionIds, answers: progress.answers, ...(reading?.completedAt ? { reading } : {}) };
   const encoded = btoa(JSON.stringify(data));
   return `${window.location.href.split('#')[0]}#/eiken4/worksheet?data=${encodeURIComponent(encoded)}`;
 };
 
-export const parseWorksheetShareData = (encoded: string | null): DailyProgress | null => {
+export const parseWorksheetShareData = (encoded: string | null): SharedWorksheet | null => {
   if (!encoded) return null;
   try {
     const data = JSON.parse(atob(decodeURIComponent(encoded))) as WorksheetShareData;
     if (!/^\d{4}-\d{2}-\d{2}$/.test(data.date) || !Array.isArray(data.questionIds) || !Array.isArray(data.answers)) return null;
     if (data.questionIds.length < 1 || data.questionIds.length > 20) return null;
     if (data.questionIds.some(id => typeof id !== 'string' || !getQuestionById(id, data.date))) return null;
-    return { ...data, retryIds: [], retryAnswers: [], completedAt: data.date };
+    const reading = data.reading?.completedAt && eiken4Readings.some(item => item.id === data.reading?.readingId) ? data.reading : undefined;
+    return { progress: { date: data.date, questionIds: data.questionIds, answers: data.answers, retryIds: [], retryAnswers: [], completedAt: data.date }, reading };
   } catch {
     return null;
   }
@@ -62,12 +66,15 @@ const makeWorksheet = (progress: DailyProgress): WorksheetQuestion[] => {
       if (used.has(id)) return false;
       const question = getQuestionById(id, progress.date);
       if (!question || !source) return false;
+      if (sourceId.startsWith('listening-')) return id.startsWith('exam-') && question.kind === '会話文空所補充';
       if (sourceWord && id.startsWith('word-')) {
         return eiken4Words.find(item => `word-${item.id}` === id)?.category === sourceWord.category;
       }
       return question.kind === source.kind || (sourceId.startsWith('sentence-') && id.startsWith('sentence-') && question.detail === source.detail);
     });
-    const fallback = candidateIds.filter(id => !used.has(id) && id.split('-')[0] === sourceId.split('-')[0]);
+    const fallback = sourceId.startsWith('listening-')
+      ? candidateIds.filter(id => !used.has(id) && id.startsWith('sentence-'))
+      : candidateIds.filter(id => !used.has(id) && id.split('-')[0] === sourceId.split('-')[0]);
     const pool = matches.length ? matches : fallback;
     const pickedId = pool[hash(`${progress.date}-${sourceId}-${index}`) % Math.max(pool.length, 1)] || sourceId;
     used.add(pickedId);
@@ -76,7 +83,7 @@ const makeWorksheet = (progress: DailyProgress): WorksheetQuestion[] => {
       id: picked.id,
       kind: picked.kind,
       prompt: picked.prompt,
-      detail: pickedId.startsWith('listening-') ? `英文：${picked.transcript?.replace(/\n/g, ' / ') || ''}` : picked.detail,
+      detail: picked.detail,
       choices: picked.choices,
       answer: picked.answer,
       explanation: picked.explanation || '答えと文の意味をもう一度確認しましょう。',
@@ -128,14 +135,18 @@ const drawHeader = (context: CanvasRenderingContext2D, date: string, page: strin
   context.beginPath(); context.moveTo(70, 165); context.lineTo(1170, 165); context.stroke();
 };
 
-export const downloadDailyWorksheet = async (progress: DailyProgress) => {
+export const downloadDailyWorksheet = async (progress: DailyProgress, readingProgress?: ReadingProgress) => {
   const { jsPDF } = await import('jspdf');
   const questions = makeWorksheet(progress);
   const pages: HTMLCanvasElement[] = [];
+  const sourceReading = readingProgress?.completedAt ? eiken4Readings.find(item => item.id === readingProgress.readingId) : undefined;
+  const similarReadings = sourceReading ? eiken4Readings.filter(item => item.id !== sourceReading.id && item.type === sourceReading.type) : [];
+  const similarReading = sourceReading ? (similarReadings[hash(`${progress.date}-${sourceReading.id}`) % Math.max(similarReadings.length, 1)] || eiken4Readings.find(item => item.id !== sourceReading.id)) : undefined;
+  const pageCount = similarReading ? 5 : 4;
 
   for (let pageIndex = 0; pageIndex < 3; pageIndex++) {
     const { canvas, context } = createPage();
-    drawHeader(context, progress.date, `${pageIndex + 1} / 4`);
+    drawHeader(context, progress.date, `${pageIndex + 1} / ${pageCount}`);
     let y = 205;
     questions.slice(pageIndex * 5, pageIndex * 5 + 5).forEach((question, localIndex) => {
       const number = pageIndex * 5 + localIndex + 1;
@@ -162,8 +173,26 @@ export const downloadDailyWorksheet = async (progress: DailyProgress) => {
     pages.push(canvas);
   }
 
+  if (similarReading) {
+    const { canvas, context } = createPage();
+    drawHeader(context, progress.date, `4 / ${pageCount}`);
+    context.font = 'bold 27px sans-serif';
+    context.fillStyle = '#0f172a';
+    context.fillText(`16.［長文・${similarReading.type}］${similarReading.title}`, 70, 205);
+    context.font = '24px sans-serif';
+    let y = drawLines(context, similarReading.passage, 80, 255, 1080, 36) + 28;
+    similarReading.questions.forEach((question, index) => {
+      context.font = 'bold 23px sans-serif';
+      y = drawLines(context, `問${index + 1}　${question.question}`, 80, y, 1080, 33) + 8;
+      context.font = '22px sans-serif';
+      question.choices.forEach((choice, choiceIndex) => { y = drawLines(context, `${choiceIndex + 1}) ${choice}`, 105, y, 1030, 30) + 3; });
+      y += 24;
+    });
+    pages.push(canvas);
+  }
+
   const { canvas: answerPage, context } = createPage();
-  drawHeader(context, progress.date, '4 / 4', true);
+  drawHeader(context, progress.date, `${pageCount} / ${pageCount}`, true);
   let y = 200;
   questions.forEach((question, index) => {
     context.font = 'bold 22px sans-serif';
@@ -173,6 +202,19 @@ export const downloadDailyWorksheet = async (progress: DailyProgress) => {
     context.fillStyle = '#475569';
     y = drawLines(context, question.explanation, 95, y + 2, 1075, 27) + 12;
   });
+  if (similarReading) {
+    context.font = 'bold 22px sans-serif';
+    context.fillStyle = '#111827';
+    y = drawLines(context, '16. 長文', 70, y + 8, 1100, 30);
+    similarReading.questions.forEach((question, index) => {
+      y = drawLines(context, `問${index + 1} ${question.answer}`, 95, y + 3, 1075, 28);
+      context.font = '19px sans-serif';
+      context.fillStyle = '#475569';
+      y = drawLines(context, `${question.explanation} 根拠：${question.evidence}`, 115, y + 2, 1055, 27) + 8;
+      context.font = 'bold 22px sans-serif';
+      context.fillStyle = '#111827';
+    });
+  }
   pages.push(answerPage);
 
   const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
