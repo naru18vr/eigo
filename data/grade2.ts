@@ -55,7 +55,7 @@ export const GRADE_2_UNIT_0_SENTENCES: Grade['units'][0]['sentences'] = [
   { id: "g2u0s50", japaneseQuestion: "その事故のとき、たくさんの車がありました。", words: ["There", "were", "a", "lot", "of", "cars", "at", "the", "time", "of", "the", "accident", "."], grammarTag: "There were ~.の文", explanation: "特定の状況における物の存在を表します。" },
 ];
 
-export const GRADE_2_UNIT_1_SENTENCES: Grade['units'][0]['sentences'] = [
+const GRADE_2_UNIT_1_BASE_SENTENCES: Grade['units'][0]['sentences'] = [
   { id: "g2u1s1", japaneseQuestion: "私は明日、叔母を訪ねる予定です。", words: ["I", "am", "going", "to", "visit", "my", "aunt", "tomorrow", "."], grammarTag: "be going to 〜", explanation: "未来の予定や意図を表すときに使います。" },
   { id: "g2u1s2", japaneseQuestion: "あなたはこの週末に何をしますか？", words: ["What", "are", "you", "going", "to", "do", "this", "weekend", "?"], grammarTag: "be going to 〜 の疑問文", explanation: "未来の予定を尋ねる疑問文です。" },
   { id: "g2u1s3", japaneseQuestion: "彼は明日のパーティーに来る予定ではありません。", words: ["He", "is", "not", "going", "to", "come", "to", "the", "party", "tomorrow", "."], grammarTag: "be going to 〜 の否定文", explanation: "be not going to＋動詞の原形で、予定や意図を否定します。" },
@@ -108,7 +108,12 @@ export const GRADE_2_UNIT_1_SENTENCES: Grade['units'][0]['sentences'] = [
   { id: "g2u1s50", japaneseQuestion: "私は絶対にあなたを忘れません。", words: ["I", "will", "never", "forget", "you", "."], grammarTag: "will 〜 の文", explanation: "never を使って強い意志の否定を表します。" },
 ];
 
-export const GRADE_2_UNIT_2_SENTENCES: Grade['units'][0]['sentences'] = [
+// 2025年度版 Unit 1 は未来表現・SVOO・SVOC（C=名詞）が中心。
+export const GRADE_2_UNIT_1_SENTENCES = GRADE_2_UNIT_1_BASE_SENTENCES.filter(
+  sentence => !['g2u1s12', 'g2u1s24', 'g2u1s28', 'g2u1s32', 'g2u1s36', 'g2u1s39', 'g2u1s44', 'g2u1s48'].includes(sentence.id),
+);
+
+const GRADE_2_UNIT_2_BASE_SENTENCES: Grade['units'][0]['sentences'] = [
   { id: "g2u2s1", japaneseQuestion: "私が帰宅したとき、母は料理をしていました。", words: ["When", "I", "came", "home", ",", "my", "mother", "was", "cooking", "."], grammarTag: "when 〜 の文", explanation: "「〜とき」と時を表す接続詞です。" },
   { id: "g2u2s2", japaneseQuestion: "もし明日晴れたら、私たちはピクニックに行きます。", words: ["If", "it", "is", "sunny", "tomorrow", ",", "we", "will", "go", "on", "a", "picnic", "."], grammarTag: "if 〜 の文", explanation: "「もし〜ならば」と条件を表す接続詞です。" },
   { id: "g2u2s3", japaneseQuestion: "私は彼は正しいと思います。", words: ["I", "think", "that", "he", "is", "right", "."], grammarTag: "I think that 〜. の文", explanation: "「〜だと思う」と意見や考えを述べるときに使います。thatは省略できます。" },
@@ -160,6 +165,13 @@ export const GRADE_2_UNIT_2_SENTENCES: Grade['units'][0]['sentences'] = [
   { id: "g2u2s49", japaneseQuestion: "もし急げば、電車に間に合うでしょう。", words: ["If", "you", "hurry", ",", "you", "will", "catch", "the", "train", "."], grammarTag: "if 〜 の文", explanation: "条件とその結果を述べています。" },
   { id: "g2u2s50", japaneseQuestion: "彼は疲れていたので、早く寝ました。", words: ["Because", "he", "was", "tired", ",", "he", "went", "to", "bed", "early", "."], grammarTag: "Because 〜 の文", explanation: "理由を先に述べる場合、because節の後にコンマを置きます。" },
 ];
+
+// 現行Unit 2の学習事項（when / if / because / that）だけを出題する。
+export const GRADE_2_UNIT_2_SENTENCES = GRADE_2_UNIT_2_BASE_SENTENCES.filter(
+  sentence => !sentence.grammarTag.includes('May I')
+    && !sentence.grammarTag.includes('Could you')
+    && !sentence.grammarTag.includes('過去完了'),
+);
 
 export const GRADE_2_UNIT_3_SENTENCES: Grade['units'][0]['sentences'] = [
   { id: "g2u3s1", japaneseQuestion: "私は本を借りるために図書館へ行きました。", words: ["I", "went", "to", "the", "library", "to", "borrow", "some", "books", "."], grammarTag: "to + 動詞の原形「〜するために」", explanation: "to borrow ... が、図書館へ行った目的を表します。" },
@@ -267,7 +279,7 @@ export const GRADE_2_UNIT_4_SENTENCES: Grade['units'][0]['sentences'] = [
   { id: "g2u4s50", japaneseQuestion: "あなたはシートベルトを締めなければなりません。", words: ["You", "must", "fasten", "your", "seatbelt", "."], grammarTag: "must 〜 の文", explanation: "規則による強い義務を表します。"}
 ];
 
-export const GRADE_2_UNIT_5_SENTENCES: Grade['units'][0]['sentences'] = [
+const GRADE_2_UNIT_5_BASE_SENTENCES: Grade['units'][0]['sentences'] = [
   { id: "g2u5s1", japaneseQuestion: "この機械の使い方を教えてください。", words: ["Please", "show", "me", "how", "to", "use", "this", "machine", "."], grammarTag: "how to 〜", explanation: "「〜の仕方」という意味で、方法を表します。" },
   { id: "g2u5s2", japaneseQuestion: "次に何をすべきか分かりません。", words: ["I", "don't", "know", "what", "to", "do", "next", "."], grammarTag: "what to 〜", explanation: "「何を〜すべきか」という意味で、名詞句を作ります。" },
   { id: "g2u5s3", japaneseQuestion: "あなたは成功すると私は確信しています。", words: ["I'm", "sure", "that", "you", "will", "succeed", "."], grammarTag: "I'm sure that 〜", explanation: "「〜だと確信している」と強い確信を表します。" },
@@ -319,6 +331,11 @@ export const GRADE_2_UNIT_5_SENTENCES: Grade['units'][0]['sentences'] = [
   { id: "g2u5s49", japaneseQuestion: "私は休暇をどう過ごすかについて考えています。", words: ["I'm", "thinking", "about", "how", "to", "spend", "my", "vacation", "."], grammarTag: "how to 〜", explanation: "計画を立てる際の思考を表します。" },
   { id: "g2u5s50", japaneseQuestion: "何をすべきか、彼らの助言は私が知る助けになりました。", words: ["Their", "advice", "helped", "me", "know", "what", "to", "do", "."], grammarTag: "what to 〜", explanation: "what to do は「何をすべきか」、helped me know は「知る助けになった」という意味です。" },
 ];
+
+// 中3範囲の現在完了と、現行Unit 5の型から外れる旧問題を除外する。
+export const GRADE_2_UNIT_5_SENTENCES = GRADE_2_UNIT_5_BASE_SENTENCES.filter(
+  sentence => !['g2u5s17', 'g2u5s48'].includes(sentence.id),
+);
 
 export const GRADE_2_UNIT_6_SENTENCES: Grade['units'][0]['sentences'] = [
   { id: "g2u6s1", japaneseQuestion: "ケンはトムより背が高いです。", words: ["Ken", "is", "taller", "than", "Tom", "."], grammarTag: "比較級 (-er)", explanation: "「〜より…だ」と二つのものを比べる表現です。" },
@@ -423,16 +440,20 @@ export const GRADE_2_UNIT_7_SENTENCES: Grade['units'][0]['sentences'] = [
   { id: "g2u7s47", japaneseQuestion: "すべてのドアは夜には施錠されます。", words: ["All", "the", "doors", "are", "locked", "at", "night", "."], grammarTag: "受け身 (be + 過去分詞)", explanation: "習慣や規則を表す受け身の文です。" },
   { id: "g2u7s48", japaneseQuestion: "そのコンサートのチケットは完売しました。", words: ["The", "tickets", "for", "the", "concert", "were", "sold", "out", "."], grammarTag: "不規則動詞の過去分詞", explanation: "sellの過去分詞はsoldです。be sold outで「完売する」。" },
   { id: "g2u7s49", japaneseQuestion: "この本は子供向けに書かれました。", words: ["This", "book", "was", "written", "for", "children", "."], grammarTag: "受け身 (be + 過去分詞)", explanation: "対象者をforで示します。" },
-  { id: "g2u7s50", japaneseQuestion: "そのケーキは誰によって作られましたか？", words: ["Who", "was", "the", "cake", "made", "by", "?"], grammarTag: "受け身の疑問文 (疑問詞)", explanation: "ケーキを作った人を尋ねています。" }
+  { id: "g2u7s50", japaneseQuestion: "そのケーキは誰によって作られましたか？", words: ["Who", "was", "the", "cake", "made", "by", "?"], grammarTag: "受け身の疑問文 (疑問詞)", explanation: "ケーキを作った人を尋ねています。" },
+  { id: "g2u7s51", japaneseQuestion: "この本は図書館で借りることができます。", words: ["This", "book", "can", "be", "borrowed", "from", "the", "library", "."], grammarTag: "助動詞 + 受け身", explanation: "助動詞の後は be＋過去分詞にして「〜されることができる」と表します。" },
+  { id: "g2u7s52", japaneseQuestion: "世界遺産は守らなければなりません。", words: ["World", "Heritage", "Sites", "must", "be", "protected", "."], grammarTag: "助動詞 + 受け身", explanation: "must be＋過去分詞で「〜されなければならない」と表します。" },
+  { id: "g2u7s53", japaneseQuestion: "この問題はすぐに解決されるべきです。", words: ["This", "problem", "should", "be", "solved", "soon", "."], grammarTag: "助動詞 + 受け身", explanation: "should be＋過去分詞で「〜されるべきだ」と表します。" },
+  { id: "g2u7s54", japaneseQuestion: "その古い建物は安全に利用できますか？", words: ["Can", "the", "old", "building", "be", "used", "safely", "?"], grammarTag: "助動詞 + 受け身の疑問文", explanation: "助動詞を文頭に置き、主語＋be＋過去分詞を続けます。" }
 ];
 
 export const GRADE_2_UNITS: Grade['units'] = [
-    { id: 'u0', title: 'Unit 0: １年生の復習', sentences: GRADE_2_UNIT_0_SENTENCES },
-    { id: 'u1', title: 'Unit 1: 未来の予定', sentences: GRADE_2_UNIT_1_SENTENCES },
-    { id: 'u2', title: 'Unit 2: 文をつなぐ言葉', sentences: GRADE_2_UNIT_2_SENTENCES },
-    { id: 'u3', title: 'Unit 3: 不定詞の使い方', sentences: GRADE_2_UNIT_3_SENTENCES },
-    { id: 'u4', title: 'Unit 4: 動名詞と助動詞', sentences: GRADE_2_UNIT_4_SENTENCES },
-    { id: 'u5', title: 'Unit 5: いろいろな疑問文', sentences: GRADE_2_UNIT_5_SENTENCES },
-    { id: 'u6', title: 'Unit 6: 比較する', sentences: GRADE_2_UNIT_6_SENTENCES },
-    { id: 'u7', title: 'Unit 7: World Heritage Sites', sentences: GRADE_2_UNIT_7_SENTENCES },
+    { id: 'u0', title: 'Unit 0: My Spring Vacation（中1の復習）', sentences: GRADE_2_UNIT_0_SENTENCES },
+    { id: 'u1', title: 'Unit 1: What can we experience on a trip?', sentences: GRADE_2_UNIT_1_SENTENCES },
+    { id: 'u2', title: 'Unit 2: What is local food?', sentences: GRADE_2_UNIT_2_SENTENCES },
+    { id: 'u3', title: 'Unit 3: What kind of job are you interested in?', sentences: GRADE_2_UNIT_3_SENTENCES },
+    { id: 'u4', title: 'Unit 4: What is important in a homestay?', sentences: GRADE_2_UNIT_4_SENTENCES },
+    { id: 'u5', title: 'Unit 5: What design is good for everyone?', sentences: GRADE_2_UNIT_5_SENTENCES },
+    { id: 'u6', title: 'Unit 6: How can we make a good presentation?', sentences: GRADE_2_UNIT_6_SENTENCES },
+    { id: 'u7', title: 'Unit 7: What are World Heritage sites and their problems?', sentences: GRADE_2_UNIT_7_SENTENCES },
 ];
