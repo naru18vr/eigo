@@ -3,6 +3,7 @@ import React, { Suspense, lazy } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Eiken4SessionProvider } from './contexts/Eiken4SessionContext';
 import LoadingSpinner from './components/shared/LoadingSpinner';
+import Eiken4DailyPage from './pages/Eiken4DailyPage';
 
 const HomePage = lazy(() => import('./pages/HomePage'));
 const UnitSelectPage = lazy(() => import('./pages/UnitSelectPage'));
@@ -16,7 +17,6 @@ const Eiken4WordCardsPage = lazy(() => import('./pages/Eiken4WordCardsPage'));
 const Eiken4WordQuizPage = lazy(() => import('./pages/Eiken4WordQuizPage'));
 const Eiken4SentencesPage = lazy(() => import('./pages/Eiken4SentencesPage'));
 const Eiken4ResultPage = lazy(() => import('./pages/Eiken4ResultPage'));
-const Eiken4DailyPage = lazy(() => import('./pages/Eiken4DailyPage'));
 const Eiken4ReadingPage = lazy(() => import('./pages/Eiken4ReadingPage'));
 const Eiken4MockPage = lazy(() => import('./pages/Eiken4MockPage'));
 const Eiken4ProgressPage = lazy(() => import('./pages/Eiken4ProgressPage'));
