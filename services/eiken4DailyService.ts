@@ -241,3 +241,9 @@ export const saveDailyProgress = (progress: DailyProgress) => {
   if (typeof localStorage !== 'undefined') localStorage.setItem(EIKEN4_DAILY_KEY, JSON.stringify(progress));
   if (progress.completedAt) recordEiken4Activity('daily', progress.date);
 };
+
+export const resetTodayDailyProgress = () => {
+  if (typeof localStorage === 'undefined') return;
+  [EIKEN4_DAILY_KEY, 'eiken4DailyProgressV3', 'eiken4DailyProgressV2', 'eiken4DailyProgressV1']
+    .forEach(key => localStorage.removeItem(key));
+};
