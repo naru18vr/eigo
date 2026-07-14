@@ -7,7 +7,7 @@ import SpeakerWaveIcon from '../components/shared/SpeakerWaveIcon';
 import { useAppContext } from '../contexts/AppContext';
 import { getTodayReading, loadReadingProgress, saveReadingProgress } from '../services/eiken4ReadingService';
 import { loadDailyProgress } from '../services/eiken4DailyService';
-import { createWorksheetShareLink } from '../services/eiken4WorksheetService';
+import { copyTextToClipboard, createWorksheetShareLink } from '../services/eiken4WorksheetService';
 import { playCorrectSound, playIncorrectSound } from '../services/soundService';
 import { speakText } from '../services/speechService';
 
@@ -18,6 +18,7 @@ const Eiken4ReadingPage: React.FC = () => {
   const [progress, setProgress] = useState(loadReadingProgress);
   const [selected, setSelected] = useState('');
   const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'error'>('idle');
+  const [parentMessage, setParentMessage] = useState('');
   const index = progress.answers.length;
   const complete = index >= reading.questions.length;
   const question = reading.questions[Math.min(index, reading.questions.length - 1)];
@@ -37,8 +38,8 @@ const Eiken4ReadingPage: React.FC = () => {
     const dailyScore = daily.answers.filter(item => item.correct).length;
     const readingScore = reading.questions.filter((item, i) => progress.answers[i] === item.answer).length;
     const message = `今日の15分とミニ長文を完了しました！\n15分：${dailyScore} / ${daily.questionIds.length}問\nミニ長文：${readingScore} / ${reading.questions.length}問\n今日の類題プリントはこちら\n${createWorksheetShareLink(daily, progress)}`;
-    try { await navigator.clipboard.writeText(message); setCopyStatus('copied'); }
-    catch { setCopyStatus('error'); }
+    setParentMessage(message);
+    setCopyStatus(await copyTextToClipboard(message) ? 'copied' : 'error');
   };
 
   return <div className="flex-grow container mx-auto p-4 sm:p-6 max-w-2xl">
@@ -56,7 +57,7 @@ const Eiken4ReadingPage: React.FC = () => {
       <div className="flex items-center"><BookOpenIcon className="h-7 w-7 text-emerald-700 mr-2" /><h2 className="text-xl font-bold text-emerald-800">今日の長文 完了！</h2></div>
       <p className="font-bold text-slate-700 mt-4">全文和訳</p><p className="text-slate-700 leading-7 mt-1">{reading.translation}</p>
       <div className="mt-5 space-y-4">{reading.questions.map((item, i) => <div key={item.question} className="rounded-lg bg-white p-4"><p className="font-bold">{i + 1}. {progress.answers[i] === item.answer ? '正解' : `正解：${item.answer}`}</p><p className="text-sm text-sky-800 mt-2">根拠：“{item.evidence}”</p><p className="text-sm text-slate-600 mt-1">{item.explanation}</p></div>)}</div>
-      <div className="mt-5 rounded-xl bg-amber-50 border border-amber-200 p-4"><p className="font-bold text-amber-900">保護者へ完了報告</p><p className="text-sm text-amber-900 mt-1">類似長文を含む印刷リンクをGoogle Chatへ送れます。</p><Button onClick={copyParentMessage} className="w-full mt-3">{copyStatus === 'copied' ? 'コピーしました！' : '結果と印刷リンクをコピー'}</Button>{copyStatus === 'error' && <p className="text-sm text-rose-700 font-bold mt-2">コピーできませんでした。Chromeの権限をご確認ください。</p>}</div>
+      <div className="mt-5 rounded-xl bg-amber-50 border border-amber-200 p-4"><p className="font-bold text-amber-900">保護者へ完了報告</p><p className="text-sm text-amber-900 mt-1">類似長文を含む印刷リンクをGoogle Chatへ送れます。</p><Button onClick={copyParentMessage} className="w-full mt-3">{copyStatus === 'copied' ? 'コピーしました！' : '結果と印刷リンクをコピー'}</Button>{copyStatus === 'copied' && <p className="text-sm text-emerald-700 font-bold mt-2">コピーしました！ Google Chatに貼り付けてください。</p>}{copyStatus === 'error' && <><p className="text-sm text-rose-700 font-bold mt-2">自動コピーできませんでした。下の文章を長押ししてコピーしてください。</p><textarea readOnly value={parentMessage} onFocus={event => event.currentTarget.select()} className="mt-2 w-full h-36 rounded-lg border border-amber-300 bg-white p-2 text-xs text-slate-700" aria-label="Google Chatへ送る文章" /></>}</div>
       <Button onClick={() => navigate('/eiken4')} className="w-full mt-5">英検4級ホームへ</Button>
     </section>}
   </div>;
