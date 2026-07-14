@@ -85,7 +85,7 @@ const makeWorksheet = (progress: DailyProgress): WorksheetQuestion[] => {
   const sourceIds = [...progress.questionIds].sort((a, b) => Number(wrongIds.has(b)) - Number(wrongIds.has(a)));
   const used = new Set(progress.questionIds);
 
-  return sourceIds.map((sourceId, index) => {
+  return sourceIds.slice(0, 15).map((sourceId, index) => {
     const source = getQuestionById(sourceId, progress.date);
     const sourceWord = sourceId.startsWith('word-') ? eiken4Words.find(item => `word-${item.id}` === sourceId) : undefined;
     const matches = candidateIds.filter(id => {
@@ -170,11 +170,30 @@ export const downloadDailyWorksheet = async (progress: DailyProgress, readingPro
     : eiken4Readings[hash(`${progress.date}-reading`) % eiken4Readings.length];
   const similarReadings = sourceReading ? eiken4Readings.filter(item => item.id !== sourceReading.id && item.type === sourceReading.type) : [];
   const similarReading = sourceReading ? (similarReadings[hash(`${progress.date}-${sourceReading.id}`) % Math.max(similarReadings.length, 1)] || eiken4Readings.find(item => item.id !== sourceReading.id)) : undefined;
-  const pageCount = 5;
+  const pageCount = 6;
+
+  const writingWords = progress.questionIds.filter(id => id.startsWith('word-')).map(id => eiken4Words.find(word => `word-${word.id}` === id)).filter((word): word is (typeof eiken4Words)[number] => Boolean(word));
+  const { canvas: writingPage, context: writingContext } = createPage();
+  drawHeader(writingContext, progress.date, `1 / ${pageCount}`);
+  writingContext.font = 'bold 28px sans-serif';
+  writingContext.fillText('今日の英単語　3回ずつ書こう', 70, 205);
+  let writingY = 260;
+  writingWords.forEach((word, index) => {
+    writingContext.font = 'bold 25px sans-serif'; writingContext.fillStyle = '#111827';
+    writingContext.fillText(`${index + 1}. ${word.word}（${word.meaning}）`, 75, writingY);
+    writingY += 42;
+    for (let line = 0; line < 3; line++) {
+      writingContext.strokeStyle = '#94a3b8'; writingContext.lineWidth = 2;
+      writingContext.beginPath(); writingContext.moveTo(95, writingY + 25); writingContext.lineTo(1160, writingY + 25); writingContext.stroke();
+      writingY += 42;
+    }
+    writingY += 12;
+  });
+  pages.push(writingPage);
 
   for (let pageIndex = 0; pageIndex < 3; pageIndex++) {
     const { canvas, context } = createPage();
-    drawHeader(context, progress.date, `${pageIndex + 1} / ${pageCount}`);
+    drawHeader(context, progress.date, `${pageIndex + 2} / ${pageCount}`);
     let y = 205;
     questions.slice(pageIndex * 5, pageIndex * 5 + 5).forEach((question, localIndex) => {
       const number = pageIndex * 5 + localIndex + 1;
@@ -203,7 +222,7 @@ export const downloadDailyWorksheet = async (progress: DailyProgress, readingPro
 
   if (similarReading) {
     const { canvas, context } = createPage();
-    drawHeader(context, progress.date, `4 / ${pageCount}`);
+    drawHeader(context, progress.date, `5 / ${pageCount}`);
     context.font = 'bold 27px sans-serif';
     context.fillStyle = '#0f172a';
     context.fillText(`16.［長文・${similarReading.type}］${similarReading.title}`, 70, 205);
