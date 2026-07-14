@@ -9,6 +9,7 @@ import ClockIcon from '../components/shared/ClockIcon';
 import { useEiken4Session } from '../contexts/Eiken4SessionContext';
 import { getDueReviewCount, loadDailyProgress } from '../services/eiken4DailyService';
 import { loadReadingProgress } from '../services/eiken4ReadingService';
+import { loadGrade1Review } from '../services/grade1ReviewService';
 
 const Eiken4HomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ const Eiken4HomePage: React.FC = () => {
   const dailyDone = Boolean(dailyProgress.completedAt);
   const dueReviewCount = getDueReviewCount();
   const readingProgress = loadReadingProgress();
+  const grade1Progress = loadGrade1Review();
 
   const startFresh = (path: string) => {
     resetSession();
@@ -63,7 +65,7 @@ const Eiken4HomePage: React.FC = () => {
         <button onClick={() => navigate('/eiken4/reading')} className="w-full p-5 rounded-xl shadow-lg bg-sky-600 text-white text-left hover:shadow-xl active:scale-95 transition-all">
           <div className="flex items-center justify-between"><div className="flex items-center"><BookOpenIcon className="h-9 w-9 mr-4"/><div><h2 className="text-xl font-bold">1日1題 ミニ長文</h2><p className="text-sm opacity-90">{readingProgress.completedAt ? '今日の長文は完了！' : readingProgress.answers.length ? '今日の続きをしよう' : '短い英文＋2問'}</p></div></div><ChevronRightIcon className="h-7 w-7 opacity-80"/></div>
         </button>
-        <button onClick={() => navigate('/eiken4/grade1-review')} className="w-full p-5 rounded-xl shadow-lg bg-amber-500 text-white text-left hover:shadow-xl active:scale-95 transition-all"><div className="flex items-center justify-between"><div><p className="text-xs font-bold opacity-90">英検4級につながる基礎を毎日5分</p><h2 className="text-xl font-bold">中1 単語・文法おさらい</h2><p className="text-sm opacity-90">頻出場面の単語3語＋必要文法3問</p></div><ChevronRightIcon className="h-7 w-7 opacity-80"/></div></button>
+        <button onClick={() => navigate('/eiken4/grade1-review')} className="w-full p-5 rounded-xl shadow-lg bg-amber-500 text-white text-left hover:shadow-xl active:scale-95 transition-all"><div className="flex items-center justify-between"><div><p className="text-xs font-bold opacity-90">英検4級につながる基礎を毎日5分</p><h2 className="text-xl font-bold">{grade1Progress.completedAt ? '中1おさらい 完了！' : grade1Progress.answers.length ? '中1おさらいの続きをする' : '中1 単語・文法おさらい'}</h2><p className="text-sm opacity-90">頻出場面の単語3語＋必要文法3問</p></div><div className="text-right"><span className="font-bold">{grade1Progress.answers.length} / 6</span><ChevronRightIcon className="h-7 w-7 ml-auto opacity-80"/></div></div></button>
 
         <button onClick={() => navigate('/eiken4/mock')} className="w-full p-5 rounded-xl shadow-lg bg-violet-700 text-white text-left hover:shadow-xl active:scale-95 transition-all">
           <div className="flex items-center justify-between"><div className="flex items-center"><ClockIcon className="h-9 w-9 mr-4"/><div><p className="text-xs font-bold opacity-80">週1回</p><h2 className="text-xl font-bold">10分ミニ模試</h2><p className="text-sm opacity-90">単語・文法・聞き取り・長文</p></div></div><ChevronRightIcon className="h-7 w-7 opacity-80"/></div>
