@@ -21,6 +21,7 @@ const Eiken4ReadingPage = lazy(() => import('./pages/Eiken4ReadingPage'));
 const Eiken4MockPage = lazy(() => import('./pages/Eiken4MockPage'));
 const Eiken4ProgressPage = lazy(() => import('./pages/Eiken4ProgressPage'));
 const Eiken4ExamPracticePage = lazy(() => import('./pages/Eiken4ExamPracticePage'));
+const GuidePage = lazy(() => import('./pages/GuidePage'));
 
 const App: React.FC = () => {
   return (
@@ -41,6 +42,7 @@ const App: React.FC = () => {
             <Route path="/eiken4/mock" element={<Eiken4MockPage />} />
             <Route path="/eiken4/progress" element={<Eiken4ProgressPage />} />
             <Route path="/eiken4/exam-practice" element={<Eiken4ExamPracticePage />} />
+            <Route path="/guide" element={<GuidePage />} />
             <Route path="/eiken4/words" element={<Eiken4WordCardsPage />} />
             <Route path="/eiken4/words/quiz" element={<Eiken4WordQuizPage />} />
             <Route path="/eiken4/sentences" element={<Eiken4SentencesPage />} />
