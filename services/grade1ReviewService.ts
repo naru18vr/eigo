@@ -40,6 +40,7 @@ export const loadGrade1Review = (): Grade1ReviewProgress => {
 };
 
 export const saveGrade1Review = (progress: Grade1ReviewProgress) => {
+  if (typeof localStorage === 'undefined') return;
   localStorage.setItem(KEY, JSON.stringify(progress));
   if (!progress.completedAt) return;
   const items = getGrade1DailyItems(progress.date);
