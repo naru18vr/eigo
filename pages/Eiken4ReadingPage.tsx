@@ -5,7 +5,7 @@ import ArrowLeftIcon from '../components/shared/ArrowLeftIcon';
 import BookOpenIcon from '../components/shared/BookOpenIcon';
 import SpeakerWaveIcon from '../components/shared/SpeakerWaveIcon';
 import { useAppContext } from '../contexts/AppContext';
-import { getTodayReading, loadReadingProgress, saveReadingProgress } from '../services/eiken4ReadingService';
+import { getTodayReading, loadReadingProgress, recordReadingAnswer, saveReadingProgress } from '../services/eiken4ReadingService';
 import { loadDailyProgress } from '../services/eiken4DailyService';
 import { copyTextToClipboard, createWorksheetShareLink } from '../services/eiken4WorksheetService';
 import { playCorrectSound, playIncorrectSound } from '../services/soundService';
@@ -33,6 +33,7 @@ const Eiken4ReadingPage: React.FC = () => {
     const nextAttempts = attempts + 1;
     setAttempts(nextAttempts);
     if (!correct && nextAttempts < 3) { setRetrying(true); return; }
+    recordReadingAnswer(reading.id, correct);
     setResolved(true);
   };
 
