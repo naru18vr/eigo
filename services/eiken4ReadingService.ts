@@ -47,3 +47,7 @@ export const saveReadingProgress = (progress: ReadingProgress) => {
     }
   }
 };
+
+export const resetTodayReadingProgress = () => {
+  if (typeof localStorage !== 'undefined') localStorage.removeItem(KEY);
+};
