@@ -47,7 +47,7 @@ const Eiken4WordCardsPage: React.FC = () => {
     const nextReview = known ? reviewWords : [...reviewWords, `${current.word} / ${current.meaning}`];
 
     if (isLast) {
-      completeWords(words.length, nextKnown, nextReview);
+      completeWords(words.length, nextKnown, nextReview, words.map(word => word.id));
       setKnownCount(nextKnown);
       setReviewWords(nextReview);
       setIsComplete(true);
