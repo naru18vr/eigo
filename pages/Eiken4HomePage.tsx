@@ -39,89 +39,29 @@ const Eiken4HomePage: React.FC = () => {
         </div>
       </header>
 
-      <main className="grid grid-cols-1 gap-4 max-w-xl mx-auto">
-        <button onClick={() => navigate('/eiken4/course')} className="w-full p-6 rounded-2xl shadow-xl bg-gradient-to-r from-amber-400 to-orange-500 text-white text-left hover:shadow-2xl active:scale-95 transition-all"><div className="flex items-center justify-between"><div><p className="text-sm font-bold opacity-90">毎日はここから</p><h2 className="text-2xl font-bold mt-1">今日の学習コース</h2><p className="text-sm mt-2">中1復習 → 15分 → 長文 → 英単語 → 紙</p></div><ChevronRightIcon className="h-9 w-9"/></div></button>
-        <Link to="/guide" className="block rounded-xl border-2 border-indigo-200 bg-indigo-50 p-4 text-indigo-800 shadow hover:shadow-md transition-all"><div className="flex items-center justify-between"><div><h2 className="font-bold text-lg">使い方を見る</h2><p className="text-sm">毎日のおすすめ順・できること</p></div><ChevronRightIcon className="h-6 w-6"/></div></Link>
-        <button onClick={() => navigate('/eiken4/progress')} className="w-full p-5 rounded-xl shadow-lg bg-teal-600 text-white text-left hover:shadow-xl active:scale-95 transition-all">
-          <div className="flex items-center justify-between"><div className="flex items-center"><ClockIcon className="h-9 w-9 mr-4"/><div><p className="text-xs font-bold opacity-80">試験までの日数・苦手</p><h2 className="text-xl font-bold">学習ダッシュボード</h2></div></div><ChevronRightIcon className="h-7 w-7 opacity-80"/></div>
-        </button>
-        <button
-          onClick={() => navigate('/eiken4/daily')}
-          className="w-full p-6 rounded-xl shadow-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-left hover:shadow-2xl active:scale-95 transition-all"
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-bold opacity-90">毎日これだけ</p>
-              <h2 className="text-2xl font-bold mt-1">{dailyDone ? '今日の15分 完了！' : dailyProgress.answers.length ? '今日の続きをする' : '今日の15分を始める'}</h2>
-              <p className="text-sm opacity-90 mt-1">単語・文法・リスニング{dueReviewCount > 0 ? `（復習${dueReviewCount}問あり）` : ''}</p>
-            </div>
-            <div className="text-right">
-              <span className="text-3xl font-bold">{dailyProgress.answers.length}</span>
-              <span className="text-sm"> / {dailyProgress.questionIds.length}</span>
-              <ChevronRightIcon className="h-7 w-7 ml-auto mt-1 opacity-80" />
-            </div>
-          </div>
-        </button>
+      <main className="max-w-xl mx-auto">
+        <button onClick={() => navigate('/eiken4/course')} className="w-full p-6 rounded-2xl shadow-xl bg-gradient-to-r from-amber-400 to-orange-500 text-white text-left hover:shadow-2xl active:scale-95 transition-all"><div className="flex items-center justify-between"><div><p className="text-sm font-bold opacity-90">毎日はここだけ押せばOK</p><h2 className="text-2xl font-bold mt-1">今日の学習コース</h2><p className="text-sm mt-2">中1復習 → 15分 → 長文 → 英単語 → 紙</p></div><ChevronRightIcon className="h-9 w-9"/></div></button>
 
-        <button onClick={() => navigate('/eiken4/reading')} className="w-full p-5 rounded-xl shadow-lg bg-sky-600 text-white text-left hover:shadow-xl active:scale-95 transition-all">
-          <div className="flex items-center justify-between"><div className="flex items-center"><BookOpenIcon className="h-9 w-9 mr-4"/><div><h2 className="text-xl font-bold">1日1題 ミニ長文</h2><p className="text-sm opacity-90">{readingProgress.completedAt ? '今日の長文は完了！' : readingProgress.answers.length ? '今日の続きをしよう' : '短い英文＋2問'}</p></div></div><ChevronRightIcon className="h-7 w-7 opacity-80"/></div>
-        </button>
-        <button onClick={() => navigate('/eiken4/grade1-review')} className="w-full p-5 rounded-xl shadow-lg bg-amber-500 text-white text-left hover:shadow-xl active:scale-95 transition-all"><div className="flex items-center justify-between"><div><p className="text-xs font-bold opacity-90">英検4級につながる基礎を毎日5分</p><h2 className="text-xl font-bold">{grade1Progress.completedAt ? '中1おさらい 完了！' : grade1Progress.answers.length ? '中1おさらいの続きをする' : '中1 単語・文法おさらい'}</h2><p className="text-sm opacity-90">頻出場面の単語3語＋必要文法3問</p></div><div className="text-right"><span className="font-bold">{grade1Progress.answers.length} / 6</span><ChevronRightIcon className="h-7 w-7 ml-auto opacity-80"/></div></div></button>
+        <section className="mt-7"><h2 className="text-lg font-bold text-slate-800">今日のコースを個別に開く</h2><p className="text-sm text-slate-500 mt-1">途中からやり直すときに使います</p><div className="mt-3 grid grid-cols-2 gap-3">
+          <button onClick={() => navigate('/eiken4/grade1-review')} className="rounded-xl bg-white border-2 border-amber-200 p-4 text-left shadow-sm"><p className="text-xs font-bold text-amber-700">1　{grade1Progress.completedAt ? '完了！' : `${grade1Progress.answers.length}/6`}</p><h3 className="font-bold mt-1">中1おさらい</h3></button>
+          <button onClick={() => navigate('/eiken4/daily')} className="rounded-xl bg-white border-2 border-emerald-200 p-4 text-left shadow-sm"><p className="text-xs font-bold text-emerald-700">2　{dailyDone ? '完了！' : `${dailyProgress.answers.length}/${dailyProgress.questionIds.length}`}</p><h3 className="font-bold mt-1">今日の15分</h3><p className="text-xs text-slate-500 mt-1">{dueReviewCount ? `復習${dueReviewCount}問あり` : '18問'}</p></button>
+          <button onClick={() => navigate('/eiken4/reading')} className="rounded-xl bg-white border-2 border-sky-200 p-4 text-left shadow-sm"><p className="text-xs font-bold text-sky-700">3　{readingProgress.completedAt ? '完了！' : readingProgress.answers.length ? `${readingProgress.answers.length}/2` : '未実施'}</p><h3 className="font-bold mt-1">ミニ長文</h3></button>
+          <button onClick={() => startFresh('/eiken4/words')} className="rounded-xl bg-white border-2 border-indigo-200 p-4 text-left shadow-sm"><p className="text-xs font-bold text-indigo-700">4　8語</p><h3 className="font-bold mt-1">英単語カード</h3></button>
+        </div></section>
 
-        <button onClick={() => navigate('/eiken4/mock')} className="w-full p-5 rounded-xl shadow-lg bg-violet-700 text-white text-left hover:shadow-xl active:scale-95 transition-all">
-          <div className="flex items-center justify-between"><div className="flex items-center"><ClockIcon className="h-9 w-9 mr-4"/><div><p className="text-xs font-bold opacity-80">週1回</p><h2 className="text-xl font-bold">10分ミニ模試</h2><p className="text-sm opacity-90">単語・文法・聞き取り・長文</p></div></div><ChevronRightIcon className="h-7 w-7 opacity-80"/></div>
-        </button>
-        <button onClick={() => navigate('/eiken4/exam-practice')} className="w-full p-5 rounded-xl shadow-lg bg-rose-600 text-white text-left hover:shadow-xl active:scale-95 transition-all"><div className="flex items-center justify-between"><div><p className="text-xs font-bold opacity-80">毎日10問</p><h2 className="text-xl font-bold">英検4級 本番形式</h2><p className="text-sm opacity-90">空所補充・会話・語句整序</p></div><ChevronRightIcon className="h-7 w-7 opacity-80"/></div></button>
+        <section className="mt-8"><h2 className="text-lg font-bold text-slate-800">余裕がある日に追加</h2><p className="text-sm text-slate-500 mt-1">毎日の必須メニューではありません</p><div className="mt-3 space-y-3">
+          <button onClick={() => navigate('/eiken4/exam-practice')} className="w-full rounded-xl bg-rose-50 border border-rose-200 p-4 text-left flex items-center justify-between"><div><p className="text-xs font-bold text-rose-600">本番に慣れる・10問</p><h3 className="font-bold text-slate-800">英検4級 本番形式</h3></div><ChevronRightIcon className="h-6 w-6 text-rose-400"/></button>
+          <button onClick={() => startFresh('/eiken4/sentences')} className="w-full rounded-xl bg-amber-50 border border-amber-200 p-4 text-left flex items-center justify-between"><div className="flex items-center"><SparklesIcon className="h-7 w-7 text-amber-500 mr-3"/><div><p className="text-xs font-bold text-amber-600">語順を確認・5問</p><h3 className="font-bold text-slate-800">並べ替え問題</h3></div></div><ChevronRightIcon className="h-6 w-6 text-amber-400"/></button>
+        </div></section>
 
-        <button onClick={() => navigate('/eiken4/word-map')} className="w-full p-5 rounded-xl shadow-lg bg-indigo-50 border-2 border-indigo-200 text-left hover:shadow-xl active:scale-95 transition-all"><div className="flex items-center justify-between"><div><p className="text-xs font-bold text-indigo-600">全128語の進み具合</p><h2 className="text-xl font-bold text-indigo-900">英単語マップ</h2><p className="text-sm text-indigo-700">覚えた・練習中・未学習</p></div><ChevronRightIcon className="h-7 w-7 text-indigo-500" /></div></button>
+        <section className="mt-8"><h2 className="text-lg font-bold text-slate-800">週1回・記録を見る</h2><div className="mt-3 grid grid-cols-2 gap-3">
+          <button onClick={() => navigate('/eiken4/mock')} className="rounded-xl bg-violet-700 text-white p-4 text-left shadow"><ClockIcon className="h-7 w-7"/><h3 className="font-bold mt-2">10分ミニ模試</h3><p className="text-xs opacity-90">週1回</p></button>
+          <button onClick={() => navigate('/eiken4/progress')} className="rounded-xl bg-teal-600 text-white p-4 text-left shadow"><ClockIcon className="h-7 w-7"/><h3 className="font-bold mt-2">ダッシュボード</h3><p className="text-xs opacity-90">試験まで・苦手</p></button>
+          <button onClick={() => navigate('/eiken4/word-map')} className="rounded-xl bg-indigo-50 border border-indigo-200 p-4 text-left"><BookOpenIcon className="h-7 w-7 text-indigo-600"/><h3 className="font-bold text-indigo-900 mt-2">英単語マップ</h3><p className="text-xs text-indigo-700">全128語</p></button>
+          <Link to="/eiken4/result" className="rounded-xl bg-white border border-slate-200 p-4 text-left"><ClockIcon className="h-7 w-7 text-teal-600"/><h3 className="font-bold text-slate-800 mt-2">今日の結果</h3><p className="text-xs text-slate-500">報告用画面</p></Link>
+        </div></section>
 
-        <button
-          onClick={() => startFresh('/eiken4/words')}
-          className="w-full p-5 rounded-xl shadow-lg bg-white border border-indigo-100 text-left hover:shadow-xl active:scale-95 transition-all"
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <BookOpenIcon className="h-9 w-9 text-indigo-600 mr-4" />
-              <div>
-                <h2 className="text-xl font-bold text-slate-800">単語カード</h2>
-                <p className="text-sm text-slate-500">未学習・苦手な8語を確認</p>
-              </div>
-            </div>
-            <ChevronRightIcon className="h-7 w-7 text-slate-400" />
-          </div>
-        </button>
-
-        <button
-          onClick={() => startFresh('/eiken4/sentences')}
-          className="w-full p-5 rounded-xl shadow-lg bg-white border border-indigo-100 text-left hover:shadow-xl active:scale-95 transition-all"
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <SparklesIcon className="h-9 w-9 text-amber-500 mr-4" />
-              <div>
-                <h2 className="text-xl font-bold text-slate-800">並べ替え問題</h2>
-                <p className="text-sm text-slate-500">5問で語順をチェック</p>
-              </div>
-            </div>
-            <ChevronRightIcon className="h-7 w-7 text-slate-400" />
-          </div>
-        </button>
-
-        <Link
-          to="/eiken4/result"
-          className="block p-5 rounded-xl shadow-lg bg-white border border-indigo-100 hover:shadow-xl active:scale-95 transition-all"
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <ClockIcon className="h-9 w-9 text-teal-600 mr-4" />
-              <div>
-                <h2 className="text-xl font-bold text-slate-800">今日の結果</h2>
-                <p className="text-sm text-slate-500">スクショで報告しよう</p>
-              </div>
-            </div>
-            <ChevronRightIcon className="h-7 w-7 text-slate-400" />
-          </div>
-        </Link>
+        <Link to="/guide" className="mt-8 block rounded-xl border border-slate-300 bg-white p-4 text-slate-700 hover:shadow-md transition-all"><div className="flex items-center justify-between"><div><h2 className="font-bold">使い方を見る</h2><p className="text-sm text-slate-500">できること・毎日の進め方</p></div><ChevronRightIcon className="h-6 w-6"/></div></Link>
       </main>
     </div>
   );
