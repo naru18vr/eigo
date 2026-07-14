@@ -8,6 +8,7 @@ import { getQuestionById, loadDailyProgress, recordReviewAnswer, saveDailyProgre
 import { isSpeechSupported, speakText } from '../services/speechService';
 import { useAppContext } from '../contexts/AppContext';
 import { playCorrectSound, playIncorrectSound } from '../services/soundService';
+import { downloadDailyWorksheet } from '../services/eiken4WorksheetService';
 
 const Eiken4DailyPage: React.FC = () => {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ const Eiken4DailyPage: React.FC = () => {
   const [slow, setSlow] = useState(false);
   const [audioStatus, setAudioStatus] = useState<'idle' | 'loading' | 'playing' | 'error'>('idle');
   const [audioMessage, setAudioMessage] = useState('');
+  const [pdfStatus, setPdfStatus] = useState<'idle' | 'making' | 'error'>('idle');
   const baseDone = progress.answers.length >= progress.questionIds.length;
   const retryDone = progress.retryAnswers.length >= progress.retryIds.length;
   const complete = baseDone && retryDone;
@@ -77,6 +79,15 @@ const Eiken4DailyPage: React.FC = () => {
   };
 
   if (complete || !current) {
+    const downloadWorksheet = async () => {
+      setPdfStatus('making');
+      try {
+        await downloadDailyWorksheet(progress);
+        setPdfStatus('idle');
+      } catch {
+        setPdfStatus('error');
+      }
+    };
     return (
       <div className="flex-grow container mx-auto p-4 sm:p-6 max-w-xl">
         <div className="mt-12 rounded-2xl bg-white shadow-xl border border-emerald-100 p-7 text-center">
@@ -85,6 +96,14 @@ const Eiken4DailyPage: React.FC = () => {
           <h1 className="text-3xl font-bold text-slate-800 mt-2">{correctCount} / {progress.questionIds.length} 問正解</h1>
           <p className="text-slate-600 mt-3">間違えた問題も今日のうちに復習しました。</p>
           <p className="text-sm text-indigo-700 font-semibold mt-2">次は翌日・3日後・7日後・14日後に自動で出題します。</p>
+          <div className="mt-6 rounded-xl bg-amber-50 border border-amber-200 p-4 text-left">
+            <p className="font-bold text-amber-900">保護者の方へ</p>
+            <p className="text-sm text-amber-900 mt-1">今日の内容に合った別問題15問と、解答・解説をA4 PDFで作ります。</p>
+            <Button onClick={downloadWorksheet} disabled={pdfStatus === 'making'} variant="secondary" className="mt-3 w-full">
+              {pdfStatus === 'making' ? 'PDFを作成中…' : '今日の類題プリントPDF'}
+            </Button>
+            {pdfStatus === 'error' && <p className="text-sm text-rose-700 font-bold mt-2">PDFを作れませんでした。Chromeで開き直してお試しください。</p>}
+          </div>
           <Button onClick={() => navigate('/eiken4/reading')} className="mt-7 w-full">続けて今日のミニ長文へ</Button>
           <Button onClick={() => navigate('/eiken4')} variant="ghost" className="mt-2 w-full">英検4級ホームへ</Button>
         </div>
