@@ -58,3 +58,7 @@ export const saveGrade1Review = (progress: Grade1ReviewProgress) => {
   });
   localStorage.setItem(COVERAGE_KEY, JSON.stringify(next));
 };
+
+export const resetTodayGrade1Review = () => {
+  if (typeof localStorage !== 'undefined') localStorage.removeItem(KEY);
+};
