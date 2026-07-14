@@ -10,6 +10,7 @@ import { useAppContext } from '../contexts/AppContext';
 import { playCorrectSound, playIncorrectSound } from '../services/soundService';
 import { createWorksheetShareLink, downloadDailyWorksheet } from '../services/eiken4WorksheetService';
 import { loadReadingProgress } from '../services/eiken4ReadingService';
+import { recordWordMastery } from '../services/eiken4WordMasteryService';
 
 const Eiken4DailyPage: React.FC = () => {
   const navigate = useNavigate();
@@ -65,6 +66,7 @@ const Eiken4DailyPage: React.FC = () => {
   const next = () => {
     if (!selected || !current) return;
     const correct = selected === current.answer;
+    if (current.id.startsWith('word-')) recordWordMastery(current.id, correct);
     recordReviewAnswer(current.id, correct, isRetry);
     const nextProgress = { ...progress };
     if (isRetry) {
