@@ -115,6 +115,17 @@ const BuilderPage: React.FC = () => {
   }, [gradeId, unitId, setIndexParam, getUnitById, getSentencesForUnit, navigate, getGradeById, location.state, startTime]);
 
   const { state: sentenceBuilderState, addWordToBuilt, removeWordFromBuilt, checkAnswer, nextSentence, retrySentence } = useSentenceLogic(currentSentences, gradeId, unitId);
+  const [wrongAttempts, setWrongAttempts] = useState(0);
+
+  const handleCheckAnswer = () => {
+    if (sentenceBuilderState.currentSentence) {
+      const correct = sentenceBuilderState.builtWords.join(' ') === sentenceBuilderState.currentSentence.words.join(' ');
+      if (!correct) setWrongAttempts(value => value + 1);
+    }
+    checkAnswer();
+  };
+
+  const handleRetrySentence = () => retrySentence();
   
   useEffect(() => {
     if (
@@ -180,6 +191,7 @@ const BuilderPage: React.FC = () => {
   }
 
   const handleNext = () => {
+    setWrongAttempts(0);
     const isLastSentenceInCurrentSet = sentenceBuilderState.currentSentenceIndex >= sentenceBuilderState.allSentences.length - 1;
     const elapsedTimeInSeconds = startTime ? Math.round((Date.now() - startTime) / 1000) : 0;
 
@@ -264,7 +276,7 @@ const BuilderPage: React.FC = () => {
 
           <div className="mt-auto pt-6 text-center">
             <Button 
-              onClick={checkAnswer} 
+              onClick={handleCheckAnswer} 
               disabled={sentenceBuilderState.builtWords.length === 0 || sentenceBuilderState.showResultModal || isLoadingSentences}
               variant="primary"
               size="lg"
@@ -284,12 +296,13 @@ const BuilderPage: React.FC = () => {
       {sentenceBuilderState.currentSentence && sentenceBuilderState.showResultModal && (
         <ResultModal
           isOpen={sentenceBuilderState.showResultModal}
-          onClose={retrySentence}
+          onClose={handleRetrySentence}
           isCorrect={sentenceBuilderState.isCorrect!}
           sentence={sentenceBuilderState.currentSentence}
           userSentence={sentenceBuilderState.builtWords.join(' ')}
           onNext={handleNext}
           isLastSentence={isLastSentenceInSet}
+          wrongAttempts={wrongAttempts}
         />
       )}
        <footer className="text-center mt-8 text-sm text-slate-400">
