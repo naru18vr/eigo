@@ -1,9 +1,10 @@
 import { eiken4Sentences } from '../data/eiken4Sentences';
 import { eiken4Words } from '../data/eiken4Words';
 import { eiken4ListeningQuestions } from '../data/eiken4Listening';
+import { eiken4CoreExamQuestions, eiken4CoreSentences } from '../data/eiken4Curriculum';
 import { recordEiken4Activity } from './eiken4ProgressService';
 
-export const EIKEN4_DAILY_KEY = 'eiken4DailyProgressV2';
+export const EIKEN4_DAILY_KEY = 'eiken4DailyProgressV3';
 const REVIEW_KEY = 'eiken4ReviewScheduleV1';
 const REVIEW_INTERVALS = [1, 3, 7, 14];
 
@@ -95,6 +96,20 @@ const sentenceQuestion = (sentenceId: string, date: string): DailyQuestion | und
   };
 };
 
+const examQuestion = (examId: string, date: string): DailyQuestion | undefined => {
+  const exam = eiken4CoreExamQuestions.find(item => `exam-${item.id}` === examId);
+  if (!exam) return undefined;
+  return {
+    id: examId,
+    prompt: exam.prompt,
+    detail: exam.translation || exam.type,
+    answer: exam.answer,
+    choices: seededItems(exam.choices, `${date}-${exam.id}`, exam.choices.length),
+    explanation: exam.explanation,
+    kind: exam.type,
+  };
+};
+
 const listeningQuestion = (listeningId: string, date: string): DailyQuestion | undefined => {
   const listening = eiken4ListeningQuestions.find(item => `listening-${item.id}` === listeningId);
   if (!listening) return undefined;
@@ -113,7 +128,10 @@ const listeningQuestion = (listeningId: string, date: string): DailyQuestion | u
 };
 
 export const getQuestionById = (id: string, date = localDateKey()) =>
-  id.startsWith('word-') ? wordQuestion(id, date) : id.startsWith('listening-') ? listeningQuestion(id, date) : sentenceQuestion(id, date);
+  id.startsWith('word-') ? wordQuestion(id, date)
+    : id.startsWith('listening-') ? listeningQuestion(id, date)
+      : id.startsWith('exam-') ? examQuestion(id, date)
+        : sentenceQuestion(id, date);
 
 const loadReviews = (): ReviewRecord[] => {
   if (typeof localStorage === 'undefined') return [];
@@ -126,7 +144,7 @@ const saveReviews = (records: ReviewRecord[]) => {
 
 export const getDueReviewCount = () => loadReviews().filter(record => record.dueDate <= localDateKey()).length;
 export const getReviewCategoryCounts = () => loadReviews().reduce((counts, record) => {
-  const category = record.id.startsWith('word-') ? '単語' : record.id.startsWith('listening-') ? 'リスニング' : '文法・会話';
+  const category = record.id.startsWith('word-') ? '単語' : record.id.startsWith('listening-') ? 'リスニング' : record.id.startsWith('exam-') ? '本番形式' : '文法・会話';
   counts[category] = (counts[category] || 0) + 1; return counts;
 }, {} as Record<string, number>);
 
@@ -146,15 +164,17 @@ export const recordReviewAnswer = (id: string, correct: boolean, isRetry: boolea
 
 const buildDailyQuestionIds = (date: string) => {
   const dueIds = loadReviews().filter(record => record.dueDate <= date).slice(0, 5).map(record => record.id);
-  const wordIds = seededItems(eiken4Words, `${date}-words`, 7).map(word => `word-${word.id}`);
-  const sentenceIds = seededItems(eiken4Sentences, `${date}-sentences`, 5).map(sentence => `sentence-${sentence.id}`);
+  const wordIds = seededItems(eiken4Words, `${date}-words`, 5).map(word => `word-${word.id}`);
+  const sentenceIds = seededItems(eiken4CoreSentences, `${date}-sentences`, 4).map(sentence => `sentence-${sentence.id}`);
   const listeningIds = seededItems(eiken4ListeningQuestions, `${date}-listening`, 3).map(item => `listening-${item.id}`);
+  const examIds = seededItems(eiken4CoreExamQuestions, `${date}-exam`, 3).map(item => `exam-${item.id}`);
   const category = (prefix: string, fresh: string[], count: number) =>
     Array.from(new Set([...dueIds.filter(id => id.startsWith(prefix)), ...fresh])).slice(0, count);
   return [
-    ...category('word-', wordIds, 7),
-    ...category('sentence-', sentenceIds, 5),
+    ...category('word-', wordIds, 5),
+    ...category('sentence-', sentenceIds, 4),
     ...category('listening-', listeningIds, 3),
+    ...category('exam-', examIds, 3),
   ];
 };
 
@@ -171,6 +191,12 @@ export const loadDailyProgress = (): DailyProgress => {
   try {
     const saved = JSON.parse(localStorage.getItem(EIKEN4_DAILY_KEY) || 'null') as DailyProgress | null;
     if (saved?.date === localDateKey()) return saved;
+    const previous = JSON.parse(localStorage.getItem('eiken4DailyProgressV2') || 'null') as DailyProgress | null;
+    if (previous?.date === localDateKey()) {
+      const migrated = previous.answers.length ? previous : { ...previous, questionIds: buildDailyQuestionIds(previous.date) };
+      saveDailyProgress(migrated);
+      return migrated;
+    }
     const legacy = JSON.parse(localStorage.getItem('eiken4DailyProgressV1') || 'null') as { date: string; answers: DailyAnswer[]; completedAt?: string } | null;
     if (legacy?.date === localDateKey()) {
       const migrated: DailyProgress = {
