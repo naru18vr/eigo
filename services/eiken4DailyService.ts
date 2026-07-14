@@ -6,6 +6,7 @@ import { recordEiken4Activity } from './eiken4ProgressService';
 
 export const EIKEN4_DAILY_KEY = 'eiken4DailyProgressV4';
 const REVIEW_KEY = 'eiken4ReviewScheduleV1';
+const COVERAGE_KEY = 'eiken4QuestionCoverageV1';
 const REVIEW_INTERVALS = [1, 3, 7, 14];
 
 export type DailyQuestion = {
@@ -142,6 +143,23 @@ const saveReviews = (records: ReviewRecord[]) => {
   if (typeof localStorage !== 'undefined') localStorage.setItem(REVIEW_KEY, JSON.stringify(records));
 };
 
+const loadCoverage = (): Record<string, number> => {
+  if (typeof localStorage === 'undefined') return {};
+  try { return JSON.parse(localStorage.getItem(COVERAGE_KEY) || '{}'); } catch { return {}; }
+};
+
+export const recordQuestionCoverage = (id: string) => {
+  if (typeof localStorage === 'undefined') return;
+  const coverage = loadCoverage(); coverage[id] = (coverage[id] || 0) + 1;
+  localStorage.setItem(COVERAGE_KEY, JSON.stringify(coverage));
+};
+
+const leastSeen = <T extends { id: string }>(items: T[], prefix: string, seed: string, count: number) => {
+  const coverage = loadCoverage();
+  return items.map((item, index) => ({ item, seen: coverage[`${prefix}${item.id}`] || 0, order: hash(`${seed}-${index}`) }))
+    .sort((a, b) => a.seen - b.seen || a.order - b.order).slice(0, count).map(({ item }) => `${prefix}${item.id}`);
+};
+
 export const getDueReviewCount = () => loadReviews().filter(record => record.dueDate <= localDateKey()).length;
 export const getReviewCategoryCounts = () => loadReviews().reduce((counts, record) => {
   const category = record.id.startsWith('word-') ? '単語' : record.id.startsWith('listening-') ? 'リスニング' : record.id.startsWith('exam-') ? '本番形式' : '文法・会話';
@@ -164,10 +182,10 @@ export const recordReviewAnswer = (id: string, correct: boolean, isRetry: boolea
 
 const buildDailyQuestionIds = (date: string) => {
   const dueIds = loadReviews().filter(record => record.dueDate <= date).slice(0, 5).map(record => record.id);
-  const wordIds = seededItems(eiken4Words, `${date}-words`, 8).map(word => `word-${word.id}`);
-  const sentenceIds = seededItems(eiken4CoreSentences, `${date}-sentences`, 4).map(sentence => `sentence-${sentence.id}`);
-  const listeningIds = seededItems(eiken4ListeningQuestions, `${date}-listening`, 3).map(item => `listening-${item.id}`);
-  const examIds = seededItems(eiken4CoreExamQuestions, `${date}-exam`, 3).map(item => `exam-${item.id}`);
+  const wordIds = leastSeen(eiken4Words, 'word-', `${date}-words`, 8);
+  const sentenceIds = leastSeen(eiken4CoreSentences, 'sentence-', `${date}-sentences`, 4);
+  const listeningIds = leastSeen(eiken4ListeningQuestions, 'listening-', `${date}-listening`, 3);
+  const examIds = leastSeen(eiken4CoreExamQuestions, 'exam-', `${date}-exam`, 3);
   const category = (prefix: string, fresh: string[], count: number) =>
     Array.from(new Set([...dueIds.filter(id => id.startsWith(prefix)), ...fresh])).slice(0, count);
   return [
