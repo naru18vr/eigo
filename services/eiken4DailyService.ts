@@ -62,8 +62,10 @@ const seededItems = <T,>(items: T[], seed: string, count: number) =>
     .slice(0, count)
     .map(({ item }) => item);
 
-const choicesFor = (answer: string, distractors: string[], seed: string) =>
-  seededItems([answer, ...seededItems(distractors, `${seed}-distractors`, 3)], `${seed}-order`, 4);
+const choicesFor = (answer: string, distractors: string[], seed: string) => {
+  const uniqueDistractors = Array.from(new Set(distractors)).filter(item => item !== answer);
+  return seededItems([answer, ...seededItems(uniqueDistractors, `${seed}-distractors`, 3)], `${seed}-order`, 4);
+};
 
 const wordQuestion = (wordId: string, date: string): DailyQuestion | undefined => {
   const word = eiken4Words.find(item => `word-${item.id}` === wordId);
