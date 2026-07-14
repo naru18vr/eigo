@@ -5,6 +5,12 @@ import { localDateKey } from './eiken4DailyService';
 const KEY = 'grade1DailyReviewV1';
 const COVERAGE_KEY = 'grade1DailyCoverageV1';
 const SELECTION_KEY = 'grade1DailySelectionV1';
+const EIKEN4_WORDS = new Set([
+  'where','when','school','teacher','student','family','breakfast','morning','today','tomorrow','every',
+  'go','come','play','like','have','study','eat','drink','read','write','speak','watch','listen','help','know','want','live','make',
+  'good','new','old','big','small','happy','busy','kind','can','not','in','on','under','with','from','to','and','but',
+]);
+const EIKEN4_GRAMMAR = /三人称単数|三単現|疑問詞|疑問文|否定文|can|命令文|目的格|Whose|Which|現在進行形|過去形|There (?:is|are|was|were)|How many|感嘆文/;
 export type Grade1ReviewProgress = { date: string; answers: boolean[]; completedAt?: string };
 export type Grade1Selection = { wordIndexes: number[]; grammarIndexes: number[] };
 export const grade1GrammarItems = GRADE_1_UNITS.flatMap((unit, unitIndex) => unit.sentences.map(sentence => ({
@@ -17,6 +23,7 @@ export const grade1GrammarItems = GRADE_1_UNITS.flatMap((unit, unitIndex) => uni
 })));
 
 const coverage = () => { try { return JSON.parse(localStorage.getItem(COVERAGE_KEY) || '{}') as Record<string, number>; } catch { return {}; } };
+const hash = (value: string) => { let result = 2166136261; for (const character of value) { result ^= character.charCodeAt(0); result = Math.imul(result, 16777619); } return result >>> 0; };
 
 export const getGrade1DailyItems = (date = localDateKey()) => {
   if (typeof localStorage !== 'undefined') try {
@@ -24,18 +31,21 @@ export const getGrade1DailyItems = (date = localDateKey()) => {
     if (saved?.date === date) return getGrade1ItemsBySelection(saved);
   } catch { /* choose again */ }
   const seen = typeof localStorage === 'undefined' ? {} : coverage();
-  const pick = <T extends { word?: string; title?: string; question?: string }>(items: T[], count: number, prefix: string) => items
-    .map((item, index) => ({ item, index, count: seen[`${prefix}-${index}`] || 0 }))
-    .sort((a, b) => a.count - b.count || a.index - b.index)
+  const pick = <T,>(items: Array<{ item: T; index: number }>, count: number, prefix: string) => items
+    .map(({ item, index }) => ({ item, index, count: seen[`${prefix}-${index}`] || 0, order: hash(`${date}-${prefix}-${index}`) }))
+    .sort((a, b) => a.count - b.count || a.order - b.order)
     .slice(0, count);
-  const seed = Number(date.replaceAll('-', '')) % GRADE_1_UNITS.length;
-  const unitIndexes = Array.from({ length: 5 }, (_, offset) => (seed + offset) % GRADE_1_UNITS.length);
-  const grammar = unitIndexes.map(unitIndex => grade1GrammarItems
-    .map((item, index) => ({ item, index, count: seen[`grammar-${index}`] || 0 }))
-    .filter(entry => entry.item.unitIndex === unitIndex)
-    .sort((a, b) => a.count - b.count || a.index - b.index)[0])
-    .filter((entry): entry is NonNullable<typeof entry> => Boolean(entry));
-  const result = { words: pick(grade1ReviewWords, 5, 'word'), grammar };
+  const wordPool = grade1ReviewWords.map((item, index) => ({ item, index })).filter(entry => EIKEN4_WORDS.has(entry.item.word));
+  const grammarPool = grade1GrammarItems.map((item, index) => ({ item, index })).filter(entry => EIKEN4_GRAMMAR.test(entry.item.note));
+  const rankedGrammar = grammarPool.map(({ item, index }) => ({ item, index, count: seen[`grammar-${index}`] || 0, order: hash(`${date}-grammar-${index}`) }))
+    .sort((a, b) => a.count - b.count || a.order - b.order);
+  const topics = new Set<string>();
+  const grammar = rankedGrammar.filter(entry => {
+    const topic = entry.item.note.split('：')[0].replace(/の文.*$/, '').replace(/①|②|③/g, '');
+    if (topics.has(topic)) return false;
+    topics.add(topic); return true;
+  }).slice(0, 5);
+  const result = { words: pick(wordPool, 5, 'word'), grammar };
   if (typeof localStorage !== 'undefined') localStorage.setItem(SELECTION_KEY, JSON.stringify({ date, wordIndexes: result.words.map(item => item.index), grammarIndexes: result.grammar.map(item => item.index) }));
   return result;
 };
