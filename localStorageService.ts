@@ -176,6 +176,7 @@ export const clearAllProgressData = (): void => {
   if (typeof localStorage === 'undefined') return;
 
   clearDailyLog();
+  localStorage.removeItem('sentenceLearningProfileV1');
 
   const keysToRemove: string[] = [];
   for (let i = 0; i < localStorage.length; i++) {
@@ -211,4 +212,10 @@ export const clearGradeProgressData = (gradeId: string): void => {
   keysToRemove.forEach(key => {
     localStorage.removeItem(key);
   });
+
+  try {
+    const profile = JSON.parse(localStorage.getItem('sentenceLearningProfileV1') || '{}') as Record<string, unknown>;
+    Object.keys(profile).filter(key => key.startsWith(`${gradeId}_`)).forEach(key => delete profile[key]);
+    localStorage.setItem('sentenceLearningProfileV1', JSON.stringify(profile));
+  } catch { /* 壊れた旧データは次回記録時に作り直す */ }
 };
