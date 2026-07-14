@@ -17,6 +17,9 @@ const Eiken4ReadingPage: React.FC = () => {
   const reading = getTodayReading();
   const [progress, setProgress] = useState(loadReadingProgress);
   const [selected, setSelected] = useState('');
+  const [attempts, setAttempts] = useState(0);
+  const [retrying, setRetrying] = useState(false);
+  const [resolved, setResolved] = useState(false);
   const [copyStatus, setCopyStatus] = useState<'idle' | 'copying' | 'copied' | 'error'>('idle');
   const [parentMessage, setParentMessage] = useState('');
   const index = progress.answers.length;
@@ -25,12 +28,23 @@ const Eiken4ReadingPage: React.FC = () => {
 
   const answer = () => {
     if (!selected) return;
-    if (isSoundEnabled) (selected === question.answer ? playCorrectSound : playIncorrectSound)();
+    const correct = selected === question.answer;
+    if (isSoundEnabled) (correct ? playCorrectSound : playIncorrectSound)();
+    const nextAttempts = attempts + 1;
+    setAttempts(nextAttempts);
+    if (!correct && nextAttempts < 3) { setRetrying(true); return; }
+    setResolved(true);
+  };
+
+  const nextQuestion = () => {
     const answers = [...progress.answers, selected];
     const next = { ...progress, answers, ...(answers.length === reading.questions.length ? { completedAt: new Date().toISOString() } : {}) };
     saveReadingProgress(next);
     setProgress(next);
     setSelected('');
+    setAttempts(0);
+    setRetrying(false);
+    setResolved(false);
   };
 
   const copyParentMessage = async () => {
@@ -56,8 +70,8 @@ const Eiken4ReadingPage: React.FC = () => {
     </section>
     {!complete ? <section className="mt-4 rounded-xl bg-white border border-slate-200 shadow p-5">
       <p className="text-sm font-bold text-slate-500">問題 {index + 1} / {reading.questions.length}</p><h2 className="text-xl font-bold text-slate-800 mt-2">{question.question}</h2>
-      <div className="grid gap-3 mt-4">{question.choices.map(choice => <button key={choice} onClick={() => setSelected(choice)} className={`rounded-xl border-2 p-3 text-left font-bold ${selected === choice ? 'border-sky-500 bg-sky-50' : 'border-slate-200'}`}>{choice}</button>)}</div>
-      <Button onClick={answer} disabled={!selected} className="w-full mt-4">答える</Button>
+      <div className="grid gap-3 mt-4">{question.choices.map(choice => <button key={choice} disabled={retrying || resolved} onClick={() => setSelected(choice)} className={`rounded-xl border-2 p-3 text-left font-bold ${resolved && choice === question.answer ? 'border-emerald-500 bg-emerald-50' : (retrying || resolved) && choice === selected && selected !== question.answer ? 'border-rose-500 bg-rose-50' : selected === choice ? 'border-sky-500 bg-sky-50' : 'border-slate-200'}`}>{choice}</button>)}</div>
+      {resolved ? <div className="mt-4 rounded-xl bg-slate-50 p-4"><p className="font-bold">{selected === question.answer ? '正解！' : `3回間違えました。正解：${question.answer}`}</p><p className="text-sm text-sky-800 mt-2">根拠：“{question.evidence}”</p><p className="text-sm mt-1">{question.explanation}</p><Button onClick={nextQuestion} className="w-full mt-3">次の問題へ</Button></div> : retrying ? <div className="mt-4 rounded-xl bg-amber-50 p-4"><p className="font-bold text-amber-800">不正解。本文を読み直そう（{attempts}/3回）</p><Button onClick={() => { setSelected(''); setRetrying(false); }} variant="secondary" className="w-full mt-3">もう一度</Button></div> : <Button onClick={answer} disabled={!selected} className="w-full mt-4">答える</Button>}
     </section> : <section className="mt-4 rounded-xl bg-emerald-50 border border-emerald-200 p-5">
       <div className="flex items-center"><BookOpenIcon className="h-7 w-7 text-emerald-700 mr-2" /><h2 className="text-xl font-bold text-emerald-800">今日の長文 完了！</h2></div>
       <p className="font-bold text-slate-700 mt-4">全文和訳</p><p className="text-slate-700 leading-7 mt-1">{reading.translation}</p>
