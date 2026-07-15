@@ -8,8 +8,10 @@ const UnitSelectPage = lazy(() => import('./pages/UnitSelectPage'));
 const BuilderPage = lazy(() => import('./pages/BuilderPage'));
 const SetSelectPage = lazy(() => import('./pages/SetSelectPage'));
 const ResultReportPage = lazy(() => import('./pages/ResultReportPage'));
-const RandomChallengeOptionsPage = lazy(() => import('./pages/RandomChallengeOptionsPage'));
 const ProgressPage = lazy(() => import('./pages/ProgressPage'));
+const VocabularyHomePage = lazy(() => import('./pages/VocabularyHomePage'));
+const Grade1VocabularyQuizPage = lazy(() => import('./pages/Grade1VocabularyQuizPage'));
+const Grade1VocabularyMapPage = lazy(() => import('./pages/Grade1VocabularyMapPage'));
 const Eiken4HomePage = lazy(() => import('./pages/Eiken4HomePage'));
 const Eiken4DailyPage = lazy(() => import('./pages/Eiken4DailyPage'));
 const Eiken4WordCardsPage = lazy(() => import('./pages/Eiken4WordCardsPage'));
@@ -46,13 +48,15 @@ const App: React.FC = () => {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route element={<GradeDataBoundary />}>
-              <Route path="/random-challenge-options" element={<RandomChallengeOptionsPage />} />
               <Route path="/grade/:gradeId" element={<UnitSelectPage />} />
               <Route path="/grade/:gradeId/unit/:unitId/sets" element={<SetSelectPage />} />
               <Route path="/grade/:gradeId/unit/:unitId/set/:setIndex" element={<BuilderPage />} />
               <Route path="/report" element={<ResultReportPage />} />
               <Route path="/progress" element={<ProgressPage />} />
             </Route>
+            <Route path="/vocabulary" element={<VocabularyHomePage />} />
+            <Route path="/vocabulary/grade1/quiz" element={<Grade1VocabularyQuizPage />} />
+            <Route path="/vocabulary/grade1/map" element={<Grade1VocabularyMapPage />} />
             <Route path="/eiken4" element={<Eiken4HomePage />} />
             <Route path="/eiken4/daily" element={<Eiken4DailyPage />} />
             <Route path="/eiken4/reading" element={<Eiken4ReadingPage />} />

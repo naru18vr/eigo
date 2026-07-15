@@ -25,7 +25,7 @@ const GradeCard: React.FC<GradeCardProps> = ({ grade }) => {
              <BookOpenIcon className="h-8 w-8 text-white" />
           </div>
           <h2 className="text-2xl font-bold">{grade.name}</h2>
-          <p className="text-sm opacity-90">{grade.units.length > 0 ? `${grade.units.length} ユニット利用可能` : 'ユニットがありません'}</p>
+          <p className="text-sm opacity-90">{grade.units.length > 0 ? `${grade.units.length} ユニット利用可能` : '学年別コースを開く'}</p>
         </div>
         <ChevronRightIcon className="h-8 w-8 opacity-70" />
       </div>

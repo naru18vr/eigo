@@ -3,7 +3,6 @@ import React from 'react';
 import { useAppContext } from '../contexts/AppContext';
 import GradeCard from '../components/GradeCard';
 import { Link } from 'react-router-dom';
-import SparklesIcon from '../components/shared/SparklesIcon';
 import ChevronRightIcon from '../components/shared/ChevronRightIcon';
 import ClockIcon from '../components/shared/ClockIcon';
 import BookOpenIcon from '../components/shared/BookOpenIcon';
@@ -29,6 +28,20 @@ const HomePage: React.FC = () => {
           ))}
 
           <Link
+            to="/vocabulary"
+            className="block p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 bg-emerald-600 text-white transform hover:scale-105 active:scale-95"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="p-3 rounded-full bg-emerald-600 inline-block mb-3"><BookOpenIcon className="h-8 w-8 text-white" /></div>
+                <h2 className="text-2xl font-bold">英単語</h2>
+                <p className="text-sm opacity-90">学年別の確認テスト・英単語マップ</p>
+              </div>
+              <ChevronRightIcon className="h-8 w-8 opacity-70" />
+            </div>
+          </Link>
+
+          <Link
             to="/eiken4"
             className="block p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 bg-indigo-600 text-white transform hover:scale-105 active:scale-95"
           >
@@ -39,22 +52,6 @@ const HomePage: React.FC = () => {
                 </div>
                 <h2 className="text-2xl font-bold">英検4級</h2>
                 <p className="text-sm opacity-90">単語カード・並べ替え・結果カード</p>
-              </div>
-              <ChevronRightIcon className="h-8 w-8 opacity-70" />
-            </div>
-          </Link>
-
-          <Link
-            to="/random-challenge-options"
-            className="block p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 bg-amber-500 text-white transform hover:scale-105 active:scale-95"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <div className={`p-3 rounded-full bg-amber-500 inline-block mb-3`}>
-                  <SparklesIcon className="h-8 w-8 text-white" />
-                </div>
-                <h2 className="text-2xl font-bold">ランダムチャレンジ</h2>
-                <p className="text-sm opacity-90">学年とユニットを選んで実力テスト！</p>
               </div>
               <ChevronRightIcon className="h-8 w-8 opacity-70" />
             </div>
