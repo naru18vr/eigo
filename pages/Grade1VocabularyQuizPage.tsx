@@ -80,7 +80,7 @@ const Grade1VocabularyQuizPage: React.FC = () => {
       <Button onClick={() => navigate('/vocabulary')} variant="ghost" size="sm"><ArrowLeftIcon className="h-5 w-5 mr-2" />英単語に戻る</Button>
       <header className="mt-4 rounded-2xl bg-emerald-600 p-5 text-white shadow"><p className="text-sm font-bold text-emerald-100">中学{config.grade}年生</p><h1 className="mt-1 text-2xl font-bold">英単語 確認テスト</h1><p className="mt-2 text-sm">{index + 1} / {words.length}</p></header>
       <main className="mt-5 rounded-2xl bg-white p-5 shadow-xl">
-        <p className="text-sm font-bold text-slate-500">次の単語の意味は？</p><h2 className="mt-2 text-4xl font-bold text-slate-800">{current.word}</h2>
+        <p className="text-sm font-bold text-slate-500">次の単語の意味は？</p><div className="mt-2 flex items-center gap-2"><h2 className="text-4xl font-bold text-slate-800">{current.word}</h2>{current.review && <span className="rounded-full bg-violet-100 px-2 py-1 text-xs font-bold text-violet-700">前学年の復習</span>}</div>
         <button onClick={() => speakText(current.word, 'en-US', 0.82)} className="mt-3 inline-flex items-center rounded-full bg-emerald-50 px-4 py-2 font-bold text-emerald-700"><SpeakerWaveIcon className="h-5 w-5 mr-2" />発音を聞く</button>
         <div className="mt-5 space-y-3">{choices.map((choice, choiceIndex) => {
           const answer = checked && choice === current.meaning;

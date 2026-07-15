@@ -82,6 +82,18 @@ for (const [gradeId, config] of Object.entries(gradeVocabularyData)) {
   }
 }
 
+const vocabularyFirstGrade = new Map<string, number>();
+for (const config of Object.values(gradeVocabularyData).sort((left, right) => left.grade - right.grade)) {
+  for (const item of config.words) {
+    const word = item.word.toLowerCase();
+    const firstGrade = vocabularyFirstGrade.get(word);
+    if (firstGrade !== undefined && !item.review) errors.push(`中${config.grade}英単語: 前学年と重複する ${item.word} に復習表示がない`);
+    if (firstGrade === undefined) vocabularyFirstGrade.set(word, config.grade);
+  }
+}
+if (!gradeVocabularyData.grade1.words.find(item => item.word === 'want')?.meaning.includes('～したい')) errors.push('中1英単語: want の重要な意味「～したい」がない');
+if (!gradeVocabularyData.grade3.words.find(item => item.word === 'right')?.meaning.includes('権利')) errors.push('中3英単語: right の意味「権利」がない');
+
 if (errors.length) {
   console.error(errors.slice(0, 50).join('\n'));
   process.exit(1);

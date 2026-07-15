@@ -7,7 +7,7 @@ export const grade2VocabularyWords: Grade1Word[] = [
   ['artist','芸術家','The artist showed us her pictures.'],['interested','興味を持って','I am interested in science.'],['important','大切な','It is important to help others.'],['choose','選ぶ','You can choose one book.'],['practice','練習する','I practice English every day.'],['learn','学ぶ・覚える','We learn many things at school.'],
   ['local','地元の','We enjoyed the local food.'],['traditional','伝統的な','This is a traditional Japanese dish.'],['dish','料理・皿','This dish is popular here.'],['meal','食事','We had a good meal together.'],['taste','味がする・味','This soup tastes good.'],['sweet','甘い','This cake is too sweet for me.'],
   ['delicious','おいしい','The curry was delicious.'],['popular','人気のある','Soccer is popular in many countries.'],['different','異なる','This dish is different from that one.'],['culture','文化','Food is an important part of culture.'],['festival','祭り','The summer festival was exciting.'],['special','特別な','Today is a special day for us.'],
-  ['homestay','ホームステイ','I enjoyed my homestay in Canada.'],['host','受け入れる人・主人','My host family was very kind.'],['guest','客','We have a guest from Australia.'],['rule','規則','You must follow the house rules.'],['message','伝言・メッセージ','Please leave a message for Ken.'],['advice','助言','My teacher gave me good advice.'],
+  ['homestay','ホームステイ','I enjoyed my homestay in Canada.'],['host','受け入れ先の人・ホスト','My host family was very kind.'],['guest','客','We have a guest from Australia.'],['rule','規則','You must follow the house rules.'],['message','伝言・メッセージ','Please leave a message for Ken.'],['advice','助言','My teacher gave me good advice.'],
   ['should','～すべきだ','You should go to bed early.'],['must','～しなければならない','We must follow the rules.'],['need','必要とする','I need to finish my homework.'],['understand','理解する','I understand what you mean.'],['remember','覚えている','Please remember my advice.'],['forget','忘れる','Do not forget your umbrella.'],
   ['design','デザイン・設計する','This design is easy to understand.'],['useful','役に立つ','This map is useful for visitors.'],['safe','安全な','This street is safe at night.'],['easy','簡単な','This book is easy to read.'],['difficult','難しい','It is difficult to answer the question.'],['possible','可能な','Is it possible to finish today?'],
   ['way','方法・道','Please tell me the way to the station.'],['problem','問題','We have to solve this problem.'],['answer','答え・答える','I do not know the answer.'],['question','質問','May I ask you a question?'],['example','例','Please give me an example.'],['information','情報','I found the information online.'],
@@ -18,3 +18,8 @@ export const grade2VocabularyWords: Grade1Word[] = [
   ['because','～なので','I stayed home because it was raining.'],['if','もし～なら','If you are tired, take a rest.'],['when','～するとき','Call me when you get home.'],['that','～ということ','I think that he is right.'],['before','～の前に','Wash your hands before dinner.'],['after','～の後に','We played tennis after school.'],
   ['already','すでに','Lunch is already ready.'],['still','まだ・今も','She is still studying.'],['soon','まもなく','The bus will come soon.'],['again','もう一度','Please say that again.'],['together','一緒に','Let us work together.'],['during','～の間に','I read many books during vacation.'],
 ].map(([word, meaning, example]) => ({ word, meaning, example }));
+
+// 中1で学んだ語を、接続詞などの新しい用法で復習する語。
+for (const item of grade2VocabularyWords) {
+  if (item.word === 'that' || item.word === 'when') item.review = true;
+}

@@ -1,4 +1,4 @@
-export type Grade1Word = { word: string; meaning: string; example: string };
+export type Grade1Word = { word: string; meaning: string; example: string; review?: boolean };
 
 export const grade1ReviewWords: Grade1Word[] = [
   ['I','私は','I am a student.'],['you','あなたは','You are my friend.'],['he','彼は','He plays soccer.'],['she','彼女は','She likes music.'],['we','私たちは','We study English.'],['they','彼らは','They are students.'],
@@ -9,7 +9,7 @@ export const grade1ReviewWords: Grade1Word[] = [
   ['water','水','I drink water.'],['breakfast','朝食','I eat breakfast at seven.'],['morning','朝','I study in the morning.'],['today','今日','I am busy today.'],['tomorrow','明日','See you tomorrow.'],['every','毎～','I walk every day.'],
   ['go','行く','I go to school.'],['come','来る','Please come here.'],['play','する・遊ぶ','I play tennis.'],['like','好きである','I like English.'],['have','持っている','I have a bike.'],['study','勉強する','We study math.'],
   ['eat','食べる','I eat an apple.'],['drink','飲む','She drinks milk.'],['read','読む','I read a book.'],['write','書く','Write your name.'],['speak','話す','I speak Japanese.'],['watch','見る','We watch TV.'],
-  ['listen','聞く','Listen to me.'],['help','手伝う','I help my mother.'],['know','知っている','I know him.'],['want','欲しい','I want a new bag.'],['live','住む','I live in Tokyo.'],['make','作る','We make lunch.'],
+  ['listen','聞く','Listen to me.'],['help','手伝う','I help my mother.'],['know','知っている','I know him.'],['want','欲しい・～したい','I want a new bag.'],['live','住む','I live in Tokyo.'],['make','作る','We make lunch.'],
   ['good','よい','This book is good.'],['new','新しい','I have a new bike.'],['old','古い・年を取った','This house is old.'],['big','大きい','That is a big dog.'],['small','小さい','I have a small cat.'],['happy','うれしい','I am happy.'],
   ['busy','忙しい','She is busy today.'],['kind','親切な','My teacher is kind.'],['can','～できる','I can swim.'],['not','～でない','I am not tired.'],['in','～の中に','The ball is in the box.'],['on','～の上に','The pen is on the desk.'],
   ['under','～の下に','The cat is under the table.'],['with','～と一緒に','I play with Ken.'],['from','～出身の','I am from Japan.'],['to','～へ','I go to school.'],['and','そして','Ken and Yumi are friends.'],['but','しかし','I like dogs, but I do not like cats.'],
