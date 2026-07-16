@@ -15,6 +15,7 @@ import Eiken4GrammarReference from '../components/Eiken4GrammarReference';
 import { createTransfer } from '../services/learningTransferService';
 import { recordWorksheetDone } from '../services/eiken4CourseService';
 import { listeningCauseOptions, recordListeningCause, type ListeningCause } from '../services/eiken4ListeningCauseService';
+import { daysUntilExam, getExamDate } from '../services/eiken4ProgressService';
 
 const Eiken4DailyPage: React.FC = () => {
   const navigate = useNavigate();
@@ -43,6 +44,7 @@ const Eiken4DailyPage: React.FC = () => {
   const correctCount = progress.answers.filter(answer => answer.correct).length;
   const isListening = Boolean(current?.audioText);
   const dailyWordCount = progress.questionIds.filter(id => id.startsWith('word-')).length;
+  const finalMode = daysUntilExam(getExamDate()) <= 14;
 
   useEffect(() => {
     setPlayCount(0);
@@ -180,6 +182,7 @@ const Eiken4DailyPage: React.FC = () => {
         <div className="h-full bg-indigo-600 transition-all" style={{ width: `${total ? (finished / total) * 100 : 0}%` }} />
       </div>
       {isRetry && <div className="mb-4 rounded-xl bg-amber-100 text-amber-900 p-3 text-sm font-bold">あと少し！ 間違えた問題をもう一度やろう。</div>}
+      {finalMode && !isRetry && <div className="mb-4 rounded-xl bg-violet-100 p-3 text-sm font-bold text-violet-900">試験直前モード：新しい範囲を増やさず、模試と復習の弱点を優先します。</div>}
       <section className="rounded-2xl bg-white shadow-lg border border-indigo-100 p-6">
         <p className="text-sm text-indigo-600 font-bold">{isListening ? '会話を聞いて答えよう' : 'いちばん合う答えを選ぼう'}</p>
         {isListening && <div className="mt-4 rounded-xl bg-indigo-50 p-4">

@@ -4,6 +4,7 @@ import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Eiken4SessionProvider } from './contexts/Eiken4SessionContext';
 import HomePage from './pages/HomePage';
 import PwaUpdatePrompt from './components/PwaUpdatePrompt';
+import StorageErrorBanner from './components/StorageErrorBanner';
 
 const UnitSelectPage = lazy(() => import('./pages/UnitSelectPage'));
 const BuilderPage = lazy(() => import('./pages/BuilderPage'));
@@ -36,6 +37,7 @@ const Eiken4WeaknessPage = lazy(() => import('./pages/Eiken4WeaknessPage'));
 const Eiken4WordChallengePage = lazy(() => import('./pages/Eiken4WordChallengePage'));
 const LearningTransferPage = lazy(() => import('./pages/LearningTransferPage'));
 const Eiken4ListeningFocusPage = lazy(() => import('./pages/Eiken4ListeningFocusPage'));
+const StorageRecoveryPage = lazy(() => import('./pages/StorageRecoveryPage'));
 const GradeDataBoundary = lazy(() => import('./components/GradeDataBoundary'));
 
 const PageLoading = () => (
@@ -53,6 +55,7 @@ const App: React.FC = () => {
       <Eiken4SessionProvider>
         <div className="min-h-screen flex flex-col">
           <PwaUpdatePrompt />
+          <StorageErrorBanner />
           <Suspense fallback={<PageLoading />}>
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -89,6 +92,7 @@ const App: React.FC = () => {
             <Route path="/eiken4/weakness" element={<Eiken4WeaknessPage />} />
             <Route path="/eiken4/word-challenge" element={<Eiken4WordChallengePage />} />
             <Route path="/transfer" element={<LearningTransferPage />} />
+            <Route path="/storage-recovery" element={<StorageRecoveryPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
           </Suspense>

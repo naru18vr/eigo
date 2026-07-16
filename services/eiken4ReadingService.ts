@@ -1,6 +1,8 @@
 import { eiken4Readings } from '../data/eiken4Readings';
 import { localDateKey } from './eiken4DailyService';
 import { recordEiken4Activity } from './eiken4ProgressService';
+import { classifyReadingSkill, topReadingSkill } from './eiken4ReadingSkillService';
+import { safeSetLearningItem } from './storageHealthService';
 
 const KEY = 'eiken4DailyReadingV1';
 const HISTORY_KEY = 'eiken4ReadingCoverageV1';
@@ -20,7 +22,8 @@ export const getTodayReading = () => {
   const counts = history.reduce((result, id) => { result[id] = (result[id] || 0) + 1; return result; }, {} as Record<string, number>);
   let weak: Record<string, number> = {};
   if (typeof localStorage !== 'undefined') try { weak = JSON.parse(localStorage.getItem(WEAK_KEY) || '{}'); } catch { /* repair below */ }
-  return eiken4Readings.map((reading, index) => ({ reading, index, count: counts[reading.id] || 0, weak: weak[reading.id] || 0 })).sort((a, b) => b.weak - a.weak || a.count - b.count || a.index - b.index)[0].reading;
+  const targetSkill=topReadingSkill();
+  return eiken4Readings.map((reading, index) => ({ reading, index, count: counts[reading.id] || 0, weak: weak[reading.id] || 0, skill:targetSkill&&reading.questions.some(q=>classifyReadingSkill(q.question)===targetSkill)?3:0 })).sort((a, b) => b.skill-a.skill||b.weak - a.weak || a.count - b.count || a.index - b.index)[0].reading;
 };
 
 export const recordReadingAnswer = (readingId: string, correct: boolean) => {
@@ -42,7 +45,7 @@ export const loadReadingProgress = (): ReadingProgress => {
 };
 
 export const saveReadingProgress = (progress: ReadingProgress) => {
-  if (typeof localStorage !== 'undefined') localStorage.setItem(KEY, JSON.stringify(progress));
+  if (typeof localStorage !== 'undefined') safeSetLearningItem(KEY, JSON.stringify(progress));
   if (progress.completedAt) {
     recordEiken4Activity('reading', progress.date);
     if (typeof localStorage !== 'undefined') {

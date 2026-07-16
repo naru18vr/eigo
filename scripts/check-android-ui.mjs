@@ -14,6 +14,11 @@ const checks = [
   ['components/PwaUpdatePrompt.tsx', /updateServiceWorker/, 'PWA更新操作がない'],
   ['vite.config.ts', /VitePWA/, 'オフライン対応設定がない'],
   ['pages/Eiken4ListeningFocusPage.tsx', /原因別6問/, '原因別リスニング練習がない'],
+  ['pages/Eiken4FullMockPage.tsx', /saveFullMockAttempt/, 'フル模試の途中保存がない'],
+  ['pages/StorageRecoveryPage.tsx', /破損項目だけを分離/, '保存データ復旧画面がない'],
+  ['pages/Eiken4ListeningFocusPage.tsx', /aria-label/, '音声ボタンの読み上げラベルがない'],
+  ['pages/Eiken4ListeningFocusPage.tsx', /○ 正解|× 正解/, '正誤を色だけで表示している'],
+  ['components/StorageErrorBanner.tsx', /role="alert"/, '保存失敗時の結果退避案内がない'],
 ];
 const errors = checks.filter(([path, pattern]) => !pattern.test(read(path))).map(([, , message]) => message);
 if (errors.length) { console.error(errors.join('\n')); process.exit(1); }

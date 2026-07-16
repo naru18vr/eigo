@@ -1,8 +1,9 @@
 import { eiken4Words } from '../data/eiken4Words';
 import { eiken4ListeningQuestions } from '../data/eiken4Listening';
 import { eiken4CoreExamQuestions, eiken4CoreSentences } from '../data/eiken4Curriculum';
-import { recordEiken4Activity } from './eiken4ProgressService';
+import { daysUntilExam, getExamDate, recordEiken4Activity } from './eiken4ProgressService';
 import { loadAvailableMockPriorities } from './eiken4MockPriorityService';
+import { safeSetLearningItem } from './storageHealthService';
 
 export const EIKEN4_DAILY_KEY = 'eiken4DailyProgressV4';
 const REVIEW_KEY = 'eiken4ReviewScheduleV1';
@@ -193,9 +194,10 @@ export const recordReviewAnswer = (id: string, correct: boolean, isRetry: boolea
 };
 
 const buildDailyQuestionIds = (date: string) => {
+  const finalMode = daysUntilExam(getExamDate()) <= 14;
   const dueIds = loadReviews().filter(record => record.dueDate <= date)
     .sort((left, right) => left.dueDate.localeCompare(right.dueDate) || left.step - right.step)
-    .slice(0, 8).map(record => record.id);
+    .slice(0, finalMode ? 14 : 8).map(record => record.id);
   const wordIds = leastSeen(eiken4Words, 'word-', `${date}-words`, 8);
   const sentenceIds = leastSeen(eiken4CoreSentences, 'sentence-', `${date}-sentences`, 4);
   const listeningIds = leastSeen(eiken4ListeningQuestions, 'listening-', `${date}-listening`, 3);
@@ -253,7 +255,7 @@ export const loadDailyProgress = (): DailyProgress => {
 };
 
 export const saveDailyProgress = (progress: DailyProgress) => {
-  if (typeof localStorage !== 'undefined') localStorage.setItem(EIKEN4_DAILY_KEY, JSON.stringify(progress));
+  if (typeof localStorage !== 'undefined') safeSetLearningItem(EIKEN4_DAILY_KEY, JSON.stringify(progress));
   if (progress.completedAt) recordEiken4Activity('daily', progress.date);
 };
 
