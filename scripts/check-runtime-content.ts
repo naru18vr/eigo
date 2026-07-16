@@ -4,6 +4,7 @@ import { GRADE_3_UNITS } from '../data/grade3';
 import { eiken4CoreExamQuestions, eiken4CoreSentences } from '../data/eiken4Curriculum';
 import { eiken4Words } from '../data/eiken4Words';
 import { gradeVocabularyData } from '../data/gradeVocabularyData';
+import { isTransferableLearningKey } from '../services/learningTransferService';
 
 const errors: string[] = [];
 const grades = [GRADE_1_UNITS, GRADE_2_UNITS, GRADE_3_UNITS];
@@ -93,6 +94,22 @@ for (const config of Object.values(gradeVocabularyData).sort((left, right) => le
 }
 if (!gradeVocabularyData.grade1.words.find(item => item.word === 'want')?.meaning.includes('～したい')) errors.push('中1英単語: want の重要な意味「～したい」がない');
 if (!gradeVocabularyData.grade3.words.find(item => item.word === 'right')?.meaning.includes('権利')) errors.push('中3英単語: right の意味「権利」がない');
+
+const transferableKeys = [
+  'eiken4DailyProgressV4',
+  'grade1VocabularyMasteryV1',
+  'setAttemptCount_grade1_u1_0',
+  'setStats_grade2_u3_1',
+  'sentenceMistakeCount_grade3_u2_g3u2s1',
+  'dailyLog',
+  'sentenceLearningProfileV1',
+];
+for (const key of transferableKeys) {
+  if (!isTransferableLearningKey(key)) errors.push(`引き継ぎ対象から学習記録が漏れている: ${key}`);
+}
+for (const key of ['soundEnabled', 'unrelatedSetting', 'apiKey']) {
+  if (isTransferableLearningKey(key)) errors.push(`引き継ぎ対象に学習記録以外が混入している: ${key}`);
+}
 
 if (errors.length) {
   console.error(errors.slice(0, 50).join('\n'));
