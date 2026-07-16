@@ -4,6 +4,7 @@ import Button from '../components/Button';
 import CheckCircleIcon from '../components/shared/CheckCircleIcon';
 import { getQuestionById } from '../services/eiken4DailyService';
 import { downloadDailyWorksheet, parseWorksheetShareData } from '../services/eiken4WorksheetService';
+import { recordWorksheetDone } from '../services/eiken4CourseService';
 
 const Eiken4WorksheetPage: React.FC = () => {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ const Eiken4WorksheetPage: React.FC = () => {
   const weakKinds = Array.from(new Set(progress.answers.filter(answer => !answer.correct).map(answer => getQuestionById(answer.id, progress.date)?.kind).filter(Boolean)));
   const download = async () => {
     setStatus('making');
-    try { await downloadDailyWorksheet(progress, reading, grade1); setStatus('idle'); }
+    try { await downloadDailyWorksheet(progress, reading, grade1); recordWorksheetDone(); setStatus('idle'); }
     catch { setStatus('error'); }
   };
 

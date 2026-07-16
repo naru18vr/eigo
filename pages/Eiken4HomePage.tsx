@@ -13,6 +13,7 @@ import { loadReadingProgress } from '../services/eiken4ReadingService';
 import { loadGrade1Review } from '../services/grade1ReviewService';
 import { isWordQuizDoneToday } from '../services/eiken4WordMasteryService';
 import { eiken4Words } from '../data/eiken4Words';
+import { getNextTodayCourseStep, getTodayCourseSteps } from '../services/eiken4CourseService';
 
 const Eiken4HomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -23,7 +24,9 @@ const Eiken4HomePage: React.FC = () => {
   const readingProgress = loadReadingProgress();
   const grade1Progress = loadGrade1Review();
   const cardsDone = isWordQuizDoneToday();
-  const courseDone = [Boolean(grade1Progress.completedAt), dailyDone, Boolean(readingProgress.completedAt), cardsDone].filter(Boolean).length;
+  const courseSteps = getTodayCourseSteps();
+  const courseDone = courseSteps.filter(step => step.done).length;
+  const nextStep = getNextTodayCourseStep();
 
   const startFresh = (path: string) => {
     resetSession();
@@ -50,7 +53,8 @@ const Eiken4HomePage: React.FC = () => {
           <p className="text-xs text-violet-700 mt-1">翌日 → 3日後 → 7日後 → 14日後に定着を確認します。</p>
         </div>
         <button onClick={() => navigate('/transfer')} className="mb-4 w-full rounded-2xl border border-teal-200 bg-teal-50 p-4 text-left flex items-center justify-between"><div><p className="text-xs font-bold text-teal-600">スマホ・タブレットで続きから</p><h3 className="font-bold text-slate-800">記録の引き継ぎリンク</h3></div><ChevronRightIcon className="h-6 w-6 text-teal-500"/></button>
-        <button onClick={() => navigate('/eiken4/course')} className="w-full p-6 rounded-3xl shadow-xl shadow-orange-200 bg-gradient-to-br from-amber-400 to-orange-500 text-white text-left hover:shadow-2xl active:scale-[.98] transition-all"><div className="flex items-start justify-between"><div><span className="inline-flex rounded-full bg-white/20 px-3 py-1 text-xs font-bold">毎日はここだけ押せばOK</span><h2 className="text-2xl font-bold mt-3">今日の学習コース</h2><p className="text-sm mt-2 text-orange-50">中1復習 → 15分 → 長文 → 英単語 → 紙</p></div><span className="rounded-full bg-white/20 p-2"><ChevronRightIcon className="h-7 w-7"/></span></div><div className="mt-5 flex items-center gap-3"><div className="h-2 flex-grow overflow-hidden rounded-full bg-white/30"><div className="h-full rounded-full bg-white transition-all" style={{width:`${courseDone * 25}%`}}/></div><span className="text-sm font-bold">{courseDone}/4</span></div></button>
+        <button onClick={() => navigate(nextStep.path)} className="w-full p-6 rounded-3xl shadow-xl shadow-orange-200 bg-gradient-to-br from-amber-400 to-orange-500 text-white text-left hover:shadow-2xl active:scale-[.98] transition-all"><div className="flex items-start justify-between"><div><span className="inline-flex rounded-full bg-white/20 px-3 py-1 text-xs font-bold">{courseDone === 5 ? '今日のコース完了！' : '開いたら次はここ'}</span><h2 className="text-2xl font-bold mt-3">{courseDone === 5 ? '今日の結果を見る' : `次は「${nextStep.title}」`}</h2><p className="text-sm mt-2 text-orange-50">中1復習 → 15分 → 長文 → 英単語 → 紙</p></div><span className="rounded-full bg-white/20 p-2"><ChevronRightIcon className="h-7 w-7"/></span></div><div className="mt-5 flex items-center gap-3"><div className="h-2 flex-grow overflow-hidden rounded-full bg-white/30"><div className="h-full rounded-full bg-white transition-all" style={{width:`${courseDone * 20}%`}}/></div><span className="text-sm font-bold">{courseDone}/5</span></div></button>
+        <button type="button" onClick={()=>navigate('/eiken4/course')} className="mb-1 mt-2 w-full py-2 text-sm font-bold text-orange-700 underline">5ステップの一覧を見る</button>
 
         <section className="mt-8"><div className="flex items-end justify-between"><div><p className="text-xs font-bold tracking-wider text-indigo-500">TODAY</p><h2 className="text-xl font-bold text-slate-800 mt-1">今日のコース</h2></div><p className="text-xs text-slate-500">個別にも開けます</p></div><div className="mt-4 grid grid-cols-2 gap-3">
           <button onClick={() => navigate('/eiken4/grade1-review')} className={`rounded-2xl border p-4 text-left shadow-sm transition active:scale-95 ${grade1Progress.completedAt ? 'bg-emerald-50 border-emerald-200' : 'bg-white border-amber-200'}`}><div className="flex items-center justify-between"><span className="text-xs font-bold text-amber-700">STEP 1</span>{grade1Progress.completedAt && <CheckCircleIcon className="h-5 w-5 text-emerald-500"/>}</div><h3 className="font-bold mt-2 text-slate-800">中1おさらい</h3><p className="text-xs text-slate-500 mt-1">{grade1Progress.completedAt ? '完了！' : `${grade1Progress.answers.length}/10問`}</p></button>

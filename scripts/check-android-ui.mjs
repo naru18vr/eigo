@@ -1,0 +1,16 @@
+import fs from 'node:fs';
+
+const read = path => fs.readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
+const checks = [
+  ['index.html', /width=device-width, initial-scale=1\.0/, 'Android向けviewportがない'],
+  ['services/eiken4WorksheetService.ts', /document\.execCommand\('copy'\)/, 'Clipboard API失敗時のコピー代替がない'],
+  ['pages/Eiken4DailyPage.tsx', /playCount >= 2/, '毎日リスニングの2回制限がない'],
+  ['pages/Eiken4ListeningPracticePage.tsx', /playCount >= 2/, '特訓リスニングの2回制限がない'],
+  ['pages/Eiken4DailyPage.tsx', /saveDailyProgress\(nextProgress\)/, '途中回答の保存がない'],
+  ['pages/HomePage.tsx', /getNextTodayCourseStep/, 'アプリ起動時の続き導線がない'],
+  ['pages/Eiken4DailyPage.tsx', /min-h-11|py-4/, 'スマホ用タップ領域が不足'],
+  ['pages/LearningTransferPage.tsx', /transfer\.isLong/, '長い引き継ぎリンクの警告がない'],
+];
+const errors = checks.filter(([path, pattern]) => !pattern.test(read(path))).map(([, , message]) => message);
+if (errors.length) { console.error(errors.join('\n')); process.exit(1); }
+console.log(`Android UIチェックOK: ${checks.length}項目`);

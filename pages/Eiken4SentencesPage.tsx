@@ -24,6 +24,7 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 };
 
 const formatSentence = (sentence: Sentence) => sentence.words.join(' ').replace(/ ([.,?!])/g, '$1');
+const frequentOrderPattern = (sentence: Sentence) => /疑問詞|疑問文|一般動詞|助動詞|can|will|must|不定詞|比較級|最上級|when|if|because/i.test(`${sentence.grammarTag} ${sentence.explanation}`);
 
 const Eiken4SentencesPage: React.FC = () => {
   const navigate = useNavigate();
@@ -34,7 +35,9 @@ const Eiken4SentencesPage: React.FC = () => {
     return shuffled.sort((a, b) => {
       const left = getSentenceLearningRecord('eiken4', 'sentences', a.id);
       const right = getSentenceLearningRecord('eiken4', 'sentences', b.id);
-      return ((right?.wrong || 0) - (right?.correct || 0)) - ((left?.wrong || 0) - (left?.correct || 0));
+      const leftWeak = (left?.wrong || 0) * 3 - (left?.correct || 0) + (frequentOrderPattern(a) ? 2 : 0);
+      const rightWeak = (right?.wrong || 0) * 3 - (right?.correct || 0) + (frequentOrderPattern(b) ? 2 : 0);
+      return rightWeak - leftWeak;
     }).slice(0, QUESTION_COUNT);
   }, []);
   const [index, setIndex] = useState(0);
@@ -115,6 +118,7 @@ const Eiken4SentencesPage: React.FC = () => {
           <p className="text-center text-sm font-semibold text-slate-500 mb-2">これを英語にしよう</p>
           <p className="text-center text-2xl md:text-3xl font-bold text-amber-600 mb-5">{current.japaneseQuestion}</p>
           <div className="flex flex-wrap justify-center gap-2 mb-5 text-xs font-bold">
+            {frequentOrderPattern(current) && <span className="rounded-full bg-amber-100 px-3 py-1 text-amber-800">英検4級の頻出語順</span>}
             <span className="rounded-full bg-violet-100 text-violet-800 px-3 py-1">{getSentenceDifficulty(current)}</span>
             {getCurriculumLabels('eiken4', 'sentences', current).map(label => <span key={label} className="rounded-full bg-emerald-100 text-emerald-800 px-3 py-1">{label}</span>)}
           </div>

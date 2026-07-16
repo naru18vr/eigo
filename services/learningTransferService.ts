@@ -13,6 +13,7 @@ const PREFIXES = [
 const EXACT_KEYS = new Set(['dailyLog', 'sentenceLearningProfileV1']);
 export const isTransferableLearningKey = (key: string) => EXACT_KEYS.has(key) || PREFIXES.some(prefix => key.startsWith(prefix));
 export type TransferPackage = { version: 1; createdAt: string; values: Record<string, string> };
+export const TRANSFER_LINK_WARNING_LENGTH = 12000;
 
 const encode = (value: string) => btoa(unescape(encodeURIComponent(value))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
 const decode = (value: string) => decodeURIComponent(escape(atob(value.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(value.length / 4) * 4, '='))));
@@ -23,13 +24,16 @@ export const createTransfer = () => {
   if (typeof localStorage !== 'undefined') for (let index = 0; index < localStorage.length; index += 1) {
     const key = localStorage.key(index); if (key && isTransferableLearningKey(key)) values[key] = localStorage.getItem(key) || '';
   }
-  const payload = encode(JSON.stringify({ version: 1, createdAt: new Date().toISOString(), values } satisfies TransferPackage));
+  const json = JSON.stringify({ version: 1, createdAt: new Date().toISOString(), values } satisfies TransferPackage);
+  const compressed = compressToEncodedURIComponent(json);
+  const payload = `z${compressed}`;
   const code = String(hash(payload) % 10000).padStart(4, '0');
   const base = typeof window === 'undefined' ? '' : `${window.location.origin}${window.location.pathname}`;
-  return { code, link: `${base}#/transfer?data=${payload}&code=${code}`, itemCount: Object.keys(values).length };
+  const link = `${base}#/transfer?data=${payload}&code=${code}`;
+  return { code, link, itemCount: Object.keys(values).length, linkLength: link.length, isLong: link.length > TRANSFER_LINK_WARNING_LENGTH, compressionRatio: json.length ? compressed.length / json.length : 1 };
 };
 
-export const readTransfer = (payload: string): TransferPackage | null => { try { const data = JSON.parse(decode(payload)) as TransferPackage; return data.version === 1 && data.values ? data : null; } catch { return null; } };
+export const readTransfer = (payload: string): TransferPackage | null => { try { const json = payload.startsWith('z') ? decompressFromEncodedURIComponent(payload.slice(1)) : decode(payload); if (!json) return null; const data = JSON.parse(json) as TransferPackage; return data.version === 1 && data.values ? data : null; } catch { return null; } };
 const merge = (current: unknown, incoming: unknown): unknown => {
   if (Array.isArray(current) && Array.isArray(incoming)) return Array.from(new Map([...current, ...incoming].map(item => [JSON.stringify(item), item])).values());
   if (current && incoming && typeof current === 'object' && typeof incoming === 'object') {
@@ -46,3 +50,4 @@ export const importTransfer = (data: TransferPackage) => {
   for (const [key, raw] of Object.entries(data.values)) { if (!isTransferableLearningKey(key)) continue; try { const existing = localStorage.getItem(key); localStorage.setItem(key, existing ? JSON.stringify(merge(JSON.parse(existing), JSON.parse(raw))) : raw); } catch { localStorage.setItem(key, raw); } count += 1; }
   return count;
 };
+import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';

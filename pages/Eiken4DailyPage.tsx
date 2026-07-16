@@ -13,6 +13,8 @@ import { loadReadingProgress } from '../services/eiken4ReadingService';
 import { recordWordMastery } from '../services/eiken4WordMasteryService';
 import Eiken4GrammarReference from '../components/Eiken4GrammarReference';
 import { createTransfer } from '../services/learningTransferService';
+import { recordWorksheetDone } from '../services/eiken4CourseService';
+import { listeningCauseOptions, recordListeningCause, type ListeningCause } from '../services/eiken4ListeningCauseService';
 
 const Eiken4DailyPage: React.FC = () => {
   const navigate = useNavigate();
@@ -29,6 +31,7 @@ const Eiken4DailyPage: React.FC = () => {
   const [pdfStatus, setPdfStatus] = useState<'idle' | 'making' | 'error'>('idle');
   const [copyStatus, setCopyStatus] = useState<'idle' | 'copying' | 'copied' | 'error'>('idle');
   const [parentMessage, setParentMessage] = useState('');
+  const [listeningCause, setListeningCause] = useState<ListeningCause | ''>('');
   const baseDone = progress.answers.length >= progress.questionIds.length;
   const retryDone = progress.retryAnswers.length >= progress.retryIds.length;
   const complete = baseDone && retryDone;
@@ -49,6 +52,7 @@ const Eiken4DailyPage: React.FC = () => {
     setAttempts(0);
     setRetrying(false);
     setResolved(false);
+    setListeningCause('');
     if ('speechSynthesis' in window) window.speechSynthesis.cancel();
   }, [currentId]);
 
@@ -76,6 +80,7 @@ const Eiken4DailyPage: React.FC = () => {
   const next = () => {
     if (!selected || !current || !resolved) return;
     const correct = selected === current.answer;
+    if (isListening && !correct && listeningCause) recordListeningCause(current.id, listeningCause);
     if (current.id.startsWith('word-')) recordWordMastery(current.id, correct);
     recordReviewAnswer(current.id, correct, isRetry);
     if (!isRetry) recordQuestionCoverage(current.id);
@@ -101,6 +106,7 @@ const Eiken4DailyPage: React.FC = () => {
       setPdfStatus('making');
       try {
         await downloadDailyWorksheet(progress, loadReadingProgress());
+        recordWorksheetDone();
         setPdfStatus('idle');
       } catch {
         setPdfStatus('error');
@@ -114,7 +120,9 @@ const Eiken4DailyPage: React.FC = () => {
         const transfer = createTransfer();
         const message = `今日の15分を完了しました！\n正解：${score} / ${progress.questionIds.length}問${reading.completedAt ? '\nミニ長文も完了しました！' : ''}\n今日の類題プリントはこちら\n${createWorksheetShareLink(progress, reading)}\n\nスマホ・タブレットの続きはこちら\n引き継ぎ番号：${transfer.code}\n${transfer.link}\n※別の端末では、一番新しい報告のリンクを押してください。`;
         setParentMessage(message);
-        setCopyStatus(await copyTextToClipboard(message) ? 'copied' : 'error');
+        const copied = await copyTextToClipboard(message);
+        if (copied) recordWorksheetDone();
+        setCopyStatus(copied ? 'copied' : 'error');
       } catch {
         setCopyStatus('error');
       }
@@ -197,11 +205,12 @@ const Eiken4DailyPage: React.FC = () => {
           <p className="font-bold">{answeredCorrectly ? '正解！' : `3回間違えました。正解：${current.answer}`}</p>
           {current.transcript && <div className="mt-3 border-t border-slate-200 pt-3"><p className="text-xs font-bold text-slate-500">聞こえた英文</p><p className="text-sm whitespace-pre-line mt-1">{current.transcript}</p><p className="text-xs font-bold text-slate-500 mt-3">日本語</p><p className="text-sm whitespace-pre-line mt-1">{current.translation}</p></div>}
           {current.explanation && <p className="text-sm text-slate-700 mt-2">{current.explanation}</p>}
+          {isListening && !answeredCorrectly && <fieldset className="mt-4 rounded-xl border border-indigo-200 bg-white p-3 text-left"><legend className="px-1 text-sm font-bold text-indigo-800">聞き取れなかった原因を1つ選ぼう</legend><div className="mt-2 grid gap-2">{listeningCauseOptions.map(cause=><label key={cause} className="flex min-h-11 items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm"><input type="radio" name="listening-cause" checked={listeningCause===cause} onChange={()=>setListeningCause(cause)}/>{cause}</label>)}</div></fieldset>}
           {!answeredCorrectly && <Eiken4GrammarReference source={`${current.kind} ${current.prompt} ${current.detail} ${current.explanation || ''}`} />}
           {!isListening && <button onClick={() => speakText(current.id.startsWith('word-') ? current.prompt : current.answer, 'en-US', 0.82)} className="mt-3 inline-flex items-center rounded-full bg-white text-indigo-700 font-bold px-4 py-2 border border-indigo-200">
             <SpeakerWaveIcon className="h-5 w-5 mr-2" />{current.id.startsWith('word-') ? '単語の発音を聞く' : '正しい英文を聞く'}
           </button>}
-          <Button onClick={next} className="mt-4 w-full">次の問題へ</Button>
+          <Button onClick={next} disabled={isListening && !answeredCorrectly && !listeningCause} className="mt-4 w-full">{isListening && !answeredCorrectly && !listeningCause ? '原因を選んでください' : '次の問題へ'}</Button>
         </div>}
       </section>
       <p className="text-center text-xs text-slate-500 mt-4">学習結果はこの端末に保存され、自動復習に使われます。</p>

@@ -192,7 +192,9 @@ export const recordReviewAnswer = (id: string, correct: boolean, isRetry: boolea
 };
 
 const buildDailyQuestionIds = (date: string) => {
-  const dueIds = loadReviews().filter(record => record.dueDate <= date).slice(0, 5).map(record => record.id);
+  const dueIds = loadReviews().filter(record => record.dueDate <= date)
+    .sort((left, right) => left.dueDate.localeCompare(right.dueDate) || left.step - right.step)
+    .slice(0, 8).map(record => record.id);
   const wordIds = leastSeen(eiken4Words, 'word-', `${date}-words`, 8);
   const sentenceIds = leastSeen(eiken4CoreSentences, 'sentence-', `${date}-sentences`, 4);
   const listeningIds = leastSeen(eiken4ListeningQuestions, 'listening-', `${date}-listening`, 3);

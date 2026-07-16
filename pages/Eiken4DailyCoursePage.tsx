@@ -9,6 +9,7 @@ import { loadDailyProgress, resetTodayDailyProgress } from '../services/eiken4Da
 import { loadReadingProgress, resetTodayReadingProgress } from '../services/eiken4ReadingService';
 import { isWordQuizDoneToday, resetTodayWordCourse } from '../services/eiken4WordMasteryService';
 import { useEiken4Session } from '../contexts/Eiken4SessionContext';
+import { isWorksheetDoneToday, resetTodayWorksheetDone } from '../services/eiken4CourseService';
 
 const Eiken4DailyCoursePage: React.FC = () => {
   const navigate = useNavigate();
@@ -24,17 +25,18 @@ const Eiken4DailyCoursePage: React.FC = () => {
     { title: '今日の15分', detail: '単語・文法・リスニング・本番形式18問', path: '/eiken4/daily', done: dailyDone },
     { title: 'ミニ長文', detail: '英文1題＋設問2問', path: '/eiken4/reading', done: readingDone },
     { title: '英単語＋確認テスト', detail: 'カード8語を見て、同じ8語をテスト', path: '/eiken4/words', done: cardsDone },
-    { title: '紙の類似プリント', detail: '印刷リンクをお母さんへ送る', path: '/eiken4/daily', done: false },
+    { title: '紙の類似プリント', detail: '印刷リンクをお母さんへ送る', path: '/eiken4/daily', done: isWorksheetDoneToday() },
   ];
   const nextIndex = steps.findIndex(step => !step.done);
   const next = steps[nextIndex < 0 ? steps.length - 1 : nextIndex];
-  const completed = steps.slice(0, 4).filter(step => step.done).length;
+  const completed = steps.filter(step => step.done).length;
   const resetToday = () => {
     if (!confirmReset) { setConfirmReset(true); return; }
     resetTodayGrade1Review();
     resetTodayDailyProgress();
     resetTodayReadingProgress();
     resetTodayWordCourse();
+    resetTodayWorksheetDone();
     resetSession();
     setConfirmReset(false);
     setResetVersion(value => value + 1);
@@ -42,7 +44,7 @@ const Eiken4DailyCoursePage: React.FC = () => {
   return <div className="flex-grow container mx-auto p-4 sm:p-6 max-w-xl">
     <Button onClick={() => navigate('/eiken4')} variant="ghost" size="sm"><ArrowLeftIcon className="h-5 w-5 mr-2"/>英検4級に戻る</Button>
     <header className="mt-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white p-6 shadow-lg">
-      <p className="text-sm font-bold opacity-90">迷わず上から順番に</p><h1 className="text-3xl font-bold mt-1">今日の学習コース</h1><p className="mt-2">アプリ学習 {completed} / 4 完了</p>
+      <p className="text-sm font-bold opacity-90">迷わず上から順番に</p><h1 className="text-3xl font-bold mt-1">今日の学習コース</h1><p className="mt-2">今日のコース {completed} / 5 完了</p>
     </header>
     <button onClick={() => navigate('/eiken4/grammar-guide')} className="mt-4 w-full rounded-xl border border-cyan-200 bg-cyan-50 p-4 text-left"><p className="text-xs font-bold text-cyan-700">問題の文法がわからないとき</p><p className="font-bold text-slate-800 mt-1">習う前でもわかる「英検4級文法」を読む →</p></button>
     <div className="mt-5 space-y-3">{steps.map((step, index) => {
@@ -54,7 +56,7 @@ const Eiken4DailyCoursePage: React.FC = () => {
     })}</div>
     <Button onClick={() => navigate(next.path)} className="w-full mt-6" size="lg">{nextIndex === 4 ? '結果と印刷リンクを開く' : `次の「${next.title}」を始める`}</Button>
     {completed > 0 && <Button onClick={resetToday} variant={confirmReset ? 'danger' : 'secondary'} className="w-full mt-3">{confirmReset ? '本当に今日のコースをやり直す' : '今日のコースをやり直す'}</Button>}
-    {confirmReset && <p className="text-xs text-center text-rose-600 mt-2">もう一度押すと今日の4ステップだけ未完了に戻ります。累積の定着記録は残ります。</p>}
+    {confirmReset && <p className="text-xs text-center text-rose-600 mt-2">もう一度押すと今日の5ステップだけ未完了に戻ります。累積の定着記録は残ります。</p>}
     <p className="text-xs text-center text-slate-500 mt-3">本番形式10問とミニ模試は、余裕のある日だけで大丈夫です。</p>
   </div>;
 };

@@ -6,10 +6,13 @@ import { Link } from 'react-router-dom';
 import ChevronRightIcon from '../components/shared/ChevronRightIcon';
 import ClockIcon from '../components/shared/ClockIcon';
 import BookOpenIcon from '../components/shared/BookOpenIcon';
+import { getNextTodayCourseStep, getTodayCourseSteps } from '../services/eiken4CourseService';
 
 
 const HomePage: React.FC = () => {
   const { grades } = useAppContext();
+  const nextStep = getNextTodayCourseStep();
+  const completedSteps = getTodayCourseSteps().filter(step => step.done).length;
 
   return (
     <div className="flex-grow container mx-auto p-4 sm:p-6 lg:p-8">
@@ -20,6 +23,7 @@ const HomePage: React.FC = () => {
       
       <main className="max-w-xl mx-auto">
         <div className="flex flex-col gap-6">
+          <Link to={nextStep.path} className="block rounded-2xl bg-gradient-to-r from-orange-500 to-amber-400 p-5 text-white shadow-lg active:scale-[.98]"><p className="text-xs font-bold text-orange-100">英検4級・今日の続き</p><div className="mt-1 flex items-center justify-between"><div><h2 className="text-xl font-extrabold">{completedSteps === 5 ? '今日の結果を見る' : `次は「${nextStep.title}」`}</h2><p className="mt-1 text-sm text-orange-50">{completedSteps} / 5 完了</p></div><ChevronRightIcon className="h-7 w-7" /></div></Link>
           <Link to="/guide" className="block rounded-xl border-2 border-indigo-200 bg-indigo-50 p-4 text-indigo-800 shadow hover:shadow-md transition-all">
             <div className="flex items-center justify-between"><div className="flex items-center"><BookOpenIcon className="h-7 w-7 mr-3"/><div><h2 className="font-bold text-lg">このアプリの使い方</h2><p className="text-sm">毎日の進め方・できることを見る</p></div></div><ChevronRightIcon className="h-6 w-6"/></div>
           </Link>
