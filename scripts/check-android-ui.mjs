@@ -7,9 +7,13 @@ const checks = [
   ['pages/Eiken4DailyPage.tsx', /playCount >= 2/, '毎日リスニングの2回制限がない'],
   ['pages/Eiken4ListeningPracticePage.tsx', /playCount >= 2/, '特訓リスニングの2回制限がない'],
   ['pages/Eiken4DailyPage.tsx', /saveDailyProgress\(nextProgress\)/, '途中回答の保存がない'],
-  ['pages/HomePage.tsx', /getNextTodayCourseStep/, 'アプリ起動時の続き導線がない'],
+  ['pages/HomePage.tsx', /getLightweightNextStep/, 'アプリ起動時の軽量な続き導線がない'],
   ['pages/Eiken4DailyPage.tsx', /min-h-11|py-4/, 'スマホ用タップ領域が不足'],
   ['pages/LearningTransferPage.tsx', /transfer\.isLong/, '長い引き継ぎリンクの警告がない'],
+  ['pages/LearningTransferPage.tsx', /verifyTransferChecksum/, '引き継ぎリンクの破損検出がない'],
+  ['components/PwaUpdatePrompt.tsx', /updateServiceWorker/, 'PWA更新操作がない'],
+  ['vite.config.ts', /VitePWA/, 'オフライン対応設定がない'],
+  ['pages/Eiken4ListeningFocusPage.tsx', /原因別6問/, '原因別リスニング練習がない'],
 ];
 const errors = checks.filter(([path, pattern]) => !pattern.test(read(path))).map(([, , message]) => message);
 if (errors.length) { console.error(errors.join('\n')); process.exit(1); }

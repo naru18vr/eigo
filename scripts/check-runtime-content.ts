@@ -4,7 +4,8 @@ import { GRADE_3_UNITS } from '../data/grade3';
 import { eiken4CoreExamQuestions, eiken4CoreSentences } from '../data/eiken4Curriculum';
 import { eiken4Words } from '../data/eiken4Words';
 import { gradeVocabularyData } from '../data/gradeVocabularyData';
-import { createTransfer, importTransfer, isTransferableLearningKey, readTransfer } from '../services/learningTransferService';
+import { createTransfer, importTransfer, isTransferableLearningKey, readTransfer, verifyTransferChecksum } from '../services/learningTransferService';
+import { getStudyPhases } from '../services/eiken4StudyPlanService';
 
 const errors: string[] = [];
 const grades = [GRADE_1_UNITS, GRADE_2_UNITS, GRADE_3_UNITS];
@@ -126,9 +127,13 @@ memoryStorage.setItem('setStats_grade1_u1_0', JSON.stringify({ correct: 4, attem
 memoryStorage.setItem('dailyLog', JSON.stringify(Array.from({ length: 30 }, (_, index) => ({ timestamp: index, title: '中1復習', source: '毎日の学習記録' }))));
 memoryStorage.setItem('soundEnabled', 'false');
 const compressedTransfer = createTransfer();
-const compressedData = readTransfer(new URLSearchParams(compressedTransfer.link.split('?')[1] || '').get('data') || '');
+const transferParams = new URLSearchParams(compressedTransfer.link.split('?')[1] || '');
+const compressedPayload = transferParams.get('data') || '';
+const compressedData = readTransfer(compressedPayload);
 if (!compressedData || compressedData.values.soundEnabled || !compressedData.values.dailyLog) errors.push('圧縮引き継ぎリンクの往復に失敗');
 if (compressedTransfer.compressionRatio >= 1) errors.push('引き継ぎリンクが圧縮されていない');
+if (!verifyTransferChecksum(compressedPayload, transferParams.get('sig'))) errors.push('正しい引き継ぎチェックサムを拒否した');
+if (verifyTransferChecksum(`${compressedPayload}broken`, transferParams.get('sig'))) errors.push('壊れた引き継ぎリンクを検出できない');
 const legacyJson = JSON.stringify({ version: 1, createdAt: new Date().toISOString(), values: { eiken4Legacy: JSON.stringify({ score: 2 }) } });
 const legacyPayload = Buffer.from(legacyJson).toString('base64url');
 if (!readTransfer(legacyPayload)?.values.eiken4Legacy) errors.push('旧形式の引き継ぎリンクを読めない');
@@ -136,6 +141,7 @@ memoryStorage.setItem('setStats_grade1_u1_0', JSON.stringify({ correct: 6, attem
 const importedCount = compressedData ? importTransfer(compressedData) : 0;
 const mergedStats = JSON.parse(memoryStorage.getItem('setStats_grade1_u1_0') || '{}');
 if (!importedCount || mergedStats.correct !== 6 || mergedStats.attempted !== 8) errors.push('既存端末との引き継ぎ統合に失敗');
+if (getStudyPhases('2099-09-01').current.id !== 'foundation' || getStudyPhases('2000-01-01').current.id !== 'final') errors.push('試験日逆算の学習段階が不正');
 
 if (errors.length) {
   console.error(errors.slice(0, 50).join('\n'));

@@ -6,13 +6,13 @@ import { Link } from 'react-router-dom';
 import ChevronRightIcon from '../components/shared/ChevronRightIcon';
 import ClockIcon from '../components/shared/ClockIcon';
 import BookOpenIcon from '../components/shared/BookOpenIcon';
-import { getNextTodayCourseStep, getTodayCourseSteps } from '../services/eiken4CourseService';
+import { getLightweightNextStep, getLightweightTodayCourseSteps } from '../services/eiken4CourseSummaryService';
 
 
 const HomePage: React.FC = () => {
   const { grades } = useAppContext();
-  const nextStep = getNextTodayCourseStep();
-  const completedSteps = getTodayCourseSteps().filter(step => step.done).length;
+  const nextStep = getLightweightNextStep();
+  const completedSteps = getLightweightTodayCourseSteps().filter(step => step.done).length;
 
   return (
     <div className="flex-grow container mx-auto p-4 sm:p-6 lg:p-8">

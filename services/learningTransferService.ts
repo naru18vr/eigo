@@ -1,3 +1,5 @@
+import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
+
 // Keep the version 1 package shape so links created by older releases remain valid.
 // The additional prefixes cover the original sentence-building course, whose keys
 // do not start with a grade name.
@@ -28,10 +30,21 @@ export const createTransfer = () => {
   const compressed = compressToEncodedURIComponent(json);
   const payload = `z${compressed}`;
   const code = String(hash(payload) % 10000).padStart(4, '0');
+  const checksum = hash(`eigo-transfer:${payload}`).toString(16).padStart(8, '0');
   const base = typeof window === 'undefined' ? '' : `${window.location.origin}${window.location.pathname}`;
-  const link = `${base}#/transfer?data=${payload}&code=${code}`;
-  return { code, link, itemCount: Object.keys(values).length, linkLength: link.length, isLong: link.length > TRANSFER_LINK_WARNING_LENGTH, compressionRatio: json.length ? compressed.length / json.length : 1 };
+  const link = `${base}#/transfer?data=${encodeURIComponent(payload)}&code=${code}&sig=${checksum}`;
+  const activity = safeObject(values.eiken4ActivityLogV1);
+  const mocks = safeArray(values.eiken4FullMockResultsV1).length + safeArray(values.eiken4PastPaperResultsV1).length;
+  const mastery = safeObject(values.eiken4WordMasteryV2);
+  const masteredWords = Object.values(mastery).filter(value => { const days = Object.values((value as { days?: Record<string, boolean> })?.days || {}); return days.filter(Boolean).length >= 4 && days.at(-1) === true; }).length;
+  const latestLearningDate = [...Object.keys(activity), ...Object.values(mastery).map(value => String((value as { lastSeen?: string })?.lastSeen || '').slice(0, 10))].filter(Boolean).sort().at(-1) || '記録なし';
+  return { code, checksum, link, itemCount: Object.keys(values).length, linkLength: link.length, isLong: link.length > TRANSFER_LINK_WARNING_LENGTH, compressionRatio: json.length ? compressed.length / json.length : 1, summary: { activityDays: Object.keys(activity).length, masteredWords, mockResults: mocks, latestLearningDate } };
 };
+
+const safeObject = (raw?: string): Record<string, unknown> => { try { const value = JSON.parse(raw || '{}'); return value && typeof value === 'object' && !Array.isArray(value) ? value : {}; } catch { return {}; } };
+const safeArray = (raw?: string): unknown[] => { try { const value = JSON.parse(raw || '[]'); return Array.isArray(value) ? value : []; } catch { return []; } };
+
+export const verifyTransferChecksum = (payload: string, checksum: string | null) => !checksum || hash(`eigo-transfer:${payload}`).toString(16).padStart(8, '0') === checksum;
 
 export const readTransfer = (payload: string): TransferPackage | null => { try { const json = payload.startsWith('z') ? decompressFromEncodedURIComponent(payload.slice(1)) : decode(payload); if (!json) return null; const data = JSON.parse(json) as TransferPackage; return data.version === 1 && data.values ? data : null; } catch { return null; } };
 const merge = (current: unknown, incoming: unknown): unknown => {
@@ -50,4 +63,3 @@ export const importTransfer = (data: TransferPackage) => {
   for (const [key, raw] of Object.entries(data.values)) { if (!isTransferableLearningKey(key)) continue; try { const existing = localStorage.getItem(key); localStorage.setItem(key, existing ? JSON.stringify(merge(JSON.parse(existing), JSON.parse(raw))) : raw); } catch { localStorage.setItem(key, raw); } count += 1; }
   return count;
 };
-import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';

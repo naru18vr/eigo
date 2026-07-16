@@ -2,6 +2,7 @@ import { eiken4Words } from '../data/eiken4Words';
 import { eiken4ListeningQuestions } from '../data/eiken4Listening';
 import { eiken4CoreExamQuestions, eiken4CoreSentences } from '../data/eiken4Curriculum';
 import { recordEiken4Activity } from './eiken4ProgressService';
+import { loadAvailableMockPriorities } from './eiken4MockPriorityService';
 
 export const EIKEN4_DAILY_KEY = 'eiken4DailyProgressV4';
 const REVIEW_KEY = 'eiken4ReviewScheduleV1';
@@ -199,8 +200,9 @@ const buildDailyQuestionIds = (date: string) => {
   const sentenceIds = leastSeen(eiken4CoreSentences, 'sentence-', `${date}-sentences`, 4);
   const listeningIds = leastSeen(eiken4ListeningQuestions, 'listening-', `${date}-listening`, 3);
   const examIds = leastSeen(eiken4CoreExamQuestions, 'exam-', `${date}-exam`, 3);
+  const mockIds = loadAvailableMockPriorities(date);
   const category = (prefix: string, fresh: string[], count: number) =>
-    Array.from(new Set([...dueIds.filter(id => id.startsWith(prefix)), ...fresh])).slice(0, count);
+    Array.from(new Set([...mockIds.filter(id => id.startsWith(prefix)), ...dueIds.filter(id => id.startsWith(prefix)), ...fresh])).slice(0, count);
   return [
     ...category('word-', wordIds, 8),
     ...category('sentence-', sentenceIds, 4),
