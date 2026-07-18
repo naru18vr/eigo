@@ -17,6 +17,8 @@ const checks = [
   ['pages/Eiken4FullMockPage.tsx', /saveFullMockAttempt/, 'フル模試の途中保存がない'],
   ['pages/StorageRecoveryPage.tsx', /破損項目だけを分離/, '保存データ復旧画面がない'],
   ['pages/StorageRecoveryPage.tsx', /restoreEmergencyBackup/, '一時保存した直前結果を復元できない'],
+  ['pages/Eiken4ResultPage.tsx', /おうちの人に報告をコピー/, '毎日の保護者報告をコピーできない'],
+  ['pages/Eiken4ProgressPage.tsx', /7日分の学習計画をコピー/, '学習計画アプリ向け出力がない'],
   ['pages/Eiken4ListeningFocusPage.tsx', /aria-label/, '音声ボタンの読み上げラベルがない'],
   ['pages/Eiken4ListeningFocusPage.tsx', /○ 正解|× 正解/, '正誤を色だけで表示している'],
   ['components/StorageErrorBanner.tsx', /role="alert"/, '保存失敗時の結果退避案内がない'],

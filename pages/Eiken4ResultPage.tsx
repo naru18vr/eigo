@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import ArrowLeftIcon from '../components/shared/ArrowLeftIcon';
@@ -7,6 +7,9 @@ import { getQuestionById, loadDailyProgress } from '../services/eiken4DailyServi
 import { getTodayReading, loadReadingProgress } from '../services/eiken4ReadingService';
 import { loadGrade1Review } from '../services/grade1ReviewService';
 import { createTransfer } from '../services/learningTransferService';
+import { copyTextToClipboard } from '../services/eiken4WorksheetService';
+import { createParentDailyReport } from '../services/eiken4ReportService';
+import { getLightweightTodayCourseSteps } from '../services/eiken4CourseSummaryService';
 
 const Eiken4ResultPage: React.FC = () => {
   const navigate = useNavigate(); const { result } = useEiken4Session();
@@ -17,6 +20,10 @@ const Eiken4ResultPage: React.FC = () => {
   const wrongKinds = Array.from(new Set(daily.answers.filter(answer => !answer.correct).map(answer => getQuestionById(answer.id, daily.date)?.kind).filter(Boolean)));
   const extraTotal = result.wordTotal + result.wordQuizTotal + result.sentenceTotal;
   const transfer = createTransfer();
+  const [copyStatus, setCopyStatus] = useState<'idle'|'copied'|'error'>('idle');
+  const completedSteps = getLightweightTodayCourseSteps().filter(step => step.done).length;
+  const dailyReport = createParentDailyReport({ daily, reading: readingProgress, grade1, readingTotal: reading.questions.length, readingCorrect, completedSteps, weaknessNames: wrongKinds as string[], transferCode: transfer.code, transferLink: transfer.link });
+  const copyDailyReport = async () => setCopyStatus(await copyTextToClipboard(dailyReport) ? 'copied' : 'error');
 
   return <div className="flex-grow flex flex-col p-4 max-w-xl mx-auto w-full">
     <Button onClick={() => navigate('/eiken4')} variant="ghost" size="sm"><ArrowLeftIcon className="h-5 w-5 mr-2" />英検4級に戻る</Button>
@@ -36,7 +43,7 @@ const Eiken4ResultPage: React.FC = () => {
     <section className="mt-3 rounded-xl bg-amber-50 border border-amber-200 p-4"><h2 className="font-bold text-amber-900">今日の復習ポイント</h2><p className="text-sm text-amber-900 mt-2">{wrongKinds.length ? wrongKinds.join('・') : daily.completedAt ? '今日の15分はよくできました。' : '15分コースをするとここに表示されます。'}</p></section>
     {extraTotal > 0 && <section className="mt-3 rounded-xl bg-white shadow p-4"><h2 className="font-bold">追加練習</h2><div className="grid grid-cols-3 gap-2 text-center text-sm mt-3"><div className="bg-indigo-50 rounded p-2">単語カード<br/><strong>{result.wordKnown}/{result.wordTotal}</strong></div><div className="bg-indigo-50 rounded p-2">単語テスト<br/><strong>{result.wordQuizCorrect}/{result.wordQuizTotal}</strong></div><div className="bg-indigo-50 rounded p-2">並べ替え<br/><strong>{result.sentenceCorrect}/{result.sentenceTotal}</strong></div></div></section>}
     <section className="mt-3 rounded-xl border border-teal-200 bg-teal-50 p-4 text-center"><p className="text-xs font-bold text-teal-700">今回の引き継ぎ番号</p><p className="mt-1 text-4xl font-black tracking-[.18em] text-teal-800">{transfer.code}</p><Link to="/transfer" className="mt-2 inline-block text-sm font-bold text-teal-700 underline">引き継ぎリンクをコピー</Link></section>
-    <p className="text-center text-sm font-semibold text-indigo-700 mt-4">この画面をスクショして、お母さんに送ろう</p>
+    <section className="mt-3 rounded-xl border border-indigo-200 bg-indigo-50 p-4"><h2 className="font-bold text-indigo-900">おうちの人に報告</h2><p className="mt-1 text-sm text-indigo-800">結果と最新の引き継ぎリンクをGoogle Chat用にまとめます。</p><Button onClick={copyDailyReport} className="mt-3 min-h-12 w-full">おうちの人に報告をコピー</Button>{copyStatus==='copied'&&<p role="status" className="mt-3 font-bold text-emerald-700">✓ コピーできました。Google Chatに貼って送ってね。</p>}{copyStatus==='error'&&<div className="mt-3"><p role="alert" className="font-bold text-rose-700">× 自動コピーできませんでした。下の文章を長押ししてコピーしてください。</p><textarea readOnly value={dailyReport} className="mt-2 h-40 w-full rounded-lg border border-slate-300 bg-white p-3 text-sm" aria-label="保護者への学習報告"/></div>}</section>
     <div className="grid grid-cols-2 gap-2 mt-4"><Link to="/eiken4/word-map" className="text-center rounded-lg bg-indigo-100 text-indigo-800 font-semibold px-3 py-3">英単語マップ</Link><Link to="/eiken4/daily" className="text-center rounded-lg bg-emerald-600 text-white font-semibold px-3 py-3">今日の15分</Link></div>
   </div>;
 };

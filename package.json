@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "check:content": "node scripts/check-content.mjs && node scripts/check-android-ui.mjs && esbuild scripts/check-runtime-content.ts --bundle --platform=node --format=esm --outfile=/tmp/eigo-check-runtime.mjs && node /tmp/eigo-check-runtime.mjs",
+    "check:content": "node scripts/check-content.mjs && node scripts/check-android-ui.mjs && esbuild scripts/check-runtime-content.ts --bundle --platform=node --format=esm --outfile=/tmp/eigo-check-runtime.mjs && node /tmp/eigo-check-runtime.mjs && esbuild scripts/check-share-contract.ts --bundle --platform=node --format=esm --outfile=/tmp/eigo-check-share.mjs && node /tmp/eigo-check-share.mjs",
     "check": "npm run check:content && tsc --noEmit && vite build && node scripts/check-build.mjs",
     "preview": "vite preview"
   },
