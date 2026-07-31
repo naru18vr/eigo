@@ -3,6 +3,7 @@ import { EIKEN4_GRAMMAR_PRACTICE_STATS_KEY, EIKEN4_STEP_LEARNING_KEY } from '../
 import { getDailyLearningReadiness, loadDailyProgress, resetTodayDailyProgress } from '../services/eiken4DailyService';
 import { loadMixedReviewProgress, startMixedReview } from '../services/eiken4MixedReviewService';
 import { completeLearningStep, eiken4LearningSteps, getLearningStepState, getNextLearningActivity, getNextLearningStep, getStudiedGrammarIds, recordLearningGrammarGuideCheck, recordLearningGrammarPractice } from '../services/eiken4StepLearningService';
+import { saveGrammarPracticeResult } from '../services/eiken4GrammarPracticeService';
 
 const errors: string[] = [];
 class MemoryStorage {
@@ -12,6 +13,7 @@ class MemoryStorage {
   getItem(key: string) { return this.values.get(key) ?? null; }
   setItem(key: string, value: string) { this.values.set(key, value); }
   removeItem(key: string) { this.values.delete(key); }
+  clear() { this.values.clear(); }
 }
 
 Object.defineProperty(globalThis, 'localStorage', { value: new MemoryStorage(), configurable: true });
@@ -21,11 +23,18 @@ if (getLearningStepState(eiken4LearningSteps[1]) !== '順番にやろう') error
 if (loadDailyProgress().questionIds.length) errors.push('学習前に今日のおまかせ問題へ未習問題が入る');
 recordLearningGrammarGuideCheck('general-verb');
 if (getNextLearningActivity()?.type !== 'grammar-practice' || getNextLearningActivity()?.categoryId !== 'general-verb') errors.push('文法ガイド後に同じ文法の練習を案内できない');
+saveGrammarPracticeResult('general-verb', Array.from({ length: 10 }, (_, index) => `low-${index}`), Array.from({ length: 10 }, (_, index) => ({ id: `low-${index}`, correct: index < 4 })));
 recordLearningGrammarPractice('general-verb', 4, 10);
 if (getNextLearningActivity()?.type !== 'grammar-guide' || getNextLearningActivity()?.categoryId !== 'general-verb') errors.push('低い正答率の後に説明を見直せない');
 
+localStorage.clear();
+
 for (const step of eiken4LearningSteps.slice(0, 6)) {
-  for (const categoryId of step.grammarIds) recordLearningGrammarPractice(categoryId, 8, 10);
+  for (const categoryId of step.grammarIds) {
+    const ids = Array.from({ length: 5 }, (_, index) => `${categoryId}-${index}`);
+    saveGrammarPracticeResult(categoryId, ids, ids.map(id => ({ id, correct: true })));
+    recordLearningGrammarPractice(categoryId, 5, 5);
+  }
   if (getLearningStepState(step) !== 'できた！') errors.push(`${step.id}を完了にできない`);
 }
 if (getNextLearningStep()?.id !== 'step-7') errors.push('基礎完了後に総合練習が案内されない');
