@@ -37,7 +37,7 @@ const Eiken4MixedReviewPage: React.FC = () => {
     const nextProgress = { ...progress, answers: [...progress.answers, { id: current.id, correct }] };
     if (nextProgress.answers.length >= nextProgress.questionIds.length) {
       nextProgress.completedAt = new Date().toISOString();
-      if (searchParams.get('step') === '6') completeLearningStep('step-6');
+      if (searchParams.get('step') === '7') completeLearningStep('step-7');
     }
     saveMixedReviewProgress(nextProgress);
     setProgress(nextProgress);

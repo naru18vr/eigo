@@ -4,7 +4,7 @@ import Button from '../components/Button';
 import ArrowLeftIcon from '../components/shared/ArrowLeftIcon';
 import CheckCircleIcon from '../components/shared/CheckCircleIcon';
 import ChevronRightIcon from '../components/shared/ChevronRightIcon';
-import { eiken4LearningSteps, getLearningStep, getLearningStepProgress, getLearningStepState, getStepGrammarCategories, markLearningStepOpened } from '../services/eiken4StepLearningService';
+import { eiken4LearningSteps, getLearningStep, getLearningStepProgress, getLearningStepState, getStepGrammarCategories, markLearningStepOpened, recordLearningStepCheck } from '../services/eiken4StepLearningService';
 
 const Eiken4StepLearningPage: React.FC = () => {
   const navigate = useNavigate();
@@ -27,9 +27,14 @@ const Eiken4StepLearningPage: React.FC = () => {
   const state = getLearningStepState(step);
   const checked = Boolean(picked);
   const correct = picked === step.lesson.check.answer;
-  const choose = (choice: string) => { if (!picked) setPicked(choice); };
+  const choose = (choice: string) => {
+    if (picked) return;
+    setPicked(choice);
+    recordLearningStepCheck(step.id);
+    setVersion(version => version + 1);
+  };
   const startFinalPractice = () => {
-    navigate('/eiken4/mixed-review?step=6');
+    navigate('/eiken4/mixed-review?step=7');
   };
 
   return <div className="flex-grow bg-gradient-to-b from-indigo-50 to-white p-4 sm:p-6">

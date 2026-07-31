@@ -23,7 +23,7 @@ const checks = [
   ['pages/Eiken4HomePage.tsx', /習ったことをまぜて練習しよう/, '学習済み内容を混ぜる復習への入口がない'],
   ['pages/Eiken4HomePage.tsx', /今日のおまかせ問題/, '既存の自動復習モードが分かりにくい'],
   ['pages/Eiken4HomePage.tsx', /英検4級の勉強をはじめよう！/, '初心者向けの最初の案内がない'],
-  ['pages/Eiken4HomePage.tsx', /まずはここから/, '段階別学習が最優先に表示されない'],
+  ['pages/Eiken4HomePage.tsx', /順番に学ぼう/, '段階別学習が最優先に表示されない'],
   ['pages/Eiken4StepLearningPage.tsx', /確認問題/, '段階別学習の確認問題がない'],
   ['pages/Eiken4StepLearningPage.tsx', /min-h-12/, '段階別学習の選択肢が押しにくい'],
   ['App.tsx', /grammar-practice\/:categoryId/, '文法別問題のURLルートがない'],

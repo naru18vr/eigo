@@ -1,5 +1,5 @@
 import { eiken4CoreSentences } from '../data/eiken4Curriculum';
-import { EIKEN4_GRAMMAR_CATEGORIES, getEiken4GrammarCategory, getEiken4GrammarCategoryForGuideTopic, type Eiken4GrammarCategory, type Eiken4GrammarCategoryId } from '../data/eiken4GrammarCategories';
+import { EIKEN4_GRAMMAR_CATEGORIES, getEiken4GrammarCategory, getEiken4GrammarCategoryForGuideTopic, getEiken4GrammarCategoriesForGuideTopic, type Eiken4GrammarCategory, type Eiken4GrammarCategoryId } from '../data/eiken4GrammarCategories';
 import { EIKEN4_GRAMMAR_PRACTICE_HISTORY_KEY, EIKEN4_GRAMMAR_PRACTICE_STATS_KEY } from '../data/eiken4LearningKeys';
 import { getQuestionById, localDateKey, recordReviewAnswer, type DailyAnswer, type DailyQuestion } from './eiken4DailyService';
 import { safeSetLearningItem } from './storageHealthService';
@@ -8,7 +8,7 @@ export type GrammarCategoryId = Eiken4GrammarCategoryId;
 export type GrammarCategory = Eiken4GrammarCategory;
 export type GrammarPracticeQuestion = DailyQuestion & { grammarCategory: GrammarCategoryId };
 export const grammarCategories = EIKEN4_GRAMMAR_CATEGORIES;
-export { getEiken4GrammarCategoryForGuideTopic };
+export { getEiken4GrammarCategoryForGuideTopic, getEiken4GrammarCategoriesForGuideTopic };
 
 export type GrammarPracticeStats = { attempts: number; correct: number; total: number; lastAnsweredAt?: string; lastWrongAt?: string };
 export type GrammarPracticeHistory = { id: string; categoryId: GrammarCategoryId; questionIds: string[]; answers: DailyAnswer[]; completedAt: string };
@@ -56,9 +56,9 @@ export const loadGrammarPracticeStats = (): Record<string, GrammarPracticeStats>
 };
 
 export const getGrammarLearningState = (stats: GrammarPracticeStats | undefined) => {
-  if (!stats?.total) return '未学習';
+  if (!stats?.total) return 'まだ';
   if (stats.lastWrongAt && (!stats.lastAnsweredAt || stats.lastWrongAt === stats.lastAnsweredAt)) return '復習しよう';
-  return stats.correct / stats.total >= .8 ? 'できた' : '練習中';
+  return stats.correct / stats.total >= .8 ? 'できた！' : 'がんばり中';
 };
 
 export const saveGrammarPracticeResult = (categoryId: GrammarCategoryId, questionIds: string[], answers: DailyAnswer[]) => {
