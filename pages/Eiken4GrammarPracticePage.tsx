@@ -59,12 +59,15 @@ const Eiken4GrammarPracticePage: React.FC = () => {
   if (!questions.length) return <div className="flex-grow bg-slate-50 p-4"><main className="mx-auto max-w-xl"><Button onClick={() => navigate('/eiken4/grammar-practice-select')} variant="ghost" size="sm"><ArrowLeftIcon className="mr-2 h-5 w-5" />文法を選ぶ</Button><section className="mt-12 rounded-3xl bg-white p-7 text-center shadow"><h1 className="text-2xl font-extrabold">この文法の問題は現在準備中です。</h1><p className="mt-3 text-slate-600">ほかの文法を選んで練習してみよう。</p><Button onClick={() => navigate('/eiken4/grammar-practice-select')} className="mt-6 w-full">文法選択へ戻る</Button><Button onClick={() => navigate('/eiken4')} variant="ghost" className="mt-2 w-full">英検4級トップへ戻る</Button></section></main></div>;
 
   if (finished) {
-    const passed = correctCount / questions.length >= .8;
+    const enoughAnswers = questions.length >= 5;
+    const passed = enoughAnswers && correctCount / questions.length >= .8;
     const nextActivity = passed ? getNextLearningActivity() : undefined;
     const nextCategory = nextActivity ? getGrammarCategory(nextActivity.categoryId) : undefined;
     const nextStep = passed && !nextActivity ? getNextLearningStep() : undefined;
     const nextStepCategory = nextStep?.grammarIds[0] ? getGrammarCategory(nextStep.grammarIds[0]) : undefined;
-    const mainAction = passed
+    const mainAction = !enoughAnswers
+      ? () => startAgain()
+      : passed
       ? () => {
         if (nextCategory?.guideTopic) navigate(`/eiken4/grammar-guide?topic=${nextCategory.guideTopic}&category=${nextCategory.id}`);
         else if (nextStepCategory?.guideTopic) navigate(`/eiken4/grammar-guide?topic=${nextStepCategory.guideTopic}&category=${nextStepCategory.id}`);
@@ -72,10 +75,10 @@ const Eiken4GrammarPracticePage: React.FC = () => {
         else navigate('/eiken4/mixed-review');
       }
       : () => navigate(category.guideTopic ? `/eiken4/grammar-guide?topic=${category.guideTopic}&category=${category.id}` : '/eiken4/grammar-practice-select');
-    const mainLabel = !passed ? '説明をもう一度見る' : nextCategory ? 'つぎの文法へ' : nextStep ? `ステップ${Number(nextStep.id.slice(-1))}へ` : 'まとめ問題へ';
+    const mainLabel = !enoughAnswers ? 'もう少し練習する' : !passed ? '説明をもう一度見る' : nextCategory ? 'つぎの文法へ' : nextStep ? `ステップ${Number(nextStep.id.slice(-1))}へ` : 'まとめ問題へ';
     return <div className="flex-grow bg-slate-50 p-4"><main className="mx-auto max-w-xl">
       <section className="mt-4 rounded-3xl bg-white p-7 text-center shadow"><CheckCircleIcon className="mx-auto h-16 w-16 text-emerald-500"/><p className="mt-4 font-bold text-cyan-700">{category.title}の練習結果</p><h1 className="mt-2 text-4xl font-extrabold text-slate-900">{correctCount} / {questions.length}</h1><p className="mt-2 text-slate-600">出題数：{questions.length}問・不正解：{questions.length - correctCount}問</p><p className="mt-1 text-slate-600">正答率：{Math.round(correctCount / questions.length * 100)}％</p></section>
-      <section className={`mt-4 rounded-2xl p-5 text-center ${passed ? 'bg-emerald-50 text-emerald-950' : 'bg-amber-50 text-amber-950'}`}><p className="font-extrabold">{passed ? 'よくできました！' : 'ここまでよくがんばったね。'}</p><p className="mt-2 text-sm leading-6">{passed ? nextStep && !nextCategory ? `このステップはできたよ。つぎはステップ${Number(nextStep.id.slice(-1))}へ進もう。` : nextCategory ? 'つぎの文法へ進んでみよう。' : '習った文法をまぜて確認しよう。' : '説明をもう一度見てから、同じ文法を練習してみよう。'}</p><Button onClick={mainAction} className="mt-4 w-full">{mainLabel}</Button></section>
+      <section className={`mt-4 rounded-2xl p-5 text-center ${passed ? 'bg-emerald-50 text-emerald-950' : 'bg-amber-50 text-amber-950'}`}><p className="font-extrabold">{!enoughAnswers ? 'いい調子だよ！' : passed ? 'よくできました！' : 'ここまでよくがんばったね。'}</p><p className="mt-2 text-sm leading-6">{!enoughAnswers ? 'あと少し練習すると、この文法がもっと分かるようになるよ。' : passed ? nextStep && !nextCategory ? `このステップはできたよ。つぎはステップ${Number(nextStep.id.slice(-1))}へ進もう。` : nextCategory ? 'この文法は分かってきたね。つぎの文法へ進んでみよう。' : '習った文法をまぜて確認しよう。' : '説明をもう一度見てから、同じ文法を練習してみよう。'}</p><Button onClick={mainAction} className="mt-4 w-full">{mainLabel}</Button></section>
       <section className="mt-4 rounded-3xl bg-white p-5 shadow"><h2 className="text-left text-xl font-extrabold">間違えた問題の復習</h2>{answers.every(answer => answer.correct) ? <p className="mt-3 rounded-xl bg-emerald-50 p-4 text-sm font-bold text-emerald-800">全問正解！ この文法はよくできています。</p> : <div className="mt-3 space-y-3 text-left">{questions.map((question, index) => !answers[index]?.correct && <details key={question.id} className="rounded-xl border border-rose-200 bg-rose-50 p-4"><summary className="cursor-pointer font-bold text-rose-900">{question.prompt}</summary><p className="mt-3 font-bold text-emerald-700">正解：{question.answer}</p><p className="mt-2 text-sm leading-6 text-slate-700">{question.explanation}</p></details>)}</div>}</section>
       <div className="mt-5 grid gap-2"><Button onClick={() => startAgain()} variant="secondary" className="w-full">同じ文法をもう一度</Button>{answers.some(answer => !answer.correct) && <Button onClick={() => startAgain(true)} variant="secondary" className="w-full">間違えた問題だけ復習</Button>}<Button onClick={() => navigate('/eiken4/grammar-practice-select')} variant="ghost" className="w-full">ほかの文法を選ぶ</Button><Button onClick={() => navigate('/eiken4')} variant="ghost" className="w-full">英検4級トップへ戻る</Button></div>
     </main></div>;
