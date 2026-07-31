@@ -31,7 +31,9 @@ const topics: Topic[] = [
 const Eiken4GrammarGuidePage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const requestedTopic = new URLSearchParams(location.search).get('topic');
+  const searchParams = new URLSearchParams(location.search);
+  const requestedTopic = searchParams.get('topic');
+  const requestedCategory = searchParams.get('category');
   const [openId, setOpenId] = useState<string | null>(topics.some(topic => topic.id === requestedTopic) ? requestedTopic : topics[0].id);
   const [answers, setAnswers] = useState<Record<string,string>>({});
   return <div className="flex-grow bg-gradient-to-b from-cyan-50 to-white p-4 sm:p-6">
@@ -42,7 +44,7 @@ const Eiken4GrammarGuidePage: React.FC = () => {
       </header>
       <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950"><p className="font-bold">おすすめの使い方</p><p className="mt-1">1日1項目だけ読む → 例文を音で聞く → 最後の1問を解く。全部を一度に暗記しなくてOKです。</p></div>
       <div className="mt-5 space-y-3">{topics.map((topic,index) => {
-        const open = openId === topic.id; const picked = answers[topic.id]; const correct = picked === topic.quiz.answer; const categories = getEiken4GrammarCategoriesForGuideTopic(topic.id);
+        const open = openId === topic.id; const picked = answers[topic.id]; const correct = picked === topic.quiz.answer; const allCategories = getEiken4GrammarCategoriesForGuideTopic(topic.id); const selectedCategory = allCategories.find(category => category.id === requestedCategory); const categories = selectedCategory ? [selectedCategory] : allCategories;
         return <article key={topic.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           <button onClick={() => setOpenId(open ? null : topic.id)} className="flex w-full items-center gap-3 p-4 text-left"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-cyan-100 font-bold text-cyan-800">{index+1}</span><div className="flex-grow"><p className="text-xs font-bold text-cyan-700">{topic.level}</p><h2 className="text-lg font-bold text-slate-800">{topic.title}</h2></div><ChevronRightIcon className={`h-6 w-6 text-slate-400 transition-transform ${open?'rotate-90':''}`}/></button>
           {open && <div className="border-t border-slate-100 p-5">
