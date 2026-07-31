@@ -1,5 +1,5 @@
 import { getAvailableGrammarCategories, getGrammarCategorySentences, getGrammarPracticeQuestions, loadGrammarPracticeStats, recordGrammarPracticeAnswer, saveGrammarPracticeResult } from '../services/eiken4GrammarPracticeService';
-import { getGrammarLearningState } from '../services/eiken4GrammarProgressService';
+import { getGrammarLearningState, markGrammarGuideStarted } from '../services/eiken4GrammarProgressService';
 import { recordLearningGrammarGuideCheck } from '../services/eiken4StepLearningService';
 import { eiken4CoreSentences } from '../data/eiken4Curriculum';
 
@@ -37,9 +37,12 @@ const target = categories.find(category => category.id === 'past-tense');
 if (!target) errors.push('過去形カテゴリがない');
 else {
   if (getGrammarLearningState(target.id).status !== 'not-started') errors.push('初回の文法を「まだ」にできない');
+  markGrammarGuideStarted(target.id);
+  const afterOpen = getGrammarLearningState(target.id);
+  if (!afterOpen.guideStarted || afterOpen.guideCompleted || afterOpen.status !== 'not-started') errors.push('解説を開いただけで完了扱いになる');
   recordLearningGrammarGuideCheck(target.id);
   const afterGuide = getGrammarLearningState(target.id);
-  if (!afterGuide.guideViewed || afterGuide.status !== 'in-progress') errors.push('解説確認後を「がんばり中」にできない');
+  if (!afterGuide.guideCompleted || afterGuide.status !== 'in-progress') errors.push('解説確認後を「がんばり中」にできない');
   const questions = getGrammarPracticeQuestions(target.id, 'history-test');
   const answers = questions.map((question, index) => ({ id: question.id, correct: index !== 0 }));
   recordGrammarPracticeAnswer(questions[0].id, false);
@@ -48,6 +51,13 @@ else {
   if (!stats || stats.attempts !== 1 || stats.total !== questions.length || stats.correct !== questions.length - 1) errors.push('文法別の学習履歴を保存できない');
   if (getGrammarLearningState(target.id).status !== 'review-needed') errors.push('直近の誤答を「もう一度やろう」にできない');
   if (!(localStorage.getItem('eiken4ReviewScheduleV1') || '').includes(questions[0].id)) errors.push('文法別の誤答が既存復習へ追加されない');
+}
+
+const shortTarget = categories.find(category => category.id === 'general-verb');
+if (shortTarget) {
+  const questions = getGrammarPracticeQuestions(shortTarget.id, 'short-test', 3);
+  saveGrammarPracticeResult(shortTarget.id, questions.map(question => question.id), questions.map(question => ({ id: question.id, correct: true })));
+  if (getGrammarLearningState(shortTarget.id).status === 'completed') errors.push('3問正解だけで「できた！」になる');
 }
 
 const completedTarget = categories.find(category => category.id === 'modal-verb');
