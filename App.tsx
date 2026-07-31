@@ -89,6 +89,7 @@ const App: React.FC = () => {
             <Route path="/eiken4/grade1-review" element={<Grade1DailyReviewPage />} />
             <Route path="/eiken4/course" element={<Eiken4DailyCoursePage />} />
             <Route path="/eiken4/grammar-guide" element={<Eiken4GrammarGuidePage />} />
+            <Route path="/eiken4/grammar-guide/:grammarId" element={<Eiken4GrammarGuidePage />} />
             <Route path="/eiken4/learning-step/:stepId" element={<Eiken4StepLearningPage />} />
             <Route path="/eiken4/mixed-review" element={<Eiken4MixedReviewPage />} />
             <Route path="/eiken4/grammar-practice-select" element={<Eiken4GrammarPracticeSelectPage />} />
