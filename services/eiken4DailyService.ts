@@ -2,8 +2,8 @@ import { eiken4Words } from '../data/eiken4Words';
 import { eiken4ListeningQuestions } from '../data/eiken4Listening';
 import { eiken4CoreExamQuestions, eiken4CoreSentences } from '../data/eiken4Curriculum';
 import { daysUntilExam, getExamDate, recordEiken4Activity } from './eiken4ProgressService';
-import { loadAvailableMockPriorities } from './eiken4MockPriorityService';
 import { safeSetLearningItem } from './storageHealthService';
+import { getStudiedGrammarIds } from './eiken4StepLearningService';
 
 export const EIKEN4_DAILY_KEY = 'eiken4DailyProgressV4';
 const REVIEW_KEY = 'eiken4ReviewScheduleV1';
@@ -193,24 +193,23 @@ export const recordReviewAnswer = (id: string, correct: boolean, isRetry: boolea
   saveReviews(records);
 };
 
+export const getDailyLearningReadiness = () => {
+  const studiedGrammarIds = new Set(getStudiedGrammarIds());
+  const grammarQuestionCount = eiken4CoreSentences.filter(sentence => sentence.grammarCategory && studiedGrammarIds.has(sentence.grammarCategory)).length;
+  const dueReviewCount = loadReviews().filter(record => record.dueDate <= localDateKey()).length;
+  return { studiedGrammarCount: studiedGrammarIds.size, grammarQuestionCount, dueReviewCount, canStart: grammarQuestionCount + dueReviewCount > 0 };
+};
+
 const buildDailyQuestionIds = (date: string) => {
   const finalMode = daysUntilExam(getExamDate()) <= 14;
   const dueIds = loadReviews().filter(record => record.dueDate <= date)
     .sort((left, right) => left.dueDate.localeCompare(right.dueDate) || left.step - right.step)
     .slice(0, finalMode ? 14 : 8).map(record => record.id);
-  const wordIds = leastSeen(eiken4Words, 'word-', `${date}-words`, 8);
-  const sentenceIds = leastSeen(eiken4CoreSentences, 'sentence-', `${date}-sentences`, 4);
-  const listeningIds = leastSeen(eiken4ListeningQuestions, 'listening-', `${date}-listening`, 3);
-  const examIds = leastSeen(eiken4CoreExamQuestions, 'exam-', `${date}-exam`, 3);
-  const mockIds = loadAvailableMockPriorities(date);
-  const category = (prefix: string, fresh: string[], count: number) =>
-    Array.from(new Set([...mockIds.filter(id => id.startsWith(prefix)), ...dueIds.filter(id => id.startsWith(prefix)), ...fresh])).slice(0, count);
-  return [
-    ...category('word-', wordIds, 8),
-    ...category('sentence-', sentenceIds, 4),
-    ...category('listening-', listeningIds, 3),
-    ...category('exam-', examIds, 3),
-  ];
+  const studiedGrammarIds = new Set(getStudiedGrammarIds());
+  const studiedSentences = eiken4CoreSentences.filter(sentence => sentence.grammarCategory && studiedGrammarIds.has(sentence.grammarCategory));
+  const sentenceIds = leastSeen(studiedSentences, 'sentence-', `${date}-studied-sentences`, 18);
+  // 新しい単語・聞く問題・本番問題で数を埋めず、習った文法と既存の復習だけを出す。
+  return Array.from(new Set([...dueIds, ...sentenceIds])).slice(0, 18);
 };
 
 const emptyProgress = (): DailyProgress => ({
@@ -225,7 +224,16 @@ export const loadDailyProgress = (): DailyProgress => {
   if (typeof localStorage === 'undefined') return emptyProgress();
   try {
     const saved = JSON.parse(localStorage.getItem(EIKEN4_DAILY_KEY) || 'null') as DailyProgress | null;
-    if (saved?.date === localDateKey()) return saved;
+    if (saved?.date === localDateKey()) {
+      // この版より前に、まだ1問も答えず保存された当日分だけは、未習範囲を除いた内容に作り直す。
+      // 回答済みの途中記録は消さず、そのまま続けられるようにする。
+      if (!saved.answers.length && !saved.retryAnswers.length && !saved.completedAt) {
+        const refreshed = { ...saved, questionIds: buildDailyQuestionIds(saved.date), retryIds: [] };
+        saveDailyProgress(refreshed);
+        return refreshed;
+      }
+      return saved;
+    }
     const v3 = JSON.parse(localStorage.getItem('eiken4DailyProgressV3') || 'null') as DailyProgress | null;
     if (v3?.date === localDateKey()) {
       const migrated = v3.answers.length ? v3 : { ...v3, questionIds: buildDailyQuestionIds(v3.date) };

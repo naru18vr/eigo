@@ -30,6 +30,8 @@ const Eiken4WordMapPage = lazy(() => import('./pages/Eiken4WordMapPage'));
 const Grade1DailyReviewPage = lazy(() => import('./pages/Grade1DailyReviewPage'));
 const Eiken4DailyCoursePage = lazy(() => import('./pages/Eiken4DailyCoursePage'));
 const Eiken4GrammarGuidePage = lazy(() => import('./pages/Eiken4GrammarGuidePage'));
+const Eiken4StepLearningPage = lazy(() => import('./pages/Eiken4StepLearningPage'));
+const Eiken4MixedReviewPage = lazy(() => import('./pages/Eiken4MixedReviewPage'));
 const Eiken4GrammarPracticeSelectPage = lazy(() => import('./pages/Eiken4GrammarPracticeSelectPage'));
 const Eiken4GrammarPracticePage = lazy(() => import('./pages/Eiken4GrammarPracticePage'));
 const Eiken4FullMockPage = lazy(() => import('./pages/Eiken4FullMockPage'));
@@ -87,6 +89,8 @@ const App: React.FC = () => {
             <Route path="/eiken4/grade1-review" element={<Grade1DailyReviewPage />} />
             <Route path="/eiken4/course" element={<Eiken4DailyCoursePage />} />
             <Route path="/eiken4/grammar-guide" element={<Eiken4GrammarGuidePage />} />
+            <Route path="/eiken4/learning-step/:stepId" element={<Eiken4StepLearningPage />} />
+            <Route path="/eiken4/mixed-review" element={<Eiken4MixedReviewPage />} />
             <Route path="/eiken4/grammar-practice-select" element={<Eiken4GrammarPracticeSelectPage />} />
             <Route path="/eiken4/grammar-practice/:categoryId" element={<Eiken4GrammarPracticePage />} />
             {/* 以前の共有URLも開けるように残す。新しい導線は上の固定パスを使う。 */}

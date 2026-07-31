@@ -1,5 +1,6 @@
 import { eiken4CoreSentences } from '../data/eiken4Curriculum';
 import { EIKEN4_GRAMMAR_CATEGORIES, getEiken4GrammarCategory, getEiken4GrammarCategoryForGuideTopic, type Eiken4GrammarCategory, type Eiken4GrammarCategoryId } from '../data/eiken4GrammarCategories';
+import { EIKEN4_GRAMMAR_PRACTICE_HISTORY_KEY, EIKEN4_GRAMMAR_PRACTICE_STATS_KEY } from '../data/eiken4LearningKeys';
 import { getQuestionById, localDateKey, recordReviewAnswer, type DailyAnswer, type DailyQuestion } from './eiken4DailyService';
 import { safeSetLearningItem } from './storageHealthService';
 
@@ -12,8 +13,8 @@ export { getEiken4GrammarCategoryForGuideTopic };
 export type GrammarPracticeStats = { attempts: number; correct: number; total: number; lastAnsweredAt?: string; lastWrongAt?: string };
 export type GrammarPracticeHistory = { id: string; categoryId: GrammarCategoryId; questionIds: string[]; answers: DailyAnswer[]; completedAt: string };
 
-const STATS_KEY = 'eiken4GrammarPracticeStatsV1';
-const HISTORY_KEY = 'eiken4GrammarPracticeHistoryV1';
+const STATS_KEY = EIKEN4_GRAMMAR_PRACTICE_STATS_KEY;
+const HISTORY_KEY = EIKEN4_GRAMMAR_PRACTICE_HISTORY_KEY;
 
 const hash = (value: string) => {
   let result = 2166136261;

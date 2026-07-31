@@ -4,7 +4,7 @@ import Button from '../components/Button';
 import ArrowLeftIcon from '../components/shared/ArrowLeftIcon';
 import CheckCircleIcon from '../components/shared/CheckCircleIcon';
 import SpeakerWaveIcon from '../components/shared/SpeakerWaveIcon';
-import { getQuestionById, loadDailyProgress, recordQuestionCoverage, recordReviewAnswer, saveDailyProgress } from '../services/eiken4DailyService';
+import { getDailyLearningReadiness, getQuestionById, loadDailyProgress, recordQuestionCoverage, recordReviewAnswer, saveDailyProgress } from '../services/eiken4DailyService';
 import { isSpeechSupported, speakText } from '../services/speechService';
 import { useAppContext } from '../contexts/AppContext';
 import { playCorrectSound, playIncorrectSound } from '../services/soundService';
@@ -16,6 +16,7 @@ import { createTransfer } from '../services/learningTransferService';
 import { recordWorksheetDone } from '../services/eiken4CourseService';
 import { listeningCauseOptions, recordListeningCause, type ListeningCause } from '../services/eiken4ListeningCauseService';
 import { daysUntilExam, getExamDate } from '../services/eiken4ProgressService';
+import { getNextLearningStep } from '../services/eiken4StepLearningService';
 
 const Eiken4DailyPage: React.FC = () => {
   const navigate = useNavigate();
@@ -45,6 +46,8 @@ const Eiken4DailyPage: React.FC = () => {
   const isListening = Boolean(current?.audioText);
   const dailyWordCount = progress.questionIds.filter(id => id.startsWith('word-')).length;
   const finalMode = daysUntilExam(getExamDate()) <= 14;
+  const learningReadiness = getDailyLearningReadiness();
+  const nextLearningStep = getNextLearningStep();
 
   useEffect(() => {
     setPlayCount(0);
@@ -102,6 +105,11 @@ const Eiken4DailyPage: React.FC = () => {
     setRetrying(false);
     setResolved(false);
   };
+
+  if (!progress.questionIds.length) {
+    const hasLearnedSomething = learningReadiness.canStart;
+    return <div className="flex-grow bg-gradient-to-b from-emerald-50 to-white p-4 sm:p-6"><main className="mx-auto max-w-xl"><Button onClick={() => navigate('/eiken4')} variant="ghost" size="sm"><ArrowLeftIcon className="mr-2 h-5 w-5"/>英検4級に戻る</Button><section className="mt-8 rounded-3xl bg-white p-7 text-center shadow"><p className="text-sm font-bold text-emerald-700">今日のおまかせ問題</p><h1 className="mt-3 text-2xl font-extrabold text-slate-900">{hasLearnedSomething ? '今日の復習問題はまだ少ないよ。' : 'まずはステップ1から始めよう。'}</h1><p className="mt-4 leading-7 text-slate-600">{hasLearnedSomething ? '先にステップ学習を進めると、復習できる問題が増えるよ。新しい問題を勝手に足すことはありません。' : '文法を覚えてから取り組むと、問題がもっと分かりやすくなるよ。'}</p><Button onClick={() => navigate(`/eiken4/learning-step/${nextLearningStep?.id || 'step-1'}`)} className="mt-6 w-full" size="lg">{hasLearnedSomething ? '次のステップを学ぶ' : 'ステップ1を始める'}</Button>{!hasLearnedSomething && <Button onClick={() => navigate('/eiken4/grammar-practice-select')} variant="secondary" className="mt-2 w-full">それでも問題を始める</Button>}<Button onClick={() => navigate('/eiken4')} variant="ghost" className="mt-2 w-full">英検4級トップへ戻る</Button></section></main></div>;
+  }
 
   if (complete || !current) {
     const downloadWorksheet = async () => {
@@ -182,6 +190,7 @@ const Eiken4DailyPage: React.FC = () => {
         <div className="h-full bg-indigo-600 transition-all" style={{ width: `${total ? (finished / total) * 100 : 0}%` }} />
       </div>
       {isRetry && <div className="mb-4 rounded-xl bg-amber-100 text-amber-900 p-3 text-sm font-bold">あと少し！ 間違えた問題をもう一度やろう。</div>}
+      {!isRetry && progress.questionIds.length < 5 && <div className="mb-4 rounded-xl bg-cyan-50 p-3 text-sm font-bold text-cyan-900">復習問題は今日は{progress.questionIds.length}問だけ。ステップを進めると、できる問題が増えるよ。</div>}
       {finalMode && !isRetry && <div className="mb-4 rounded-xl bg-violet-100 p-3 text-sm font-bold text-violet-900">試験直前モード：新しい範囲を増やさず、模試と復習の弱点を優先します。</div>}
       <section className="rounded-2xl bg-white shadow-lg border border-indigo-100 p-6">
         <p className="text-sm text-indigo-600 font-bold">{isListening ? '会話を聞いて答えよう' : 'いちばん合う答えを選ぼう'}</p>

@@ -100,6 +100,8 @@ const transferableKeys = [
   'eiken4DailyProgressV4',
   'eiken4GrammarPracticeStatsV1',
   'eiken4GrammarPracticeHistoryV1',
+  'eiken4StepLearningV1',
+  'eiken4MixedReviewV1',
   'grade1VocabularyMasteryV1',
   'setAttemptCount_grade1_u1_0',
   'setStats_grade2_u3_1',
