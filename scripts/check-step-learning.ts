@@ -2,7 +2,7 @@ import { eiken4CoreSentences } from '../data/eiken4Curriculum';
 import { EIKEN4_GRAMMAR_PRACTICE_STATS_KEY, EIKEN4_STEP_LEARNING_KEY } from '../data/eiken4LearningKeys';
 import { getDailyLearningReadiness, loadDailyProgress, resetTodayDailyProgress } from '../services/eiken4DailyService';
 import { loadMixedReviewProgress, startMixedReview } from '../services/eiken4MixedReviewService';
-import { completeLearningStep, eiken4LearningSteps, getLearningStepState, getNextLearningActivity, getNextLearningStep, getStudiedGrammarIds, recordLearningGrammarGuideCheck, recordLearningGrammarPractice } from '../services/eiken4StepLearningService';
+import { completeGrammarGuide, completeLearningStep, eiken4LearningSteps, getLearningStepState, getNextLearningActivity, getNextLearningStep, getStudiedGrammarIds, recordLearningGrammarPractice } from '../services/eiken4StepLearningService';
 import { saveGrammarPracticeResult } from '../services/eiken4GrammarPracticeService';
 
 const errors: string[] = [];
@@ -20,8 +20,8 @@ Object.defineProperty(globalThis, 'localStorage', { value: new MemoryStorage(), 
 const first = eiken4LearningSteps[0];
 if (getNextLearningStep()?.id !== first.id) errors.push('初回にステップ1が案内されない');
 if (getLearningStepState(eiken4LearningSteps[1]) !== '順番にやろう') errors.push('ステップ2が最初から順番待ちにならない');
-if (loadDailyProgress().questionIds.length) errors.push('学習前に今日のおまかせ問題へ未習問題が入る');
-recordLearningGrammarGuideCheck('general-verb');
+if (loadDailyProgress().questionIds.length) errors.push('学習前に今日の復習問題へまだ習っていない問題が入る');
+completeGrammarGuide('general-verb');
 if (getNextLearningActivity()?.type !== 'grammar-practice' || getNextLearningActivity()?.categoryId !== 'general-verb') errors.push('文法ガイド後に同じ文法の練習を案内できない');
 saveGrammarPracticeResult('general-verb', Array.from({ length: 10 }, (_, index) => `low-${index}`), Array.from({ length: 10 }, (_, index) => ({ id: `low-${index}`, correct: index < 4 })));
 recordLearningGrammarPractice('general-verb', 4, 10);
@@ -55,7 +55,7 @@ const daily = loadDailyProgress();
 if (!daily.questionIds.length) errors.push('習った文法の復習問題を作れない');
 for (const id of daily.questionIds.filter(id => id.startsWith('sentence-'))) {
   const sentence = eiken4CoreSentences.find(item => `sentence-${item.id}` === id);
-  if (!sentence?.grammarCategory || !studied.has(sentence.grammarCategory)) errors.push('今日のおまかせ問題に未習文法が混ざる');
+  if (!sentence?.grammarCategory || !studied.has(sentence.grammarCategory)) errors.push('今日の復習問題にまだ習っていない文法が混ざる');
 }
 
 const migrationStorage = new MemoryStorage();
