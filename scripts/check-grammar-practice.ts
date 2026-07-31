@@ -1,6 +1,6 @@
 import { getAvailableGrammarCategories, getGrammarCategorySentences, getGrammarPracticeQuestions, loadGrammarPracticeStats, recordGrammarPracticeAnswer, saveGrammarPracticeResult } from '../services/eiken4GrammarPracticeService';
 import { getGrammarLearningState, markGrammarGuideStarted, migrateGrammarStatus } from '../services/eiken4GrammarProgressService';
-import { recordLearningGrammarGuideCheck } from '../services/eiken4StepLearningService';
+import { completeGrammarGuide } from '../services/eiken4StepLearningService';
 import { eiken4CoreSentences } from '../data/eiken4Curriculum';
 
 const errors: string[] = [];
@@ -40,7 +40,7 @@ else {
   markGrammarGuideStarted(target.id);
   const afterOpen = getGrammarLearningState(target.id);
   if (!afterOpen.guideStarted || afterOpen.guideCompleted || afterOpen.status !== 'not-started') errors.push('解説を開いただけで完了扱いになる');
-  recordLearningGrammarGuideCheck(target.id);
+  completeGrammarGuide(target.id);
   const afterGuide = getGrammarLearningState(target.id);
   if (!afterGuide.guideCompleted || afterGuide.status !== 'in-progress') errors.push('解説確認後を「がんばり中」にできない');
   const questions = getGrammarPracticeQuestions(target.id, 'history-test');
@@ -53,6 +53,11 @@ else {
   if (reviewState.status !== 'review-needed') errors.push('直近の誤答を「もう一度やろう」にできない');
   if (!reviewState.incorrectQuestionIds.includes(questions[0].id)) errors.push('復習モードへ誤答問題IDを渡せない');
   if (!(localStorage.getItem('eiken4ReviewScheduleV1') || '').includes(questions[0].id)) errors.push('文法別の誤答が既存復習へ追加されない');
+  recordGrammarPracticeAnswer(questions[0].id, true);
+  saveGrammarPracticeResult(target.id, [questions[0].id], [{ id: questions[0].id, correct: true }]);
+  if (getGrammarLearningState(target.id).incorrectQuestionIds.includes(questions[0].id)) errors.push('復習正解後も誤答が未解決のままになる');
+  const reviewRecords = JSON.parse(localStorage.getItem('eiken4ReviewScheduleV1') || '[]') as { id?: string; resolved?: boolean }[];
+  if (!reviewRecords.some(record => record.id === questions[0].id && record.resolved === true)) errors.push('誤答履歴を解決済みとして保持できない');
 }
 if (migrateGrammarStatus('復習しよう') !== 'review-needed' || migrateGrammarStatus('完了') !== 'completed') errors.push('旧状態名を新しい内部状態へ変換できない');
 
