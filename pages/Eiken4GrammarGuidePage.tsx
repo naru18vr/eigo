@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import Button from '../components/Button';
 import ArrowLeftIcon from '../components/shared/ArrowLeftIcon';
@@ -7,6 +7,7 @@ import SpeakerWaveIcon from '../components/shared/SpeakerWaveIcon';
 import { speakText } from '../services/speechService';
 import { getEiken4GrammarCategoriesForGuideTopic, getGrammarCategory } from '../services/eiken4GrammarPracticeService';
 import { recordLearningGrammarGuideCheck } from '../services/eiken4StepLearningService';
+import { markGrammarGuideStarted } from '../services/eiken4GrammarProgressService';
 
 type Topic = {
   id: string; title: string; level: string; meaning: string; rule: string;
@@ -38,6 +39,9 @@ const Eiken4GrammarGuidePage: React.FC = () => {
   const requestedTopic = categoryFromRoute?.guideTopic || searchParams.get('topic');
   const [openId, setOpenId] = useState<string | null>(topics.some(topic => topic.id === requestedTopic) ? requestedTopic : topics[0].id);
   const [answers, setAnswers] = useState<Record<string,string>>({});
+  useEffect(() => {
+    if (categoryFromRoute) markGrammarGuideStarted(categoryFromRoute.id);
+  }, [categoryFromRoute?.id]);
   if (grammarId && !categoryFromRoute) return <div className="flex-grow bg-slate-50 p-4"><main className="mx-auto max-w-xl"><section className="mt-12 rounded-3xl bg-white p-7 text-center shadow"><h1 className="text-2xl font-extrabold text-slate-900">この文法は見つかりませんでした。</h1><p className="mt-3 text-slate-600">文法を選び直してね。</p><Button onClick={() => navigate('/eiken4/grammar-practice-select')} className="mt-6 w-full">文法選択へ戻る</Button><Button onClick={() => navigate('/eiken4')} variant="ghost" className="mt-2 w-full">英検4級トップへ戻る</Button></section></main></div>;
   return <div className="flex-grow bg-gradient-to-b from-cyan-50 to-white p-4 sm:p-6">
     <div className="mx-auto max-w-2xl">
