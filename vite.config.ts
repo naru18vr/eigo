@@ -1,9 +1,14 @@
 import path from 'path';
+import os from 'os';
 import { defineConfig, loadEnv } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, '.', '');
+    // Workbox's Terser plugin creates one worker per logical CPU. Some
+    // constrained build runners report zero CPUs, so use its safe, unminified
+    // fallback there instead of leaving service-worker generation unfinished.
+    const workboxMode = os.cpus().length > 0 ? 'production' : 'development';
     return {
       base: '/eigo/',
       define: {
@@ -18,7 +23,7 @@ export default defineConfig(({ mode }) => {
           theme_color: '#4f46e5', background_color: '#f8fafc', display: 'standalone', start_url: '/eigo/', scope: '/eigo/', lang: 'ja',
           icons: [{ src: '/eigo/eigo-icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },{ src: '/eigo/eigo-icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },{ src: '/eigo/eigo-icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }],
         },
-        workbox: { navigateFallback: '/eigo/index.html', globPatterns: ['**/*.{js,css,html,svg}'], cleanupOutdatedCaches: true },
+        workbox: { mode: workboxMode, navigateFallback: '/eigo/index.html', globPatterns: ['**/*.{js,css,html,svg}'], cleanupOutdatedCaches: true },
       })],
       resolve: {
         alias: {

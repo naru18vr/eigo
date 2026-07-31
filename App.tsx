@@ -30,6 +30,8 @@ const Eiken4WordMapPage = lazy(() => import('./pages/Eiken4WordMapPage'));
 const Grade1DailyReviewPage = lazy(() => import('./pages/Grade1DailyReviewPage'));
 const Eiken4DailyCoursePage = lazy(() => import('./pages/Eiken4DailyCoursePage'));
 const Eiken4GrammarGuidePage = lazy(() => import('./pages/Eiken4GrammarGuidePage'));
+const Eiken4GrammarPracticeSelectPage = lazy(() => import('./pages/Eiken4GrammarPracticeSelectPage'));
+const Eiken4GrammarPracticePage = lazy(() => import('./pages/Eiken4GrammarPracticePage'));
 const Eiken4FullMockPage = lazy(() => import('./pages/Eiken4FullMockPage'));
 const Eiken4ListeningPracticePage = lazy(() => import('./pages/Eiken4ListeningPracticePage'));
 const Eiken4PastPaperRecordPage = lazy(() => import('./pages/Eiken4PastPaperRecordPage'));
@@ -85,6 +87,8 @@ const App: React.FC = () => {
             <Route path="/eiken4/grade1-review" element={<Grade1DailyReviewPage />} />
             <Route path="/eiken4/course" element={<Eiken4DailyCoursePage />} />
             <Route path="/eiken4/grammar-guide" element={<Eiken4GrammarGuidePage />} />
+            <Route path="/eiken4/grammar-practice-select" element={<Eiken4GrammarPracticeSelectPage />} />
+            <Route path="/eiken4/grammar-practice" element={<Eiken4GrammarPracticePage />} />
             <Route path="/eiken4/full-mock" element={<Eiken4FullMockPage />} />
             <Route path="/eiken4/listening-practice" element={<Eiken4ListeningPracticePage />} />
             <Route path="/eiken4/listening-focus" element={<Eiken4ListeningFocusPage />} />
