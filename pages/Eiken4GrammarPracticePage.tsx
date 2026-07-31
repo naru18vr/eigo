@@ -8,6 +8,7 @@ import { getGrammarCategory, getGrammarPracticeQuestions, recordGrammarPracticeA
 import { speakText } from '../services/speechService';
 import type { DailyAnswer } from '../services/eiken4DailyService';
 import { getNextLearningActivity, getNextLearningStep, recordLearningGrammarPractice } from '../services/eiken4StepLearningService';
+import { getGrammarLearningState } from '../services/eiken4GrammarProgressService';
 
 const makeAttemptId = () => `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
@@ -18,8 +19,17 @@ const Eiken4GrammarPracticePage: React.FC = () => {
   // クエリ形式は過去の共有URLとの互換用。新規導線は /:categoryId を使う。
   const categoryId = (routeCategoryId || new URLSearchParams(location.search).get('category')) as GrammarCategoryId | null;
   const category = getGrammarCategory(categoryId);
+  const isReviewMode = new URLSearchParams(location.search).get('mode') === 'review';
+  const makeQuestions = (nextAttempt: string) => {
+    if (!category) return [];
+    if (!isReviewMode) return getGrammarPracticeQuestions(category.id, nextAttempt);
+    const incorrectIds = new Set(getGrammarLearningState(category.id).incorrectQuestionIds);
+    const reviewQuestions = getGrammarPracticeQuestions(category.id, nextAttempt, Number.MAX_SAFE_INTEGER).filter(question => incorrectIds.has(question.id)).slice(0, 10);
+    return reviewQuestions.length ? reviewQuestions : getGrammarPracticeQuestions(category.id, nextAttempt);
+  };
+  const reviewQuestionCount = category && isReviewMode ? getGrammarLearningState(category.id).incorrectQuestionIds.length : 0;
   const [attemptId, setAttemptId] = useState(makeAttemptId);
-  const [questions, setQuestions] = useState<GrammarPracticeQuestion[]>(() => category ? getGrammarPracticeQuestions(category.id, attemptId) : []);
+  const [questions, setQuestions] = useState<GrammarPracticeQuestion[]>(() => makeQuestions(attemptId));
   const [answers, setAnswers] = useState<DailyAnswer[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
   const [checked, setChecked] = useState(false);
@@ -28,9 +38,9 @@ const Eiken4GrammarPracticePage: React.FC = () => {
   useEffect(() => {
     const nextAttempt = makeAttemptId();
     setAttemptId(nextAttempt);
-    setQuestions(category ? getGrammarPracticeQuestions(category.id, nextAttempt) : []);
+    setQuestions(makeQuestions(nextAttempt));
     setAnswers([]); setSelected(null); setChecked(false); setSaved(false);
-  }, [categoryId]);
+  }, [categoryId, isReviewMode]);
 
   if (!category) return <div className="flex-grow bg-slate-50 p-4"><main className="mx-auto max-w-xl"><Button onClick={() => navigate('/eiken4/grammar-practice-select')} variant="ghost" size="sm"><ArrowLeftIcon className="mr-2 h-5 w-5" />文法を選ぶ</Button><section className="mt-12 rounded-3xl bg-white p-7 text-center shadow"><h1 className="text-2xl font-extrabold">指定された文法が見つかりませんでした。</h1><p className="mt-3 text-slate-600">文法を選び直してください。</p><Button onClick={() => navigate('/eiken4/grammar-practice-select')} className="mt-6 w-full">文法選択へ戻る</Button><Button onClick={() => navigate('/eiken4')} variant="ghost" className="mt-2 w-full">英検4級トップへ戻る</Button></section></main></div>;
   const current = questions[answers.length];
@@ -39,7 +49,7 @@ const Eiken4GrammarPracticePage: React.FC = () => {
 
   const startAgain = (wrongOnly = false) => {
     const nextAttempt = makeAttemptId();
-    const source = wrongOnly ? questions.filter((question, index) => !answers[index]?.correct) : getGrammarPracticeQuestions(category.id, nextAttempt);
+    const source = wrongOnly ? questions.filter((question, index) => !answers[index]?.correct) : makeQuestions(nextAttempt);
     setAttemptId(nextAttempt); setQuestions(source); setAnswers([]); setSelected(null); setChecked(false); setSaved(false);
   };
 
