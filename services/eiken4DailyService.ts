@@ -35,7 +35,7 @@ export type DailyProgress = {
   completedAt?: string;
 };
 
-type ReviewRecord = { id: string; dueDate: string; step: number };
+type ReviewRecord = { id: string; dueDate: string; step: number; resolved?: boolean; incorrectCount?: number; lastIncorrectAt?: string; resolvedAt?: string };
 
 export const localDateKey = (date = new Date()) => {
   const year = date.getFullYear();
@@ -185,11 +185,11 @@ export const recordReviewAnswer = (id: string, correct: boolean, isRetry: boolea
   const index = records.findIndex(record => record.id === id);
   const current = index >= 0 ? records[index] : undefined;
   if (!correct) {
-    const next = { id, dueDate: addDays(isRetry ? 1 : 0), step: 0 };
+    const next: ReviewRecord = { id, dueDate: addDays(isRetry ? 1 : 0), step: 0, resolved: false, incorrectCount: (current?.incorrectCount || 0) + 1, lastIncorrectAt: new Date().toISOString() };
     if (index >= 0) records[index] = next; else records.push(next);
   } else if (current) {
-    if (current.step >= REVIEW_INTERVALS.length) records.splice(index, 1);
-    else records[index] = { id, dueDate: addDays(REVIEW_INTERVALS[current.step]), step: current.step + 1 };
+    const intervalIndex = Math.min(current.step, REVIEW_INTERVALS.length - 1);
+    records[index] = { ...current, dueDate: addDays(REVIEW_INTERVALS[intervalIndex]), step: Math.min(current.step + 1, REVIEW_INTERVALS.length), resolved: true, resolvedAt: new Date().toISOString() };
   }
   saveReviews(records);
 };
