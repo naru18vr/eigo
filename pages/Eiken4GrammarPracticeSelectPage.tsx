@@ -12,7 +12,7 @@ const Eiken4GrammarPracticeSelectPage: React.FC = () => {
   const openCategory = (category: typeof categories[number]) => {
     const state = getGrammarLearningState(category.id);
     if (!state.guideViewed && category.guideTopic) navigate(`/eiken4/grammar-guide/${category.id}`);
-    else navigate(`/eiken4/grammar-practice/${category.id}`);
+    else navigate(`/eiken4/grammar-practice/${category.id}${state.status === 'review-needed' ? '?mode=review' : ''}`);
   };
 
   return <div className="flex-grow bg-gradient-to-b from-cyan-50 to-white p-4 sm:p-6">
