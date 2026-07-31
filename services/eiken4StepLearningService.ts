@@ -1,6 +1,7 @@
 import { EIKEN4_GRAMMAR_CATEGORIES, type Eiken4GrammarCategoryId } from '../data/eiken4GrammarCategories';
 import { EIKEN4_GRAMMAR_PRACTICE_STATS_KEY, EIKEN4_STEP_LEARNING_KEY } from '../data/eiken4LearningKeys';
 import { safeSetLearningItem } from './storageHealthService';
+import { markGrammarGuideCompleted } from './eiken4GrammarProgressService';
 
 export type LearningStepId = 'step-1' | 'step-2' | 'step-3' | 'step-4' | 'step-5' | 'step-6' | 'step-7';
 export type LearningStepState = 'まだ' | 'がんばり中' | 'できた！' | 'もう一度やろう' | '順番にやろう';
@@ -89,7 +90,7 @@ const legacyGrammarIds = () => {
     const attempted = EIKEN4_GRAMMAR_CATEGORIES.filter(category => (saved[category.id]?.total || 0) > 0).map(category => category.id);
     const mastered = attempted.filter(id => {
       const stat = saved[id];
-      return stat && (stat.correct || 0) / (stat.total || 1) >= 0.8;
+      return stat && (stat.total || 0) >= 5 && (stat.correct || 0) / (stat.total || 1) >= 0.8;
     });
     return { attempted, mastered };
   } catch { return { attempted: [] as Eiken4GrammarCategoryId[], mastered: [] as Eiken4GrammarCategoryId[] }; }
@@ -98,7 +99,12 @@ const legacyGrammarIds = () => {
 const recordFor = (data: StepLearningData, stepId: LearningStepId) => data.steps[stepId] || emptyRecord();
 
 const allAttempted = (data: StepLearningData) => unique([...Object.values(data.steps).flatMap(record => record?.attemptedGrammarIds || []), ...legacyGrammarIds().attempted]);
-const allMastered = (data: StepLearningData) => unique([...Object.values(data.steps).flatMap(record => record?.masteredGrammarIds || []), ...legacyGrammarIds().mastered]);
+const allMastered = (data: StepLearningData) => {
+  const legacy = legacyGrammarIds();
+  return unique([...Object.values(data.steps).flatMap(record => record?.masteredGrammarIds || []), ...legacy.mastered])
+    // 練習統計がある文法は、旧ステップ記録より「5問以上・80％以上」を優先する。
+    .filter(id => !legacy.attempted.includes(id) || legacy.mastered.includes(id));
+};
 
 export const getStepForGrammarCategory = (categoryId: Eiken4GrammarCategoryId) =>
   eiken4LearningSteps.find(step => step.grammarIds.includes(categoryId));
@@ -159,7 +165,7 @@ export const recordLearningGrammarPractice = (categoryId: Eiken4GrammarCategoryI
   const step = getStepForGrammarCategory(categoryId);
   if (!step) return;
   const data = readData(); const record = recordFor(data, step.id); const timestamp = now();
-  const passed = total > 0 && correct / total >= 0.8;
+  const passed = total >= 5 && correct / total >= 0.8;
   data.steps[step.id] = {
     ...record,
     startedAt: record.startedAt || timestamp,
@@ -189,6 +195,7 @@ export const recordLearningGrammarGuideCheck = (categoryId: Eiken4GrammarCategor
     attemptedGrammarIds: unique([...record.attemptedGrammarIds, categoryId]),
   };
   data.guideViewedGrammarIds = unique([...(data.guideViewedGrammarIds || []), categoryId]);
+  markGrammarGuideCompleted(categoryId);
   data.nextActivity = { type: 'grammar-practice', categoryId };
   saveData(data);
 };
