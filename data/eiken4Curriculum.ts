@@ -1,4 +1,5 @@
 import { eiken4ExamQuestions } from './eiken4ExamQuestions';
+import { getEiken4GrammarCategoryId } from './eiken4GrammarCategories';
 import { eiken4Sentences } from './eiken4Sentences';
 
 // 英検4級（中学中級程度）の毎日学習では、中3で扱う文法を新規出題しない。
@@ -7,7 +8,7 @@ const advancedExamIds = new Set(['x005', 'x010', 'x011', 'x014', 'x029', 'x030']
 
 export const eiken4CoreSentences = eiken4Sentences.filter(
   sentence => !advancedGrammarTags.some(tag => sentence.grammarTag.startsWith(tag)),
-);
+).map(sentence => ({ ...sentence, grammarCategory: getEiken4GrammarCategoryId(sentence) }));
 
 export const eiken4CoreExamQuestions = eiken4ExamQuestions.filter(
   question => !advancedExamIds.has(question.id),

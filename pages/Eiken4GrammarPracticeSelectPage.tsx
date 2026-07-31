@@ -25,7 +25,7 @@ const Eiken4GrammarPracticeSelectPage: React.FC = () => {
           const accuracy = result?.total ? Math.round(result.correct / result.total * 100) : null;
           const state = getGrammarLearningState(result);
           const stateStyle = state === 'できた' ? 'bg-emerald-100 text-emerald-800' : state === '復習しよう' ? 'bg-rose-100 text-rose-800' : state === '練習中' ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-700';
-          return <button key={category.id} onClick={() => navigate(`/eiken4/grammar-practice?category=${category.id}`)} className="flex min-h-24 w-full items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:border-cyan-300 active:scale-[.99]">
+          return <button key={category.id} onClick={() => navigate(`/eiken4/grammar-practice/${category.id}`)} className="flex min-h-24 w-full items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:border-cyan-300 active:scale-[.99]">
             <div className="min-w-0 flex-grow"><div className="flex flex-wrap items-center gap-2"><h2 className="text-lg font-extrabold text-slate-900">{category.title}</h2><span className={`rounded-full px-2 py-1 text-xs font-bold ${stateStyle}`}>{state}</span></div><p className="mt-1 text-sm text-slate-600">{category.description}</p><p className="mt-2 text-xs text-slate-500">問題数：{getGrammarCategorySentences(category.id).length}問{accuracy !== null ? `・正答率：${accuracy}％` : ''}</p></div>
             <ChevronRightIcon className="h-6 w-6 shrink-0 text-cyan-600" />
           </button>;

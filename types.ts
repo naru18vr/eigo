@@ -4,6 +4,7 @@ export interface Sentence {
   japaneseQuestion: string;
   words: string[]; // Correct words in order. Includes punctuation as separate words if needed.
   grammarTag: string;
+  grammarCategory?: import('./data/eiken4GrammarCategories').Eiken4GrammarCategoryId;
   explanation: string;
 }
 

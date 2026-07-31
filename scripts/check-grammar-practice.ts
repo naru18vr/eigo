@@ -20,6 +20,7 @@ if (new Set(assigned.map(value => value.split(':')[0])).size !== assigned.length
 const assignedIds = new Set(assigned.map(value => value.split(':')[0]));
 const unassigned = eiken4CoreSentences.filter(sentence => !assignedIds.has(sentence.id));
 if (unassigned.length) errors.push(`文法カテゴリが未設定の問題がある: ${unassigned.map(sentence => `${sentence.id}(${sentence.grammarTag})`).join('、')}`);
+if (eiken4CoreSentences.some(sentence => !sentence.grammarCategory)) errors.push('文法問題データにカテゴリIDがない');
 for (const category of categories) {
   const sentences = getGrammarCategorySentences(category.id);
   const questions = getGrammarPracticeQuestions(category.id, 'test-attempt');
@@ -27,6 +28,7 @@ for (const category of categories) {
   if (!questions.length || questions.length > 10) errors.push(`出題数が不正: ${category.id}`);
   if (new Set(questions.map(question => question.id)).size !== questions.length) errors.push(`練習内で問題が重複: ${category.id}`);
   if (questions.some(question => !sentences.some(sentence => `sentence-${sentence.id}` === question.id))) errors.push(`別カテゴリの問題が混入: ${category.id}`);
+  if (questions.some(question => question.grammarCategory !== category.id)) errors.push(`問題データのカテゴリIDが不正: ${category.id}`);
 }
 
 const target = categories.find(category => category.id === 'past-tense');

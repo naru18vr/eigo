@@ -1,41 +1,13 @@
 import { eiken4CoreSentences } from '../data/eiken4Curriculum';
-import type { Sentence } from '../types';
+import { EIKEN4_GRAMMAR_CATEGORIES, getEiken4GrammarCategory, getEiken4GrammarCategoryForGuideTopic, type Eiken4GrammarCategory, type Eiken4GrammarCategoryId } from '../data/eiken4GrammarCategories';
 import { getQuestionById, localDateKey, recordReviewAnswer, type DailyAnswer, type DailyQuestion } from './eiken4DailyService';
 import { safeSetLearningItem } from './storageHealthService';
 
-export type GrammarCategoryId =
-  | 'general-verb' | 'past-tense' | 'present-progressive' | 'past-progressive'
-  | 'future' | 'modal-verb' | 'question-words' | 'imperative' | 'there-is-are'
-  | 'infinitive' | 'gerund' | 'comparative' | 'superlative' | 'conjunction' | 'other-eiken4';
-
-export type GrammarCategory = {
-  id: GrammarCategoryId;
-  title: string;
-  description: string;
-  guideTopic?: string;
-  matches: (sentence: Sentence) => boolean;
-};
-
-const tag = (sentence: Sentence) => sentence.grammarTag;
-const words = (sentence: Sentence) => sentence.words.join(' ');
-
-export const grammarCategories: GrammarCategory[] = [
-  { id: 'general-verb', title: '一般動詞・基本表現', description: '「する・行く」など、動きを表す文', matches: sentence => /^(get up|want＋名詞|道案内)$/.test(tag(sentence)) },
-  { id: 'past-tense', title: '過去形', description: '昨日したことを表す文', guideTopic: 'past', matches: sentence => /^(過去形|過去形の疑問文|過去形の否定文|不規則動詞)$/.test(tag(sentence)) },
-  { id: 'present-progressive', title: '現在進行形', description: '今していることを表す文', matches: sentence => tag(sentence) === '現在進行形' },
-  { id: 'past-progressive', title: '過去進行形', description: 'そのときしていたことを表す文', guideTopic: 'past', matches: sentence => tag(sentence) === '過去進行形' },
-  { id: 'future', title: '未来を表す表現', description: 'これからすることを表す文', guideTopic: 'future', matches: sentence => /^(be going to|未来 will|Will you \.\.\.\?)$/.test(tag(sentence)) },
-  { id: 'modal-verb', title: '助動詞', description: 'できる・すべき・してはいけないを表す文', guideTopic: 'modal', matches: sentence => /^(Can I \.\.\.\?|May I \.\.\.\?|must not|should|have to)$/.test(tag(sentence)) },
-  { id: 'question-words', title: '疑問詞', description: '何・どこ・どのくらいをたずねる文', matches: sentence => /^(How often \.\.\.\?|How long \.\.\.\?|How many \.\.\.\?|疑問詞 What)$/.test(tag(sentence)) },
-  { id: 'imperative', title: '命令文・誘いかけ', description: '〜してください・〜しましょうの文', matches: sentence => /^Let's \.\.\.$/.test(tag(sentence)) || /^(Please|Let's)/.test(words(sentence)) },
-  { id: 'there-is-are', title: 'There is / There are', description: '〜があります・いますを表す文', guideTopic: 'there', matches: sentence => /^There (is|are)/.test(tag(sentence)) },
-  { id: 'infinitive', title: 'to不定詞', description: '〜すること・〜するためにを表す文', guideTopic: 'infinitive', matches: sentence => /^(want to|目的の不定詞|Would you like to \.\.\.\?)$/.test(tag(sentence)) },
-  { id: 'gerund', title: '動名詞', description: '〜することを表す動詞ingの文', guideTopic: 'gerund', matches: sentence => /^動名詞/.test(tag(sentence)) },
-  { id: 'comparative', title: '比較級', description: '2つのものを比べる文', guideTopic: 'comparison', matches: sentence => /^(比較級|as \.\.\. as)$/.test(tag(sentence)) },
-  { id: 'superlative', title: '最上級', description: '3つ以上の中で一番を表す文', guideTopic: 'comparison', matches: sentence => tag(sentence) === '最上級' },
-  { id: 'conjunction', title: '接続詞', description: '文と文をつなぐ表現', guideTopic: 'conjunction', matches: sentence => /^(because|接続詞 if|接続詞 when)$/.test(tag(sentence)) },
-  { id: 'other-eiken4', title: 'その他の英検4級文法', description: '人にものを渡す・見せるなどの表現', guideTopic: 'give', matches: sentence => /^(show|give|make|teach)＋人＋物$/.test(tag(sentence)) },
-];
+export type GrammarCategoryId = Eiken4GrammarCategoryId;
+export type GrammarCategory = Eiken4GrammarCategory;
+export type GrammarPracticeQuestion = DailyQuestion & { grammarCategory: GrammarCategoryId };
+export const grammarCategories = EIKEN4_GRAMMAR_CATEGORIES;
+export { getEiken4GrammarCategoryForGuideTopic };
 
 export type GrammarPracticeStats = { attempts: number; correct: number; total: number; lastAnsweredAt?: string; lastWrongAt?: string };
 export type GrammarPracticeHistory = { id: string; categoryId: GrammarCategoryId; questionIds: string[]; answers: DailyAnswer[]; completedAt: string };
@@ -59,20 +31,23 @@ const read = <T,>(key: string, fallback: T): T => {
   try { return JSON.parse(localStorage.getItem(key) || '') as T; } catch { return fallback; }
 };
 
-export const getGrammarCategory = (categoryId: string | null | undefined) => grammarCategories.find(category => category.id === categoryId);
+export const getGrammarCategory = getEiken4GrammarCategory;
 
 export const getGrammarCategorySentences = (categoryId: GrammarCategoryId) => {
   const category = getGrammarCategory(categoryId);
-  return category ? eiken4CoreSentences.filter(sentence => grammarCategories.find(item => item.matches(sentence))?.id === category.id) : [];
+  return category ? eiken4CoreSentences.filter(sentence => sentence.grammarCategory === category.id) : [];
 };
 
 export const getAvailableGrammarCategories = () => grammarCategories.filter(category => getGrammarCategorySentences(category.id).length > 0);
 
-export const getGrammarPracticeQuestions = (categoryId: GrammarCategoryId, attemptId: string, count = 10): DailyQuestion[] =>
+export const getGrammarPracticeQuestions = (categoryId: GrammarCategoryId, attemptId: string, count = 10): GrammarPracticeQuestion[] =>
   shuffled(getGrammarCategorySentences(categoryId), `${localDateKey()}-${categoryId}-${attemptId}`)
     .slice(0, count)
-    .map(sentence => getQuestionById(`sentence-${sentence.id}`, localDateKey()))
-    .filter((question): question is DailyQuestion => Boolean(question));
+    .map(sentence => {
+      const question = getQuestionById(`sentence-${sentence.id}`, localDateKey());
+      return question ? { ...question, grammarCategory: categoryId } : undefined;
+    })
+    .filter((question): question is GrammarPracticeQuestion => Boolean(question));
 
 export const loadGrammarPracticeStats = (): Record<string, GrammarPracticeStats> => {
   const stats = read<Record<string, GrammarPracticeStats>>(STATS_KEY, {});
@@ -104,4 +79,5 @@ export const saveGrammarPracticeResult = (categoryId: GrammarCategoryId, questio
   safeSetLearningItem(HISTORY_KEY, JSON.stringify([...history, item].slice(-120)));
 };
 
+// 文法別練習での誤答も、既存のおまかせ復習の予定に登録する。
 export const recordGrammarPracticeAnswer = (id: string, correct: boolean) => recordReviewAnswer(id, correct, false);

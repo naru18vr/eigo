@@ -88,6 +88,8 @@ const App: React.FC = () => {
             <Route path="/eiken4/course" element={<Eiken4DailyCoursePage />} />
             <Route path="/eiken4/grammar-guide" element={<Eiken4GrammarGuidePage />} />
             <Route path="/eiken4/grammar-practice-select" element={<Eiken4GrammarPracticeSelectPage />} />
+            <Route path="/eiken4/grammar-practice/:categoryId" element={<Eiken4GrammarPracticePage />} />
+            {/* 以前の共有URLも開けるように残す。新しい導線は上の固定パスを使う。 */}
             <Route path="/eiken4/grammar-practice" element={<Eiken4GrammarPracticePage />} />
             <Route path="/eiken4/full-mock" element={<Eiken4FullMockPage />} />
             <Route path="/eiken4/listening-practice" element={<Eiken4ListeningPracticePage />} />
