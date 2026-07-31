@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import Button from '../components/Button';
 import ArrowLeftIcon from '../components/shared/ArrowLeftIcon';
 import ChevronRightIcon from '../components/shared/ChevronRightIcon';
 import SpeakerWaveIcon from '../components/shared/SpeakerWaveIcon';
 import { speakText } from '../services/speechService';
-import { getEiken4GrammarCategoriesForGuideTopic } from '../services/eiken4GrammarPracticeService';
+import { getEiken4GrammarCategoriesForGuideTopic, getGrammarCategory } from '../services/eiken4GrammarPracticeService';
 import { recordLearningGrammarGuideCheck } from '../services/eiken4StepLearningService';
 
 type Topic = {
@@ -31,14 +31,17 @@ const topics: Topic[] = [
 const Eiken4GrammarGuidePage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { grammarId } = useParams<{ grammarId: string }>();
   const searchParams = new URLSearchParams(location.search);
-  const requestedTopic = searchParams.get('topic');
-  const requestedCategory = searchParams.get('category');
+  const requestedCategory = grammarId || searchParams.get('category');
+  const categoryFromRoute = requestedCategory ? getGrammarCategory(requestedCategory) : undefined;
+  const requestedTopic = categoryFromRoute?.guideTopic || searchParams.get('topic');
   const [openId, setOpenId] = useState<string | null>(topics.some(topic => topic.id === requestedTopic) ? requestedTopic : topics[0].id);
   const [answers, setAnswers] = useState<Record<string,string>>({});
+  if (grammarId && !categoryFromRoute) return <div className="flex-grow bg-slate-50 p-4"><main className="mx-auto max-w-xl"><section className="mt-12 rounded-3xl bg-white p-7 text-center shadow"><h1 className="text-2xl font-extrabold text-slate-900">この文法は見つかりませんでした。</h1><p className="mt-3 text-slate-600">文法を選び直してね。</p><Button onClick={() => navigate('/eiken4/grammar-practice-select')} className="mt-6 w-full">文法選択へ戻る</Button><Button onClick={() => navigate('/eiken4')} variant="ghost" className="mt-2 w-full">英検4級トップへ戻る</Button></section></main></div>;
   return <div className="flex-grow bg-gradient-to-b from-cyan-50 to-white p-4 sm:p-6">
     <div className="mx-auto max-w-2xl">
-      <Button onClick={() => navigate('/eiken4')} variant="ghost" size="sm"><ArrowLeftIcon className="h-5 w-5 mr-2"/>英検4級に戻る</Button>
+      <Button onClick={() => navigate(requestedCategory ? '/eiken4/grammar-practice-select' : '/eiken4')} variant="ghost" size="sm"><ArrowLeftIcon className="h-5 w-5 mr-2"/>{requestedCategory ? '文法選択へ戻る' : '英検4級に戻る'}</Button>
       <header className="mt-4 rounded-3xl bg-gradient-to-br from-cyan-600 to-blue-700 p-6 text-white shadow-xl">
         <p className="text-xs font-bold tracking-widest text-cyan-100">ZERO-START GRAMMAR</p><h1 className="mt-2 text-3xl font-bold">はじめての英検4級文法</h1><p className="mt-3 leading-7 text-cyan-50">まだ学校で習っていなくても大丈夫。上から読めば、問題を解くための形と意味がわかります。</p>
       </header>
@@ -51,7 +54,7 @@ const Eiken4GrammarGuidePage: React.FC = () => {
             <p className="text-lg font-bold leading-8 text-slate-800">{topic.meaning}</p><div className="mt-4 rounded-xl bg-blue-50 p-4"><p className="text-xs font-bold text-blue-600">作り方</p><p className="mt-1 leading-7 text-blue-950">{topic.rule}</p></div>
             <div className="mt-4 space-y-3">{topic.examples.map(example=><div key={example.en} className="rounded-xl border border-slate-200 p-3"><div className="flex items-start justify-between gap-2"><p className="font-bold text-slate-800">{example.en}</p><button onClick={()=>speakText(example.en,'en-US',.8)} aria-label="例文を聞く" className="shrink-0 rounded-full bg-indigo-50 p-2 text-indigo-700"><SpeakerWaveIcon className="h-5 w-5"/></button></div><p className="mt-1 text-sm text-slate-600">{example.ja}</p></div>)}</div>
             <div className="mt-4 grid gap-3 sm:grid-cols-2"><div className="rounded-xl bg-rose-50 p-3 text-sm text-rose-900"><p className="font-bold">よくある間違い</p><p className="mt-1">{topic.mistake}</p></div><div className="rounded-xl bg-emerald-50 p-3 text-sm text-emerald-900"><p className="font-bold">英検での見つけ方</p><p className="mt-1">{topic.tip}</p></div></div>
-            <div className="mt-5 rounded-xl border-2 border-violet-200 bg-violet-50 p-4"><p className="text-xs font-bold text-violet-600">1問チェック</p><p className="mt-1 font-bold text-slate-800">{topic.quiz.question}</p><div className="mt-3 grid gap-2">{topic.quiz.choices.map(choice=><button key={choice} disabled={Boolean(picked)} onClick={()=>{ setAnswers(value=>({...value,[topic.id]:choice})); [...categories].reverse().forEach(category=>recordLearningGrammarGuideCheck(category.id)); }} className={`min-h-11 rounded-lg border p-3 text-left font-semibold ${picked && choice===topic.quiz.answer?'border-emerald-500 bg-emerald-50 text-emerald-800':picked===choice?'border-rose-500 bg-rose-50 text-rose-800':'border-violet-200 bg-white text-slate-700'}`}>{choice}</button>)}</div>{picked&&<div className={`mt-3 rounded-lg p-3 ${correct?'bg-emerald-100':'bg-amber-100'}`}><p className="font-bold">{correct?'正解！':`正解：${topic.quiz.answer}`}</p><p className="mt-1 text-sm">{topic.quiz.explanation}</p><button onClick={()=>setAnswers(value=>{const next={...value};delete next[topic.id];return next;})} className="mt-2 text-sm font-bold text-indigo-700">もう一度解く</button></div>}{categories.length > 0 && <div className="mt-4 grid gap-2">{categories.map(category=><Button key={category.id} onClick={()=>navigate(`/eiken4/grammar-practice/${category.id}`)} className="w-full">{categories.length === 1 ? 'この文法を練習する' : `${category.title}を練習する`}</Button>)}</div>}</div>
+            <div className="mt-5 rounded-xl border-2 border-violet-200 bg-violet-50 p-4"><p className="text-xs font-bold text-violet-600">1問チェック</p><p className="mt-1 font-bold text-slate-800">{topic.quiz.question}</p><div className="mt-3 grid gap-2">{topic.quiz.choices.map(choice=><button key={choice} disabled={Boolean(picked)} onClick={()=>{ setAnswers(value=>({...value,[topic.id]:choice})); [...categories].reverse().forEach(category=>recordLearningGrammarGuideCheck(category.id)); }} className={`min-h-11 rounded-lg border p-3 text-left font-semibold ${picked && choice===topic.quiz.answer?'border-emerald-500 bg-emerald-50 text-emerald-800':picked===choice?'border-rose-500 bg-rose-50 text-rose-800':'border-violet-200 bg-white text-slate-700'}`}>{choice}</button>)}</div>{picked&&<div className={`mt-3 rounded-lg p-3 ${correct?'bg-emerald-100':'bg-amber-100'}`}><p className="font-bold">{correct?'正解！':`正解：${topic.quiz.answer}`}</p><p className="mt-1 text-sm">{topic.quiz.explanation}</p><button onClick={()=>setAnswers(value=>{const next={...value};delete next[topic.id];return next;})} className="mt-2 text-sm font-bold text-indigo-700">もう一度解く</button></div>}{categories.length > 0 && <div className="mt-4 grid gap-2">{categories.map(category=><Button key={category.id} onClick={()=>{ recordLearningGrammarGuideCheck(category.id); navigate(`/eiken4/grammar-practice/${category.id}`); }} className="w-full">{categories.length === 1 ? 'この文法を練習する' : `${category.title}を練習する`}</Button>)}</div>}</div>
           </div>}
         </article>;
       })}</div>
