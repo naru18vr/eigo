@@ -109,6 +109,13 @@ const allMastered = (data: StepLearningData) => {
 export const getStepForGrammarCategory = (categoryId: Eiken4GrammarCategoryId) =>
   eiken4LearningSteps.find(step => step.grammarIds.includes(categoryId));
 
+export const getNextGrammarCategory = (categoryId: Eiken4GrammarCategoryId) => {
+  const orderedIds = eiken4LearningSteps.flatMap(step => step.grammarIds);
+  const currentIndex = orderedIds.indexOf(categoryId);
+  const nextId = currentIndex >= 0 ? orderedIds.slice(currentIndex + 1).find(id => getGrammarLearningState(id).status !== 'completed') : undefined;
+  return nextId ? EIKEN4_GRAMMAR_CATEGORIES.find(category => category.id === nextId) : undefined;
+};
+
 export const getLearningStep = (stepId: string | undefined) => eiken4LearningSteps.find(step => step.id === stepId);
 export const getStudiedGrammarIds = () => allAttempted(readData());
 export const getNextLearningActivity = (data = readData()) => data.nextActivity;
@@ -180,7 +187,7 @@ export const recordLearningGrammarPractice = (categoryId: Eiken4GrammarCategoryI
 };
 
 // 文法ガイドの確認問題に答えた内容も、学習済みとして保存する。
-export const recordLearningGrammarGuideCheck = (categoryId: Eiken4GrammarCategoryId) => {
+export const completeGrammarGuide = (categoryId: Eiken4GrammarCategoryId) => {
   const step = getStepForGrammarCategory(categoryId);
   if (!step) return;
   const data = readData(); const record = recordFor(data, step.id); const timestamp = now();
