@@ -7,7 +7,7 @@ import SpeakerWaveIcon from '../components/shared/SpeakerWaveIcon';
 import { getGrammarCategory, getGrammarPracticeQuestions, recordGrammarPracticeAnswer, saveGrammarPracticeResult, type GrammarCategoryId, type GrammarPracticeQuestion } from '../services/eiken4GrammarPracticeService';
 import { speakText } from '../services/speechService';
 import type { DailyAnswer } from '../services/eiken4DailyService';
-import { getStepForGrammarCategory, recordLearningGrammarPractice } from '../services/eiken4StepLearningService';
+import { getNextLearningActivity, getNextLearningStep, recordLearningGrammarPractice } from '../services/eiken4StepLearningService';
 
 const makeAttemptId = () => `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
@@ -60,13 +60,22 @@ const Eiken4GrammarPracticePage: React.FC = () => {
 
   if (finished) {
     const passed = correctCount / questions.length >= .8;
-    const step = getStepForGrammarCategory(category.id);
+    const nextActivity = passed ? getNextLearningActivity() : undefined;
+    const nextCategory = nextActivity ? getGrammarCategory(nextActivity.categoryId) : undefined;
+    const nextStep = passed && !nextActivity ? getNextLearningStep() : undefined;
+    const nextStepCategory = nextStep?.grammarIds[0] ? getGrammarCategory(nextStep.grammarIds[0]) : undefined;
     const mainAction = passed
-      ? () => navigate(step ? `/eiken4/learning-step/${step.id}` : '/eiken4/grammar-practice-select')
-      : () => navigate(category.guideTopic ? `/eiken4/grammar-guide?topic=${category.guideTopic}` : '/eiken4/grammar-practice-select');
+      ? () => {
+        if (nextCategory?.guideTopic) navigate(`/eiken4/grammar-guide?topic=${nextCategory.guideTopic}&category=${nextCategory.id}`);
+        else if (nextStepCategory?.guideTopic) navigate(`/eiken4/grammar-guide?topic=${nextStepCategory.guideTopic}&category=${nextStepCategory.id}`);
+        else if (nextStep) navigate(`/eiken4/learning-step/${nextStep.id}`);
+        else navigate('/eiken4/mixed-review');
+      }
+      : () => navigate(category.guideTopic ? `/eiken4/grammar-guide?topic=${category.guideTopic}&category=${category.id}` : '/eiken4/grammar-practice-select');
+    const mainLabel = !passed ? '説明をもう一度見る' : nextCategory ? 'つぎの文法へ' : nextStep ? `ステップ${Number(nextStep.id.slice(-1))}へ` : 'まとめ問題へ';
     return <div className="flex-grow bg-slate-50 p-4"><main className="mx-auto max-w-xl">
       <section className="mt-4 rounded-3xl bg-white p-7 text-center shadow"><CheckCircleIcon className="mx-auto h-16 w-16 text-emerald-500"/><p className="mt-4 font-bold text-cyan-700">{category.title}の練習結果</p><h1 className="mt-2 text-4xl font-extrabold text-slate-900">{correctCount} / {questions.length}</h1><p className="mt-2 text-slate-600">出題数：{questions.length}問・不正解：{questions.length - correctCount}問</p><p className="mt-1 text-slate-600">正答率：{Math.round(correctCount / questions.length * 100)}％</p></section>
-      <section className={`mt-4 rounded-2xl p-5 text-center ${passed ? 'bg-emerald-50 text-emerald-950' : 'bg-amber-50 text-amber-950'}`}><p className="font-extrabold">{passed ? 'よくできました！' : 'ここまでよくがんばったね。'}</p><p className="mt-2 text-sm leading-6">{passed ? 'つぎの文法へ進んでみよう。' : '説明をもう一度見てから、同じ文法を練習してみよう。'}</p><Button onClick={mainAction} className="mt-4 w-full">{passed ? 'つぎの文法へ' : '説明をもう一度見る'}</Button></section>
+      <section className={`mt-4 rounded-2xl p-5 text-center ${passed ? 'bg-emerald-50 text-emerald-950' : 'bg-amber-50 text-amber-950'}`}><p className="font-extrabold">{passed ? 'よくできました！' : 'ここまでよくがんばったね。'}</p><p className="mt-2 text-sm leading-6">{passed ? nextStep && !nextCategory ? `このステップはできたよ。つぎはステップ${Number(nextStep.id.slice(-1))}へ進もう。` : nextCategory ? 'つぎの文法へ進んでみよう。' : '習った文法をまぜて確認しよう。' : '説明をもう一度見てから、同じ文法を練習してみよう。'}</p><Button onClick={mainAction} className="mt-4 w-full">{mainLabel}</Button></section>
       <section className="mt-4 rounded-3xl bg-white p-5 shadow"><h2 className="text-left text-xl font-extrabold">間違えた問題の復習</h2>{answers.every(answer => answer.correct) ? <p className="mt-3 rounded-xl bg-emerald-50 p-4 text-sm font-bold text-emerald-800">全問正解！ この文法はよくできています。</p> : <div className="mt-3 space-y-3 text-left">{questions.map((question, index) => !answers[index]?.correct && <details key={question.id} className="rounded-xl border border-rose-200 bg-rose-50 p-4"><summary className="cursor-pointer font-bold text-rose-900">{question.prompt}</summary><p className="mt-3 font-bold text-emerald-700">正解：{question.answer}</p><p className="mt-2 text-sm leading-6 text-slate-700">{question.explanation}</p></details>)}</div>}</section>
       <div className="mt-5 grid gap-2"><Button onClick={() => startAgain()} variant="secondary" className="w-full">同じ文法をもう一度</Button>{answers.some(answer => !answer.correct) && <Button onClick={() => startAgain(true)} variant="secondary" className="w-full">間違えた問題だけ復習</Button>}<Button onClick={() => navigate('/eiken4/grammar-practice-select')} variant="ghost" className="w-full">ほかの文法を選ぶ</Button><Button onClick={() => navigate('/eiken4')} variant="ghost" className="w-full">英検4級トップへ戻る</Button></div>
     </main></div>;
