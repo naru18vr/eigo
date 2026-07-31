@@ -7,7 +7,7 @@ import SpeakerWaveIcon from '../components/shared/SpeakerWaveIcon';
 import { getGrammarCategory, getGrammarPracticeQuestions, recordGrammarPracticeAnswer, saveGrammarPracticeResult, type GrammarCategoryId, type GrammarPracticeQuestion } from '../services/eiken4GrammarPracticeService';
 import { speakText } from '../services/speechService';
 import type { DailyAnswer } from '../services/eiken4DailyService';
-import { getNextLearningActivity, getNextLearningStep, recordLearningGrammarPractice } from '../services/eiken4StepLearningService';
+import { getNextGrammarCategory, getNextLearningStep, recordLearningGrammarPractice } from '../services/eiken4StepLearningService';
 import { getGrammarLearningState } from '../services/eiken4GrammarProgressService';
 
 const makeAttemptId = () => `${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -70,10 +70,10 @@ const Eiken4GrammarPracticePage: React.FC = () => {
 
   if (finished) {
     const enoughAnswers = questions.length >= 5;
-    const passed = enoughAnswers && correctCount / questions.length >= .8;
-    const nextActivity = passed ? getNextLearningActivity() : undefined;
-    const nextCategory = nextActivity ? getGrammarCategory(nextActivity.categoryId) : undefined;
-    const nextStep = passed && !nextActivity ? getNextLearningStep() : undefined;
+    const accuracy = questions.length ? correctCount / questions.length : 0;
+    const passed = enoughAnswers && accuracy >= .8;
+    const nextCategory = passed ? getNextGrammarCategory(category.id) : undefined;
+    const nextStep = passed && !nextCategory ? getNextLearningStep() : undefined;
     const nextStepCategory = nextStep?.grammarIds[0] ? getGrammarCategory(nextStep.grammarIds[0]) : undefined;
     const mainAction = !enoughAnswers
       ? () => startAgain()
