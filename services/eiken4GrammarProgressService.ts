@@ -23,7 +23,7 @@ export type GrammarLearningState = {
 
 type Stats = { correct?: number; total?: number; lastAnsweredAt?: string };
 type History = { categoryId?: string; questionIds?: string[]; answers?: { id?: string; correct?: boolean }[]; completedAt?: string };
-type Review = { id?: string; dueDate?: string };
+type Review = { id?: string; dueDate?: string; step?: number; resolved?: boolean };
 type StepData = { guideViewedGrammarIds?: string[] };
 export type GrammarGuideProgress = { grammarId: Eiken4GrammarCategoryId; started: boolean; completed: boolean; startedAt?: string; completedAt?: string };
 
@@ -87,6 +87,7 @@ export const getGrammarLearningState = (grammarId: Eiken4GrammarCategoryId): Gra
   const latestAnswers = Array.isArray(latest?.answers) ? latest.answers : [];
   const incorrectQuestionIds = Array.from(new Set([
     ...latestAnswers.map((answer, index) => !answer?.correct ? answer.id || latest?.questionIds?.[index] : undefined).filter((id): id is string => Boolean(id)),
+    ...grammarReviews.filter(item => item.resolved === false || (item.resolved === undefined && (item.step || 0) === 0)).map(item => item.id).filter((id): id is string => Boolean(id)),
     ...grammarReviews.filter(item => item.dueDate && item.dueDate <= today()).map(item => item.id).filter((id): id is string => Boolean(id)),
   ]));
   const latestAccuracy = latestAnswers.length ? latestAnswers.filter(answer => answer?.correct).length / latestAnswers.length * 100 : undefined;
