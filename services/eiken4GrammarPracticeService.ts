@@ -55,25 +55,20 @@ export const loadGrammarPracticeStats = (): Record<string, GrammarPracticeStats>
   return Object.fromEntries(Object.entries(stats).filter(([, value]) => value && Number.isFinite(value.attempts) && Number.isFinite(value.correct) && Number.isFinite(value.total)));
 };
 
-export const getGrammarLearningState = (stats: GrammarPracticeStats | undefined) => {
-  if (!stats?.total) return 'まだ';
-  if (stats.lastWrongAt && (!stats.lastAnsweredAt || stats.lastWrongAt === stats.lastAnsweredAt)) return '復習しよう';
-  return stats.correct / stats.total >= .8 ? 'できた！' : 'がんばり中';
-};
-
 export const saveGrammarPracticeResult = (categoryId: GrammarCategoryId, questionIds: string[], answers: DailyAnswer[]) => {
   if (!questionIds.length || answers.length !== questionIds.length) return;
   const completedAt = new Date().toISOString();
   const stats = loadGrammarPracticeStats();
   const previous = stats[categoryId] || { attempts: 0, correct: 0, total: 0 };
   const correct = answers.filter(answer => answer.correct).length;
-  stats[categoryId] = {
+  const updated: GrammarPracticeStats = {
     attempts: previous.attempts + 1,
     correct: previous.correct + correct,
     total: previous.total + answers.length,
     lastAnsweredAt: completedAt,
-    ...(answers.some(answer => !answer.correct) ? { lastWrongAt: completedAt } : {}),
   };
+  if (answers.some(answer => !answer.correct)) updated.lastWrongAt = completedAt;
+  stats[categoryId] = updated;
   const history = read<GrammarPracticeHistory[]>(HISTORY_KEY, []);
   const item: GrammarPracticeHistory = { id: `grammar-${categoryId}-${completedAt}`, categoryId, questionIds, answers, completedAt };
   safeSetLearningItem(STATS_KEY, JSON.stringify(stats));
