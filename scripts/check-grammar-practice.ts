@@ -1,4 +1,6 @@
-import { getAvailableGrammarCategories, getGrammarCategorySentences, getGrammarLearningState, getGrammarPracticeQuestions, loadGrammarPracticeStats, recordGrammarPracticeAnswer, saveGrammarPracticeResult } from '../services/eiken4GrammarPracticeService';
+import { getAvailableGrammarCategories, getGrammarCategorySentences, getGrammarPracticeQuestions, loadGrammarPracticeStats, recordGrammarPracticeAnswer, saveGrammarPracticeResult } from '../services/eiken4GrammarPracticeService';
+import { getGrammarLearningState } from '../services/eiken4GrammarProgressService';
+import { recordLearningGrammarGuideCheck } from '../services/eiken4StepLearningService';
 import { eiken4CoreSentences } from '../data/eiken4Curriculum';
 
 const errors: string[] = [];
@@ -34,14 +36,26 @@ for (const category of categories) {
 const target = categories.find(category => category.id === 'past-tense');
 if (!target) errors.push('過去形カテゴリがない');
 else {
+  if (getGrammarLearningState(target.id).status !== 'not-started') errors.push('初回の文法を「まだ」にできない');
+  recordLearningGrammarGuideCheck(target.id);
+  const afterGuide = getGrammarLearningState(target.id);
+  if (!afterGuide.guideViewed || afterGuide.status !== 'in-progress') errors.push('解説確認後を「がんばり中」にできない');
   const questions = getGrammarPracticeQuestions(target.id, 'history-test');
   const answers = questions.map((question, index) => ({ id: question.id, correct: index !== 0 }));
   recordGrammarPracticeAnswer(questions[0].id, false);
   saveGrammarPracticeResult(target.id, questions.map(question => question.id), answers);
   const stats = loadGrammarPracticeStats()[target.id];
   if (!stats || stats.attempts !== 1 || stats.total !== questions.length || stats.correct !== questions.length - 1) errors.push('文法別の学習履歴を保存できない');
-  if (getGrammarLearningState(stats) !== '復習しよう') errors.push('直近の誤答を復習状態にできない');
+  if (getGrammarLearningState(target.id).status !== 'review-needed') errors.push('直近の誤答を「もう一度やろう」にできない');
   if (!(localStorage.getItem('eiken4ReviewScheduleV1') || '').includes(questions[0].id)) errors.push('文法別の誤答が既存復習へ追加されない');
+}
+
+const completedTarget = categories.find(category => category.id === 'modal-verb');
+if (completedTarget) {
+  const questions = getGrammarPracticeQuestions(completedTarget.id, 'completed-test');
+  saveGrammarPracticeResult(completedTarget.id, questions.map(question => question.id), questions.map((question, index) => ({ id: question.id, correct: index < Math.ceil(questions.length * .8) })));
+  const state = getGrammarLearningState(completedTarget.id);
+  if (state.attemptedCount < 5 || state.accuracy < 80 || state.status !== 'completed') errors.push('5問以上・正答率80％以上を「できた！」にできない');
 }
 
 if (errors.length) { console.error(errors.join('\n')); process.exit(1); }
