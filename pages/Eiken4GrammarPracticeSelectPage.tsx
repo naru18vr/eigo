@@ -3,14 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import ArrowLeftIcon from '../components/shared/ArrowLeftIcon';
 import { getAvailableGrammarCategories, getGrammarCategorySentences } from '../services/eiken4GrammarPracticeService';
-import { getGrammarLearningState, type GrammarLearningStatus } from '../services/eiken4GrammarProgressService';
-
-const statusText: Record<GrammarLearningStatus, string> = {
-  'not-started': 'まだ',
-  'in-progress': 'がんばり中',
-  completed: 'できた！',
-  'review-needed': 'もう一度やろう',
-};
+import { getGrammarLearningState, getGrammarStatusLabel } from '../services/eiken4GrammarProgressService';
 
 const Eiken4GrammarPracticeSelectPage: React.FC = () => {
   const navigate = useNavigate();
@@ -34,7 +27,7 @@ const Eiken4GrammarPracticeSelectPage: React.FC = () => {
       <div className="mt-3 space-y-3">
         {categories.map(category => {
           const state = getGrammarLearningState(category.id);
-          const label = statusText[state.status];
+          const label = getGrammarStatusLabel(state.status);
           const stateStyle = state.status === 'completed' ? 'bg-emerald-100 text-emerald-800' : state.status === 'review-needed' ? 'bg-rose-100 text-rose-800' : state.status === 'in-progress' ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-700';
           const action = !state.guideViewed ? '説明を見る' : state.status === 'review-needed' ? '復習する' : state.practiced ? 'もう一度練習する' : '練習する';
           const ariaLabel = `${category.title}の${action}。状態は${label}です`;
