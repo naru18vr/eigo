@@ -4,9 +4,10 @@ import { eiken4CoreExamQuestions, eiken4CoreSentences } from '../data/eiken4Curr
 import { daysUntilExam, getExamDate, recordEiken4Activity } from './eiken4ProgressService';
 import { safeSetLearningItem } from './storageHealthService';
 import { getStudiedGrammarIds } from './eiken4StepLearningService';
+import { EIKEN4_REVIEW_SCHEDULE_KEY } from '../data/eiken4LearningKeys';
 
 export const EIKEN4_DAILY_KEY = 'eiken4DailyProgressV4';
-const REVIEW_KEY = 'eiken4ReviewScheduleV1';
+const REVIEW_KEY = EIKEN4_REVIEW_SCHEDULE_KEY;
 const COVERAGE_KEY = 'eiken4QuestionCoverageV1';
 const REVIEW_INTERVALS = [1, 3, 7, 14];
 
