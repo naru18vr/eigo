@@ -186,8 +186,8 @@ export const recordLearningGrammarPractice = (categoryId: Eiken4GrammarCategoryI
   saveData(data);
 };
 
-// 文法ガイドの確認問題に答えた内容も、学習済みとして保存する。
-export const completeGrammarGuide = (categoryId: Eiken4GrammarCategoryId) => {
+// 文法ガイドの確認問題に答えた内容を、段階別学習の続きとして保存する。
+export const recordLearningGrammarGuideCheck = (categoryId: Eiken4GrammarCategoryId) => {
   const step = getStepForGrammarCategory(categoryId);
   if (!step) return;
   const data = readData(); const record = recordFor(data, step.id); const timestamp = now();
@@ -199,9 +199,14 @@ export const completeGrammarGuide = (categoryId: Eiken4GrammarCategoryId) => {
     attemptedGrammarIds: unique([...record.attemptedGrammarIds, categoryId]),
   };
   data.guideViewedGrammarIds = unique([...(data.guideViewedGrammarIds || []), categoryId]);
-  markGrammarGuideCompleted(categoryId);
   data.nextActivity = { type: 'grammar-practice', categoryId };
   saveData(data);
+};
+
+// 旧呼び出しとの互換性を維持する。
+export const completeGrammarGuide = (categoryId: Eiken4GrammarCategoryId) => {
+  markGrammarGuideCompleted(categoryId);
+  recordLearningGrammarGuideCheck(categoryId);
 };
 
 export const completeLearningStep = (stepId: LearningStepId) => {
