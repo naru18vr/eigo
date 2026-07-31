@@ -1,5 +1,5 @@
 import { getAvailableGrammarCategories, getGrammarCategorySentences, getGrammarPracticeQuestions, loadGrammarPracticeStats, recordGrammarPracticeAnswer, saveGrammarPracticeResult } from '../services/eiken4GrammarPracticeService';
-import { getGrammarLearningState, markGrammarGuideStarted } from '../services/eiken4GrammarProgressService';
+import { getGrammarLearningState, markGrammarGuideStarted, migrateGrammarStatus } from '../services/eiken4GrammarProgressService';
 import { recordLearningGrammarGuideCheck } from '../services/eiken4StepLearningService';
 import { eiken4CoreSentences } from '../data/eiken4Curriculum';
 
@@ -49,9 +49,12 @@ else {
   saveGrammarPracticeResult(target.id, questions.map(question => question.id), answers);
   const stats = loadGrammarPracticeStats()[target.id];
   if (!stats || stats.attempts !== 1 || stats.total !== questions.length || stats.correct !== questions.length - 1) errors.push('文法別の学習履歴を保存できない');
-  if (getGrammarLearningState(target.id).status !== 'review-needed') errors.push('直近の誤答を「もう一度やろう」にできない');
+  const reviewState = getGrammarLearningState(target.id);
+  if (reviewState.status !== 'review-needed') errors.push('直近の誤答を「もう一度やろう」にできない');
+  if (!reviewState.incorrectQuestionIds.includes(questions[0].id)) errors.push('復習モードへ誤答問題IDを渡せない');
   if (!(localStorage.getItem('eiken4ReviewScheduleV1') || '').includes(questions[0].id)) errors.push('文法別の誤答が既存復習へ追加されない');
 }
+if (migrateGrammarStatus('復習しよう') !== 'review-needed' || migrateGrammarStatus('完了') !== 'completed') errors.push('旧状態名を新しい内部状態へ変換できない');
 
 const shortTarget = categories.find(category => category.id === 'general-verb');
 if (shortTarget) {
