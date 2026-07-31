@@ -9,7 +9,7 @@ import ClockIcon from '../components/shared/ClockIcon';
 import { useEiken4Session } from '../contexts/Eiken4SessionContext';
 import { eiken4Words } from '../data/eiken4Words';
 import { getGrammarCategory } from '../services/eiken4GrammarPracticeService';
-import { getDailyLearningReadiness } from '../services/eiken4DailyService';
+import { getDailyLearningReadiness, getDueReviewCount } from '../services/eiken4DailyService';
 import { allowLearningStepStart, eiken4LearningSteps, getLearningStepProgress, getLearningStepState, getNextLearningActivity, getNextLearningStep, type LearningStep } from '../services/eiken4StepLearningService';
 
 const stepStyle: Record<string, string> = {
@@ -40,6 +40,7 @@ const Eiken4HomePage: React.FC = () => {
   const nextStep = getNextLearningStep();
   const nextActivity = getNextLearningActivity();
   const dailyReadiness = getDailyLearningReadiness();
+  const dueReviewCount = getDueReviewCount();
   const activityCategory = nextActivity ? getGrammarCategory(nextActivity.categoryId) : undefined;
   const activeIndex = nextStep ? eiken4LearningSteps.findIndex(step => step.id === nextStep.id) : eiken4LearningSteps.length - 1;
   const compactIndexes = new Set([activeIndex - 1, activeIndex, activeIndex + 1].filter(index => index >= 0 && index < eiken4LearningSteps.length));
@@ -50,13 +51,19 @@ const Eiken4HomePage: React.FC = () => {
     if (getLearningStepState(step) === '順番にやろう') { setLockedStep(step); return; }
     navigate(`/eiken4/learning-step/${step.id}`);
   };
+  const firstCategory = nextStep?.grammarIds[0] ? getGrammarCategory(nextStep.grammarIds[0]) : undefined;
+  const openRecommendedStep = () => firstCategory?.guideTopic
+    ? navigate(`/eiken4/grammar-guide?topic=${firstCategory.guideTopic}&category=${firstCategory.id}`)
+    : nextStep && openStep(nextStep);
   const recommendation = activityCategory && nextActivity
     ? nextActivity.type === 'grammar-practice'
       ? { title: `${activityCategory.title}を問題で確認しよう`, text: 'さっき説明を見た文法を、10問で練習しよう。', button: '練習する', action: () => navigate(`/eiken4/grammar-practice/${activityCategory.id}`) }
-      : { title: `${activityCategory.title}の説明を見直そう`, text: 'もう一度説明を見てから、同じ文法を練習しよう。', button: '説明を見る', action: () => navigate(`/eiken4/grammar-guide?topic=${activityCategory.guideTopic || ''}`) }
+      : { title: `${activityCategory.title}の説明を見直そう`, text: 'もう一度説明を見てから、同じ文法を練習しよう。', button: '説明を見る', action: () => navigate(`/eiken4/grammar-guide?topic=${activityCategory.guideTopic || ''}&category=${activityCategory.id}`) }
     : nextStep
-      ? { title: `ステップ${activeIndex + 1}　${nextStep.title}`, text: nextStep.summary, button: getLearningStepState(nextStep) === 'がんばり中' || getLearningStepState(nextStep) === 'もう一度やろう' ? 'つづきから' : 'はじめる', action: () => openStep(nextStep) }
-      : { title: '今日の復習問題をやろう', text: '前に間違えた問題や、忘れかけている問題を復習しよう。', button: '復習する', action: () => navigate('/eiken4/daily') };
+      ? { title: `ステップ${activeIndex + 1}　${nextStep.title}`, text: nextStep.summary, button: getLearningStepState(nextStep) === 'がんばり中' || getLearningStepState(nextStep) === 'もう一度やろう' ? 'つづきから' : 'はじめる', action: openRecommendedStep }
+      : dueReviewCount > 0
+        ? { title: '今日の復習問題をやろう', text: '前に間違えた問題や、忘れかけている問題を復習しよう。', button: '復習する', action: () => navigate('/eiken4/daily') }
+        : { title: '習った文法をまぜて確認しよう', text: '全部のステップで覚えた文法を、まとめ問題で確認しよう。', button: 'まとめ問題をやる', action: () => navigate('/eiken4/mixed-review') };
 
   return <div className="flex-grow bg-gradient-to-b from-indigo-50 via-slate-50 to-white px-4 py-5 sm:p-7">
     <header className="mx-auto mb-5 max-w-xl">
@@ -77,12 +84,12 @@ const Eiken4HomePage: React.FC = () => {
 
       <section className="mt-7"><p className="text-xs font-bold tracking-wider text-indigo-600">LEARNING FLOW</p><h2 className="mt-1 text-xl font-extrabold text-slate-900">学習の進め方</h2><div className="mt-4 space-y-2">{learningFlow.map(([icon, title, text], index) => <React.Fragment key={title}><div className="flex gap-3 rounded-xl bg-white p-3 shadow-sm"><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-lg" aria-hidden="true">{icon}</span><div><p className="font-bold text-slate-800">{title}</p><p className="mt-1 text-xs leading-5 text-slate-600">{text}</p></div></div>{index < learningFlow.length - 1 && <p className="text-center text-base font-bold text-indigo-300">↓</p>}</React.Fragment>)}</div></section>
 
-      <section className="mt-8"><p className="text-xs font-bold tracking-wider text-emerald-600">START HERE</p><h2 className="mt-1 text-2xl font-extrabold text-slate-900">順番に学ぼう</h2><p className="mt-1 text-sm leading-6 text-slate-600">ステップ1から順番に進めると、英検4級の文法が分かりやすくなるよ。</p><div className="mt-4 space-y-3">{shownSteps.map(step => {
+      <section id="eiken4-learning-steps" className="mt-8"><p className="text-xs font-bold tracking-wider text-emerald-600">START HERE</p><h2 className="mt-1 text-2xl font-extrabold text-slate-900">順番に学ぼう</h2><p className="mt-1 text-sm leading-6 text-slate-600">ステップ1から順番に進めると、英検4級の文法が分かりやすくなるよ。</p><div className="mt-4 space-y-3">{shownSteps.map(step => {
         const index = eiken4LearningSteps.findIndex(item => item.id === step.id); const state = getLearningStepState(step); const progress = getLearningStepProgress(step); const locked = state === '順番にやろう'; const current = index === activeIndex;
         const action = state === 'できた！' ? 'もう一度見る' : state === 'がんばり中' || state === 'もう一度やろう' ? 'つづきから' : locked ? '順番に進む' : 'はじめる';
         return <article key={step.id} className={`rounded-2xl border-2 p-4 shadow-sm ${current ? 'border-amber-300 bg-amber-50 shadow-amber-100' : locked ? 'border-slate-200 bg-slate-50' : state === 'できた！' ? 'border-slate-200 bg-slate-50' : 'border-indigo-100 bg-white'}`}><div className="flex items-start gap-3"><span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-lg font-extrabold ${current ? 'bg-amber-200 text-amber-950' : locked ? 'bg-slate-200 text-slate-500' : 'bg-indigo-100 text-indigo-800'}`}>{locked ? '🔒' : stepIcon[state]}</span><div className="min-w-0 flex-grow"><div className="flex flex-wrap items-center gap-2"><p className="text-xs font-bold text-indigo-600">ステップ{index + 1}</p><span className={`rounded-full px-2 py-1 text-xs font-bold ${stepStyle[state]}`}>{stepIcon[state]} {state}</span></div><h3 className="mt-1 text-lg font-extrabold text-slate-900">{step.title}</h3><p className="mt-1 text-sm text-slate-600">{locked ? `ステップ${index}が終わったら進もう。` : step.topics}</p>{current && <p className="mt-2 text-xs font-bold text-amber-800">いまはここを進めよう</p>}{!locked && <p className="mt-2 text-xs text-slate-500">できた：{progress.done} / {progress.total || 1}</p>}</div></div><Button onClick={() => openStep(step)} variant="secondary" className="mt-4 min-h-11 w-full">{action}</Button></article>;
       })}</div>
-      <Button onClick={() => setShowAllSteps(open => !open)} variant="ghost" className="mt-3 w-full text-indigo-700">{showAllSteps ? '少なく表示する' : 'すべてのステップを見る'}</Button>
+      <Button onClick={() => setShowAllSteps(open => !open)} aria-expanded={showAllSteps} aria-controls="eiken4-learning-steps" variant="ghost" className="mt-3 w-full text-indigo-700">{showAllSteps ? 'ステップを閉じる' : 'すべてのステップを見る'}</Button>
       {lockedStep && <div className="mt-4 rounded-2xl border border-indigo-200 bg-indigo-50 p-4"><p className="font-extrabold text-indigo-950">先に前のステップをやってみよう。</p><p className="mt-1 text-sm leading-6 text-indigo-900">順番に進めると、分かりやすいよ。</p><Button onClick={() => { allowLearningStepStart(lockedStep.id); navigate(`/eiken4/learning-step/${lockedStep.id}`); }} variant="ghost" size="sm" className="mt-3 w-full text-indigo-800">もう習っている場合はここから始める</Button></div>}</section>
 
       <section className="mt-8"><p className="text-xs font-bold tracking-wider text-cyan-600">PRACTICE</p><h2 className="mt-1 text-xl font-extrabold text-slate-900">習ったところを練習しよう</h2><button onClick={() => navigate('/eiken4/grammar-practice-select')} className="mt-4 flex min-h-24 w-full items-center justify-between rounded-2xl border-2 border-cyan-300 bg-cyan-50 p-4 text-left shadow-sm active:scale-[.99]"><div><h3 className="text-lg font-extrabold text-slate-900">文法を選んで練習</h3><p className="mt-1 text-sm text-slate-600">今覚えた文法だけを選んで、10問ずつ確認できるよ。</p></div><ChevronRightIcon className="h-7 w-7 shrink-0 text-cyan-600"/></button></section>
