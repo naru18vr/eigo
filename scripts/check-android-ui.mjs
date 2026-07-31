@@ -35,6 +35,7 @@ const checks = [
   ['pages/Eiken4GrammarPracticePage.tsx', /つぎの文法へ/, '文法練習結果から次の学習へ進めない'],
   ['pages/Eiken4GrammarPracticePage.tsx', /useParams/, 'URLから文法カテゴリを受け取れない'],
   ['pages/Eiken4GrammarPracticePage.tsx', /間違えた問題だけ復習/, '文法別練習の復習導線がない'],
+  ['pages/Eiken4GrammarPracticePage.tsx', /復習する問題は、いまはないよ/, '復習対象がない場合の案内がない'],
   ['pages/Eiken4GrammarGuidePage.tsx', /この文法を練習する/, '文法解説から練習へ進めない'],
   ['pages/Eiken4ListeningFocusPage.tsx', /aria-label/, '音声ボタンの読み上げラベルがない'],
   ['pages/Eiken4ListeningFocusPage.tsx', /○ 正解|× 正解/, '正誤を色だけで表示している'],
