@@ -29,7 +29,7 @@ export const createParentDailyReport = ({ daily, reading, grade1, readingTotal, 
 ミニ長文：${reading.answers.length ? `${readingCorrect}/${readingTotal}問` : '未実施'}
 中1復習：${grade1.answers.length ? `${grade1Correct}/10問` : '未実施'}
 できたこと：${strengths.length ? strengths.join('・') : '取り組み中'}
-次に復習：${weaknessNames.length ? weaknessNames.join('・') : '今日のコースを続ける'}
+次に復習：${weaknessNames.length ? weaknessNames.join('・') : '追加の練習を続ける'}
 引き継ぎ番号：${transferCode}
 最新の記録引き継ぎリンク
 ${transferLink}

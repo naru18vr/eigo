@@ -4,7 +4,7 @@ import Button from '../components/Button';
 import ArrowLeftIcon from '../components/shared/ArrowLeftIcon';
 import CheckCircleIcon from '../components/shared/CheckCircleIcon';
 import SpeakerWaveIcon from '../components/shared/SpeakerWaveIcon';
-import { getDailyLearningReadiness, getQuestionById, loadDailyProgress, recordQuestionCoverage, recordReviewAnswer, saveDailyProgress } from '../services/eiken4DailyService';
+import { getQuestionById, loadDailyProgress, recordQuestionCoverage, recordReviewAnswer, saveDailyProgress } from '../services/eiken4DailyService';
 import { isSpeechSupported, speakText } from '../services/speechService';
 import { useAppContext } from '../contexts/AppContext';
 import { playCorrectSound, playIncorrectSound } from '../services/soundService';
@@ -46,7 +46,6 @@ const Eiken4DailyPage: React.FC = () => {
   const isListening = Boolean(current?.audioText);
   const dailyWordCount = progress.questionIds.filter(id => id.startsWith('word-')).length;
   const finalMode = daysUntilExam(getExamDate()) <= 14;
-  const learningReadiness = getDailyLearningReadiness();
   const nextLearningStep = getNextLearningStep();
 
   useEffect(() => {
@@ -106,10 +105,7 @@ const Eiken4DailyPage: React.FC = () => {
     setResolved(false);
   };
 
-  if (!progress.questionIds.length) {
-    const hasLearnedSomething = learningReadiness.canStart;
-    return <div className="flex-grow bg-gradient-to-b from-emerald-50 to-white p-4 sm:p-6"><main className="mx-auto max-w-xl"><Button onClick={() => navigate('/eiken4')} variant="ghost" size="sm"><ArrowLeftIcon className="mr-2 h-5 w-5"/>英検4級に戻る</Button><section className="mt-8 rounded-3xl bg-white p-7 text-center shadow"><p className="text-sm font-bold text-emerald-700">今日のおまかせ問題</p><h1 className="mt-3 text-2xl font-extrabold text-slate-900">{hasLearnedSomething ? '今日の復習問題はまだ少ないよ。' : 'まずはステップ1から始めよう。'}</h1><p className="mt-4 leading-7 text-slate-600">{hasLearnedSomething ? '先にステップ学習を進めると、復習できる問題が増えるよ。新しい問題を勝手に足すことはありません。' : '文法を覚えてから取り組むと、問題がもっと分かりやすくなるよ。'}</p><Button onClick={() => navigate(`/eiken4/learning-step/${nextLearningStep?.id || 'step-1'}`)} className="mt-6 w-full" size="lg">{hasLearnedSomething ? '次のステップを学ぶ' : 'ステップ1を始める'}</Button>{!hasLearnedSomething && <Button onClick={() => navigate('/eiken4/grammar-practice-select')} variant="secondary" className="mt-2 w-full">それでも問題を始める</Button>}<Button onClick={() => navigate('/eiken4')} variant="ghost" className="mt-2 w-full">英検4級トップへ戻る</Button></section></main></div>;
-  }
+  if (!progress.questionIds.length) return <div className="flex-grow bg-gradient-to-b from-emerald-50 to-white p-4 sm:p-6"><main className="mx-auto max-w-xl"><Button onClick={() => navigate('/eiken4')} variant="ghost" size="sm"><ArrowLeftIcon className="mr-2 h-5 w-5"/>英検4級に戻る</Button><section className="mt-8 rounded-3xl bg-white p-7 text-center shadow"><p className="text-sm font-bold text-emerald-700">今日の復習問題</p><h1 className="mt-3 text-2xl font-extrabold text-slate-900">今日の復習はまだないよ。</h1><p className="mt-4 leading-7 text-slate-600">先にステップ学習や文法練習を進めると、復習問題が出るようになるよ。</p><Button onClick={() => navigate(`/eiken4/learning-step/${nextLearningStep?.id || 'step-1'}`)} className="mt-6 w-full" size="lg">つぎのステップをやる</Button><Button onClick={() => navigate('/eiken4/grammar-practice-select')} variant="secondary" className="mt-2 w-full">文法を選んで練習する</Button><Button onClick={() => navigate('/eiken4')} variant="ghost" className="mt-2 w-full">英検4級トップへ戻る</Button></section></main></div>;
 
   if (complete || !current) {
     const downloadWorksheet = async () => {

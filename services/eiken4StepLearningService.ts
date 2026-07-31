@@ -42,7 +42,7 @@ export const eiken4LearningSteps: LearningStep[] = [
     lesson: { title: '2つなら「より〜」、たくさんなら「一番」', message: '2つをくらべるときは taller than。3つ以上で一番なら the tallest の形を使うよ。', shape: 'A is taller than B. / A is the tallest.', example: { en: 'Tom is taller than Ken.', ja: 'トムはケンより背が高いです。' }, check: { question: '「日本で一番高い山」に合う形は？', choices: ['the highest mountain', 'higher mountain', 'high mountain'], answer: 'the highest mountain', explanation: 'たくさんの中で一番なので the highest を使うよ。' } },
   },
   {
-    id: 'step-7', title: 'いろいろな問題に挑戦しよう', summary: '覚えたことをまぜて、本番に近い問題をやってみよう。', topics: '単語・会話・読む・聞く・本番形式', grammarIds: [], final: true,
+    id: 'step-7', title: '本番に近い問題をやってみよう', summary: '覚えたことを使って、単語・会話・読む・聞く問題に挑戦しよう。', topics: '単語・会話・読む・聞く・本番形式', grammarIds: [], final: true,
     lesson: { title: '答えを急がず、問題のしるしを見よう', message: '文法、単語、会話、読む問題、聞く問題を少しずつ使うよ。分からないときは、前のステップに戻って大丈夫。', shape: '読んで → 考えて → 答える', example: { en: 'Take your time and try.', ja: 'あわてずに、やってみよう。' }, check: { question: '分からない問題が出たら、どうする？', choices: ['前の説明を見直す', 'すぐにあきらめる', '答えだけ覚える'], answer: '前の説明を見直す', explanation: '分からないときは、説明に戻ると次は分かりやすくなるよ。' } },
   },
 ];
@@ -56,17 +56,19 @@ type StepRecord = {
   masteredGrammarIds: Eiken4GrammarCategoryId[];
   lastWrongGrammarIds: Eiken4GrammarCategoryId[];
 };
-type StepLearningData = { version: 1 | 2; steps: Partial<Record<LearningStepId, StepRecord>>; allowedStepIds: LearningStepId[] };
+export type LearningNextActivity = { type: 'grammar-guide' | 'grammar-practice'; categoryId: Eiken4GrammarCategoryId };
+type StepLearningData = { version: 1 | 2; steps: Partial<Record<LearningStepId, StepRecord>>; allowedStepIds: LearningStepId[]; nextActivity?: LearningNextActivity };
 
 const now = () => new Date().toISOString();
 const emptyRecord = (): StepRecord => ({ attemptedGrammarIds: [], masteredGrammarIds: [], lastWrongGrammarIds: [] });
 const unique = <T,>(items: T[]) => Array.from(new Set(items));
+const isNextActivity = (value: unknown): value is LearningNextActivity => Boolean(value && typeof value === 'object' && ((value as LearningNextActivity).type === 'grammar-guide' || (value as LearningNextActivity).type === 'grammar-practice') && EIKEN4_GRAMMAR_CATEGORIES.some(category => category.id === (value as LearningNextActivity).categoryId));
 
 const readData = (): StepLearningData => {
   if (typeof localStorage === 'undefined') return { version: 2, steps: {}, allowedStepIds: [] };
   try {
     const saved = JSON.parse(localStorage.getItem(EIKEN4_STEP_LEARNING_KEY) || '{}') as Partial<StepLearningData>;
-    return { version: saved.version === 2 ? 2 : 1, steps: saved.steps || {}, allowedStepIds: Array.isArray(saved.allowedStepIds) ? saved.allowedStepIds : [] };
+    return { version: saved.version === 2 ? 2 : 1, steps: saved.steps || {}, allowedStepIds: Array.isArray(saved.allowedStepIds) ? saved.allowedStepIds : [], ...(isNextActivity(saved.nextActivity) ? { nextActivity: saved.nextActivity } : {}) };
   } catch { return { version: 2, steps: {}, allowedStepIds: [] }; }
 };
 
@@ -103,6 +105,7 @@ export const getStepForGrammarCategory = (categoryId: Eiken4GrammarCategoryId) =
 
 export const getLearningStep = (stepId: string | undefined) => eiken4LearningSteps.find(step => step.id === stepId);
 export const getStudiedGrammarIds = () => allAttempted(readData());
+export const getNextLearningActivity = (data = readData()) => data.nextActivity;
 
 export const getLearningStepState = (step: LearningStep, data = readData()): LearningStepState => {
   const index = eiken4LearningSteps.findIndex(item => item.id === step.id);
@@ -165,6 +168,8 @@ export const recordLearningGrammarPractice = (categoryId: Eiken4GrammarCategoryI
   const updated = data.steps[step.id]!;
   if (step.grammarIds.every(id => updated.masteredGrammarIds.includes(id))) updated.completedAt = timestamp;
   else delete updated.completedAt;
+  const nextCategory = step.grammarIds.find(id => !allMastered(data).includes(id));
+  data.nextActivity = nextCategory ? { type: 'grammar-guide', categoryId: nextCategory } : undefined;
   saveData(data);
 };
 
@@ -180,6 +185,7 @@ export const recordLearningGrammarGuideCheck = (categoryId: Eiken4GrammarCategor
     checkAnsweredAt: timestamp,
     attemptedGrammarIds: unique([...record.attemptedGrammarIds, categoryId]),
   };
+  data.nextActivity = { type: 'grammar-practice', categoryId };
   saveData(data);
 };
 

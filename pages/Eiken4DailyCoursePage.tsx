@@ -44,7 +44,7 @@ const Eiken4DailyCoursePage: React.FC = () => {
   return <div className="flex-grow container mx-auto p-4 sm:p-6 max-w-xl">
     <Button onClick={() => navigate('/eiken4')} variant="ghost" size="sm"><ArrowLeftIcon className="h-5 w-5 mr-2"/>英検4級に戻る</Button>
     <header className="mt-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white p-6 shadow-lg">
-      <p className="text-sm font-bold opacity-90">迷わず上から順番に</p><h1 className="text-3xl font-bold mt-1">今日の学習コース</h1><p className="mt-2">今日のコース {completed} / 5 完了</p>
+      <p className="text-sm font-bold opacity-90">もっと練習したい日に</p><h1 className="text-3xl font-bold mt-1">追加の練習メニュー</h1><p className="mt-2">できた：{completed} / 5</p>
     </header>
     <button onClick={() => navigate('/eiken4/grammar-guide')} className="mt-4 w-full rounded-xl border border-cyan-200 bg-cyan-50 p-4 text-left"><p className="text-xs font-bold text-cyan-700">問題の文法がわからないとき</p><p className="font-bold text-slate-800 mt-1">習う前でもわかる「英検4級文法」を読む →</p></button>
     <div className="mt-5 space-y-3">{steps.map((step, index) => {
@@ -55,7 +55,7 @@ const Eiken4DailyCoursePage: React.FC = () => {
       </button>;
     })}</div>
     <Button onClick={() => navigate(next.path)} className="w-full mt-6" size="lg">{nextIndex === 4 ? '結果と印刷リンクを開く' : `次の「${next.title}」を始める`}</Button>
-    {completed > 0 && <Button onClick={resetToday} variant={confirmReset ? 'danger' : 'secondary'} className="w-full mt-3">{confirmReset ? '本当に今日のコースをやり直す' : '今日のコースをやり直す'}</Button>}
+    {completed > 0 && <Button onClick={resetToday} variant={confirmReset ? 'danger' : 'secondary'} className="w-full mt-3">{confirmReset ? '本当に追加の練習をやり直す' : '追加の練習をやり直す'}</Button>}
     {confirmReset && <p className="text-xs text-center text-rose-600 mt-2">もう一度押すと今日の5ステップだけ未完了に戻ります。累積の定着記録は残ります。</p>}
     <p className="text-xs text-center text-slate-500 mt-3">本番形式10問とミニ模試は、余裕のある日だけで大丈夫です。</p>
   </div>;

@@ -2,7 +2,6 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import ArrowLeftIcon from '../components/shared/ArrowLeftIcon';
-import ChevronRightIcon from '../components/shared/ChevronRightIcon';
 import { getAvailableGrammarCategories, getGrammarCategorySentences, getGrammarLearningState, loadGrammarPracticeStats } from '../services/eiken4GrammarPracticeService';
 import { getStudiedGrammarIds } from '../services/eiken4StepLearningService';
 
@@ -36,13 +35,11 @@ const Eiken4GrammarPracticeSelectPage: React.FC = () => {
           const studied = studiedGrammarIds.has(category.id);
           const state = result ? getGrammarLearningState(result) : studied ? 'がんばり中' : 'まだ';
           const stateStyle = state === 'できた！' ? 'bg-emerald-100 text-emerald-800' : state === '復習しよう' ? 'bg-rose-100 text-rose-800' : state === 'がんばり中' ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-700';
-          return <button key={category.id} onClick={() => openCategory(category)} className="flex min-h-24 w-full items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:border-cyan-300 active:scale-[.99]">
-            <div className="min-w-0 flex-grow"><div className="flex flex-wrap items-center gap-2"><h2 className="text-lg font-extrabold text-slate-900">{category.title}</h2><span className={`rounded-full px-2 py-1 text-xs font-bold ${stateStyle}`}>{state}</span></div><p className="mt-1 text-sm text-slate-600">{category.description}</p><p className="mt-2 text-xs text-slate-500">問題数：{getGrammarCategorySentences(category.id).length}問{accuracy !== null ? `・正答率：${accuracy}％` : ''}</p>{!studied && <p className="mt-2 text-xs font-bold text-cyan-700">まず説明を見よう</p>}</div>
-            <ChevronRightIcon className="h-6 w-6 shrink-0 text-cyan-600" />
-          </button>;
+          const action = !studied ? '説明を見る' : result?.total ? 'もう一度練習する' : '練習する';
+          return <article key={category.id} className="min-h-24 rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm"><div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><h2 className="text-lg font-extrabold text-slate-900">{category.title}</h2><span className={`rounded-full px-2 py-1 text-xs font-bold ${stateStyle}`}>{state}</span></div><p className="mt-1 text-sm text-slate-600">{category.description}</p><p className="mt-2 text-xs text-slate-500">問題数：{getGrammarCategorySentences(category.id).length}問{accuracy !== null ? `・正答率：${accuracy}％` : ''}</p>{!studied && <p className="mt-2 text-xs font-bold text-cyan-700">まず説明を見よう</p>}</div><Button onClick={() => openCategory(category)} variant={studied ? 'secondary' : 'primary'} className="mt-3 min-h-11 w-full">{action}</Button></article>;
         })}
       </div>
-      <p className="mt-5 rounded-xl bg-white p-4 text-xs leading-5 text-slate-600 shadow-sm">「できた！」は、正答率80％以上の目安です。まだの文法は、先に説明を見よう。間違えた問題は、今日のおまかせ問題でも復習できます。</p>
+      <p className="mt-5 rounded-xl bg-white p-4 text-xs leading-5 text-slate-600 shadow-sm">「できた！」は、正答率80％以上の目安です。まだの文法は、先に説明を見よう。間違えた問題は、今日の復習問題でも復習できます。</p>
     </main>
   </div>;
 };
