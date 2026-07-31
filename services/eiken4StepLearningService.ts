@@ -57,7 +57,7 @@ type StepRecord = {
   lastWrongGrammarIds: Eiken4GrammarCategoryId[];
 };
 export type LearningNextActivity = { type: 'grammar-guide' | 'grammar-practice'; categoryId: Eiken4GrammarCategoryId };
-type StepLearningData = { version: 1 | 2; steps: Partial<Record<LearningStepId, StepRecord>>; allowedStepIds: LearningStepId[]; nextActivity?: LearningNextActivity };
+type StepLearningData = { version: 1 | 2; steps: Partial<Record<LearningStepId, StepRecord>>; allowedStepIds: LearningStepId[]; guideViewedGrammarIds?: Eiken4GrammarCategoryId[]; nextActivity?: LearningNextActivity };
 
 const now = () => new Date().toISOString();
 const emptyRecord = (): StepRecord => ({ attemptedGrammarIds: [], masteredGrammarIds: [], lastWrongGrammarIds: [] });
@@ -68,7 +68,7 @@ const readData = (): StepLearningData => {
   if (typeof localStorage === 'undefined') return { version: 2, steps: {}, allowedStepIds: [] };
   try {
     const saved = JSON.parse(localStorage.getItem(EIKEN4_STEP_LEARNING_KEY) || '{}') as Partial<StepLearningData>;
-    return { version: saved.version === 2 ? 2 : 1, steps: saved.steps || {}, allowedStepIds: Array.isArray(saved.allowedStepIds) ? saved.allowedStepIds : [], ...(isNextActivity(saved.nextActivity) ? { nextActivity: saved.nextActivity } : {}) };
+    return { version: saved.version === 2 ? 2 : 1, steps: saved.steps || {}, allowedStepIds: Array.isArray(saved.allowedStepIds) ? saved.allowedStepIds : [], guideViewedGrammarIds: Array.isArray(saved.guideViewedGrammarIds) ? saved.guideViewedGrammarIds.filter(id => EIKEN4_GRAMMAR_CATEGORIES.some(category => category.id === id)) : [], ...(isNextActivity(saved.nextActivity) ? { nextActivity: saved.nextActivity } : {}) };
   } catch { return { version: 2, steps: {}, allowedStepIds: [] }; }
 };
 
@@ -188,6 +188,7 @@ export const recordLearningGrammarGuideCheck = (categoryId: Eiken4GrammarCategor
     checkAnsweredAt: timestamp,
     attemptedGrammarIds: unique([...record.attemptedGrammarIds, categoryId]),
   };
+  data.guideViewedGrammarIds = unique([...(data.guideViewedGrammarIds || []), categoryId]);
   data.nextActivity = { type: 'grammar-practice', categoryId };
   saveData(data);
 };
