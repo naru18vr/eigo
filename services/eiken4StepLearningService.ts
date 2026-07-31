@@ -143,6 +143,9 @@ export const markLearningStepOpened = (stepId: LearningStepId) => {
 export const recordLearningStepCheck = (stepId: LearningStepId) => {
   const data = readData(); const record = recordFor(data, stepId); const timestamp = now();
   data.steps[stepId] = { ...record, startedAt: record.startedAt || timestamp, lastStudiedAt: timestamp, checkAnsweredAt: timestamp };
+  const step = getLearningStep(stepId);
+  const nextCategory = step?.grammarIds.find(id => !allMastered(data).includes(id));
+  if (nextCategory) data.nextActivity = { type: 'grammar-guide', categoryId: nextCategory };
   saveData(data);
 };
 
