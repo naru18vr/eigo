@@ -1,7 +1,7 @@
 import { EIKEN4_GRAMMAR_CATEGORIES, type Eiken4GrammarCategoryId } from '../data/eiken4GrammarCategories';
 import { EIKEN4_GRAMMAR_PRACTICE_STATS_KEY, EIKEN4_STEP_LEARNING_KEY } from '../data/eiken4LearningKeys';
 import { safeSetLearningItem } from './storageHealthService';
-import { markGrammarGuideCompleted } from './eiken4GrammarProgressService';
+import { getGrammarLearningState, markGrammarGuideCompleted } from './eiken4GrammarProgressService';
 
 export type LearningStepId = 'step-1' | 'step-2' | 'step-3' | 'step-4' | 'step-5' | 'step-6' | 'step-7';
 export type LearningStepState = 'まだ' | 'がんばり中' | 'できた！' | 'もう一度やろう' | '順番にやろう';
@@ -122,19 +122,16 @@ export const getLearningStepState = (step: LearningStep, data = readData()): Lea
   const record = recordFor(data, step.id);
   const legacyFinalComplete = data.version === 1 && step.id === 'step-7' && Boolean(data.steps['step-6']?.completedAt);
   if (step.final) return record.completedAt || legacyFinalComplete ? 'できた！' : record.startedAt ? 'がんばり中' : 'まだ';
-  const attempted = allAttempted(data);
-  const mastered = allMastered(data);
-  const masteredAll = step.grammarIds.every(id => mastered.includes(id));
-  if (masteredAll) return 'できた！';
-  if (record.lastWrongGrammarIds.length) return 'もう一度やろう';
-  if (step.grammarIds.some(id => attempted.includes(id)) || record.startedAt) return 'がんばり中';
+  const grammarStates = step.grammarIds.map(getGrammarLearningState);
+  if (grammarStates.every(state => state.status === 'completed')) return 'できた！';
+  if (grammarStates.some(state => state.status === 'review-needed')) return 'もう一度やろう';
+  if (grammarStates.some(state => state.guideStarted || state.practiced) || record.startedAt) return 'がんばり中';
   return 'まだ';
 };
 
 export const getLearningStepProgress = (step: LearningStep, data = readData()) => {
-  const mastered = allMastered(data);
   const legacyFinalComplete = data.version === 1 && step.id === 'step-7' && Boolean(data.steps['step-6']?.completedAt);
-  return { done: step.final ? Number(Boolean(recordFor(data, step.id).completedAt) || legacyFinalComplete) : step.grammarIds.filter(id => mastered.includes(id)).length, total: step.final ? 1 : step.grammarIds.length };
+  return { done: step.final ? Number(Boolean(recordFor(data, step.id).completedAt) || legacyFinalComplete) : step.grammarIds.filter(id => getGrammarLearningState(id).status === 'completed').length, total: step.final ? 1 : step.grammarIds.length };
 };
 
 export const getNextLearningStep = (data = readData()) =>
