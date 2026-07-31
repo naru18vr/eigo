@@ -58,6 +58,14 @@ export const getGrammarStatusLabel = (status: GrammarLearningStatus) => ({
   'not-started': 'まだ', 'in-progress': 'がんばり中', completed: 'できた！', 'review-needed': 'もう一度やろう',
 } as const)[status];
 
+export const migrateGrammarStatus = (value: unknown): GrammarLearningStatus => {
+  if (value === '未学習' || value === 'まだ' || value === 'not-started') return 'not-started';
+  if (value === '練習中' || value === 'がんばり中' || value === 'in-progress') return 'in-progress';
+  if (value === '完了' || value === 'できた！' || value === 'completed') return 'completed';
+  if (value === '復習しよう' || value === 'もう一度やろう' || value === 'review-needed') return 'review-needed';
+  return 'not-started';
+};
+
 export const getGrammarLearningState = (grammarId: Eiken4GrammarCategoryId): GrammarLearningState => {
   const valid = EIKEN4_GRAMMAR_CATEGORIES.some(category => category.id === grammarId);
   const stats = read<Record<string, Stats>>(EIKEN4_GRAMMAR_PRACTICE_STATS_KEY, {})[grammarId] || {};
@@ -77,7 +85,10 @@ export const getGrammarLearningState = (grammarId: Eiken4GrammarCategoryId): Gra
   const reviewDue = grammarReviews.some(item => Boolean(item.dueDate && item.dueDate <= today()));
   const nextReviewAt = grammarReviews.map(item => item.dueDate).filter((date): date is string => Boolean(date)).sort()[0];
   const latestAnswers = Array.isArray(latest?.answers) ? latest.answers : [];
-  const incorrectQuestionIds = latestAnswers.map((answer, index) => !answer?.correct ? answer.id || latest?.questionIds?.[index] : undefined).filter((id): id is string => Boolean(id));
+  const incorrectQuestionIds = Array.from(new Set([
+    ...latestAnswers.map((answer, index) => !answer?.correct ? answer.id || latest?.questionIds?.[index] : undefined).filter((id): id is string => Boolean(id)),
+    ...grammarReviews.filter(item => item.dueDate && item.dueDate <= today()).map(item => item.id).filter((id): id is string => Boolean(id)),
+  ]));
   const latestAccuracy = latestAnswers.length ? latestAnswers.filter(answer => answer?.correct).length / latestAnswers.length * 100 : undefined;
   let status: GrammarLearningStatus = 'in-progress';
   if (!valid || (!guideCompleted && attemptedCount === 0)) status = 'not-started';
