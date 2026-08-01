@@ -1,4 +1,4 @@
-import type { Eiken4GrammarCategoryId } from './eiken4GrammarCategories';
+import { EIKEN4_GRAMMAR_CATEGORIES, type Eiken4GrammarCategoryId } from './eiken4GrammarCategories';
 
 export interface Eiken4GrammarVideo {
   id: string;
@@ -20,6 +20,13 @@ const VIDEO_CATEGORY_ALIASES: Record<string, Eiken4GrammarCategoryId[]> = {
   'that-clause': ['conjunction'],
   comparison: ['comparative', 'superlative'],
   conversation: ['modal-verb'],
+};
+
+// 動画一覧から既存の文法ガイドへ移動するときだけ使う対応表です。
+// 動画側にしかない単元も、学習を止めずに利用できるガイドへ案内します。
+const VIDEO_GUIDE_CATEGORY_ALIASES: Record<string, Eiken4GrammarCategoryId[]> = {
+  ...VIDEO_CATEGORY_ALIASES,
+  passive: ['other-eiken4'],
 };
 
 export const EIKEN4_GRAMMAR_VIDEOS: Eiken4GrammarVideo[] = [
@@ -69,3 +76,9 @@ export const getEiken4GrammarVideos = (grammarId: string) => EIKEN4_GRAMMAR_VIDE
   .sort((left, right) => left.chapter - right.chapter || left.order - right.order);
 
 export const getEiken4VideoCategoryAliases = (grammarId: string) => VIDEO_CATEGORY_ALIASES[grammarId] || [];
+
+export const getEiken4GrammarGuideCategoryId = (grammarId: string): Eiken4GrammarCategoryId | undefined => {
+  const direct = EIKEN4_GRAMMAR_CATEGORIES.find(category => category.id === grammarId);
+  if (direct) return direct.id;
+  return VIDEO_GUIDE_CATEGORY_ALIASES[grammarId]?.[0];
+};
