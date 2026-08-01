@@ -8,7 +8,7 @@ import { speakText } from '../services/speechService';
 import type { Eiken4GrammarCategoryId } from '../data/eiken4GrammarCategories';
 import { getGrammarGuideCheckQuestions, type GrammarGuideCheckQuestion } from '../data/eiken4GrammarGuideData';
 import { getEiken4GrammarVideos } from '../data/eiken4GrammarVideos';
-import { getEiken4GrammarCategoriesForGuideTopic, getGrammarCategory } from '../services/eiken4GrammarPracticeService';
+import { getEiken4GrammarCategoriesForGuideTopic, getEiken4GrammarCategoryForGuideTopic, getGrammarCategory } from '../services/eiken4GrammarPracticeService';
 import { recordLearningGrammarGuideCheck } from '../services/eiken4StepLearningService';
 import { markGrammarGuideCompleted, markGrammarGuideStarted } from '../services/eiken4GrammarProgressService';
 import { getGrammarVideoProgress, markGrammarVideoConfirmed, markGrammarVideoOpened } from '../services/eiken4GrammarVideoProgressService';
@@ -76,13 +76,14 @@ const Eiken4GrammarGuidePage: React.FC = () => {
   const requestedCategory = grammarId || searchParams.get('category');
   const categoryFromRoute = requestedCategory ? getGrammarCategory(requestedCategory) : undefined;
   const requestedTopic = categoryFromRoute?.guideTopic || searchParams.get('topic');
+  const guideTopicCategory = categoryFromRoute || (requestedTopic ? getEiken4GrammarCategoryForGuideTopic(requestedTopic) : undefined);
   const [openId, setOpenId] = useState<string | null>(topics.some(topic => topic.id === requestedTopic) ? requestedTopic : topics[0].id);
   const [checkStates, setCheckStates] = useState<Record<string, TopicCheckState>>({});
   const [videoFallback, setVideoFallback] = useState<Record<string, boolean>>({});
   const [, setVideoRevision] = useState(0);
   useEffect(() => {
-    if (categoryFromRoute) markGrammarGuideStarted(categoryFromRoute.id);
-  }, [categoryFromRoute?.id]);
+    if (guideTopicCategory) markGrammarGuideStarted(guideTopicCategory.id);
+  }, [guideTopicCategory?.id]);
   const recordGuideCompletion = (categoryId: Eiken4GrammarCategoryId) => {
     markGrammarGuideCompleted(categoryId);
     recordLearningGrammarGuideCheck(categoryId);
