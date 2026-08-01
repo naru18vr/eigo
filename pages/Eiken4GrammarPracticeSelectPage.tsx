@@ -2,8 +2,10 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import ArrowLeftIcon from '../components/shared/ArrowLeftIcon';
+import { getEiken4GrammarVideos } from '../data/eiken4GrammarVideos';
 import { getAvailableGrammarCategories, getGrammarCategorySentences } from '../services/eiken4GrammarPracticeService';
 import { getGrammarLearningState, getGrammarStatusLabel } from '../services/eiken4GrammarProgressService';
+import { getNextGrammarVideoActivity } from '../services/eiken4GrammarVideoProgressService';
 
 const Eiken4GrammarPracticeSelectPage: React.FC = () => {
   const navigate = useNavigate();
@@ -11,7 +13,8 @@ const Eiken4GrammarPracticeSelectPage: React.FC = () => {
 
   const openCategory = (category: typeof categories[number]) => {
     const state = getGrammarLearningState(category.id);
-    if (!state.guideViewed && category.guideTopic) navigate(`/eiken4/grammar-guide/${category.id}`);
+    const videoActivity = getNextGrammarVideoActivity(category.id);
+    if ((!state.guideViewed || videoActivity) && category.guideTopic && !state.guideCompleted) navigate(`/eiken4/grammar-guide/${category.id}`);
     else navigate(`/eiken4/grammar-practice/${category.id}${state.status === 'review-needed' ? '?mode=review' : ''}`);
   };
 
@@ -28,10 +31,12 @@ const Eiken4GrammarPracticeSelectPage: React.FC = () => {
         {categories.map(category => {
           const state = getGrammarLearningState(category.id);
           const label = getGrammarStatusLabel(state.status);
+          const videos = getEiken4GrammarVideos(category.id);
+          const videoActivity = getNextGrammarVideoActivity(category.id);
           const stateStyle = state.status === 'completed' ? 'bg-emerald-100 text-emerald-800' : state.status === 'review-needed' ? 'bg-rose-100 text-rose-800' : state.status === 'in-progress' ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-700';
-          const action = !state.guideViewed ? '説明を見る' : state.status === 'review-needed' ? '復習する' : state.practiced ? 'もう一度練習する' : '練習する';
+          const action = !state.guideCompleted && videoActivity?.kind === 'watch' ? '動画から始める' : !state.guideCompleted && videoActivity?.kind === 'confirm' ? '確認問題へ進む' : !state.guideViewed ? '説明を見る' : state.status === 'review-needed' ? '復習する' : state.practiced ? 'もう一度練習する' : '練習する';
           const ariaLabel = `${category.title}の${action}。状態は${label}です`;
-          return <button key={category.id} onClick={() => openCategory(category)} aria-label={ariaLabel} className="min-h-24 w-full rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-cyan-300"><div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><h2 className="text-lg font-extrabold text-slate-900">{category.title}</h2><span className={`rounded-full px-2 py-1 text-xs font-bold ${stateStyle}`}>状態：{label}</span></div><p className="mt-1 text-sm text-slate-600">{category.description}</p><p className="mt-2 text-xs text-slate-500">問題：{getGrammarCategorySentences(category.id).length}問</p>{state.practiced ? <p className="mt-2 text-sm font-bold text-slate-700">{state.attemptedCount}問中{state.correctCount}問正解・正答率{state.accuracy}％</p> : state.guideViewed ? <p className="mt-2 text-xs font-bold text-amber-700">説明を見たよ</p> : <p className="mt-2 text-xs font-bold text-cyan-700">まだ習っていない文法だよ。まず説明を見よう</p>}</div><span className={`mt-3 flex min-h-11 w-full items-center justify-center rounded-xl px-4 font-bold ${state.status === 'not-started' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-800'}`}>{action}</span></button>;
+          return <button key={category.id} onClick={() => openCategory(category)} aria-label={ariaLabel} className="min-h-24 w-full rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-cyan-300"><div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><h2 className="text-lg font-extrabold text-slate-900">{category.title}</h2><span className={`rounded-full px-2 py-1 text-xs font-bold ${stateStyle}`}>状態：{label}</span></div><p className="mt-1 text-sm text-slate-600">{category.description}</p><p className="mt-2 text-xs text-slate-500">問題：{getGrammarCategorySentences(category.id).length}問{videos.length > 0 ? `・動画${videos.filter(video => video.required).length}本` : ''}</p>{!state.guideCompleted && videoActivity?.kind === 'watch' ? <p className="mt-2 text-sm font-bold text-indigo-700">まず動画を見よう</p> : !state.guideCompleted && videoActivity?.kind === 'confirm' ? <p className="mt-2 text-sm font-bold text-indigo-700">動画の内容を確認しよう</p> : state.practiced ? <p className="mt-2 text-sm font-bold text-slate-700">{state.attemptedCount}問中{state.correctCount}問正解・正答率{state.accuracy}％</p> : state.guideViewed ? <p className="mt-2 text-xs font-bold text-amber-700">説明を見たよ</p> : <p className="mt-2 text-xs font-bold text-cyan-700">まだ習っていない文法だよ。まず説明を見よう</p>}</div><span className={`mt-3 flex min-h-11 w-full items-center justify-center rounded-xl px-4 font-bold ${state.status === 'not-started' || videoActivity ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-800'}`}>{action}</span></button>;
         })}
       </div>
       <p className="mt-5 rounded-xl bg-white p-4 text-xs leading-5 text-slate-600 shadow-sm">「できた！」は、5問以上に答えて正答率80％以上が目安です。<br/><br/>前に間違えた問題は、「今日の復習問題」でもう一度練習できます。</p>
