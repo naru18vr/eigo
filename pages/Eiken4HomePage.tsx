@@ -28,12 +28,12 @@ const stepIcon: Record<string, string> = {
 };
 
 const learningFlow = [
-  ['🎬', 'トライイット動画を見る', '対応する動画を見て、文法の形を先に知ろう。'],
-  ['📖', '説明と確認問題で理解する', '動画のあと、説明を読んで1問チェックしよう。'],
-  ['✏️', '同じ文法を練習する', '今覚えた文法だけを問題で確認しよう。'],
-  ['🔀', '習った文法をまぜて練習する', '今までに覚えた文法を組み合わせて解いてみよう。'],
-  ['↻', '間違えた問題を復習する', '前に間違えた問題や、忘れかけた問題をやろう。'],
-  ['🏁', '本番問題に挑戦する', '文法・単語・長文・リスニングに挑戦しよう。'],
+  { icon: '🎥', title: 'トライイット動画を見る', description: '学習する単元の動画を先に見よう。' },
+  { icon: '📖', title: '説明と確認問題で理解する', description: '動画の内容を説明と問題で確認しよう。' },
+  { icon: '✏️', title: '同じ文法を練習する', description: '今覚えた文法だけを問題で練習しよう。' },
+  { icon: '🔀', title: '習った文法をまぜて練習する', description: '覚えた文法を組み合わせて解いてみよう。' },
+  { icon: '↻', title: '間違えた問題を復習する', description: '間違えた問題や忘れかけた問題をやろう。' },
+  { icon: '🏁', title: '本番問題に挑戦する', description: '文法・単語・長文・リスニングに挑戦しよう。' },
 ];
 
 const Eiken4HomePage: React.FC = () => {
@@ -95,7 +95,7 @@ const Eiken4HomePage: React.FC = () => {
         <Button onClick={recommendation.action} className="mt-4 w-full" size="lg">{recommendation.button}</Button>
       </section>
 
-      <section className="mt-7"><p className="text-xs font-bold tracking-wider text-indigo-600">LEARNING FLOW</p><h2 className="mt-1 text-xl font-extrabold text-slate-900">学習の進め方</h2><div className="mt-4 space-y-2">{learningFlow.map(([icon, title, text], index) => <React.Fragment key={title}><div className="flex gap-3 rounded-xl bg-white p-3 shadow-sm"><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-lg" aria-hidden="true">{icon}</span><div><p className="font-bold text-slate-800">{title}</p><p className="mt-1 text-xs leading-5 text-slate-600">{text}</p></div></div>{index < learningFlow.length - 1 && <p className="text-center text-base font-bold text-indigo-300">↓</p>}</React.Fragment>)}</div></section>
+      <section className="mt-7"><p className="text-xs font-bold tracking-wider text-indigo-600">LEARNING FLOW</p><h2 className="mt-1 text-xl font-extrabold text-slate-900">学習の進め方</h2><div className="mt-4 space-y-2">{learningFlow.map(({ icon, title, description }, index) => <React.Fragment key={title}><div className="flex gap-3 rounded-xl bg-white p-3 shadow-sm"><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-lg" aria-hidden="true">{icon}</span><div><p className="font-bold text-slate-800">{title}</p><p className="mt-1 text-xs leading-5 text-slate-600">{description}</p></div></div>{index < learningFlow.length - 1 && <p className="text-center text-base font-bold text-indigo-300">↓</p>}</React.Fragment>)}</div></section>
 
       <section id="eiken4-learning-steps" className="mt-8"><p className="text-xs font-bold tracking-wider text-emerald-600">START HERE</p><h2 className="mt-1 text-2xl font-extrabold text-slate-900">順番に学ぼう</h2><p className="mt-1 text-sm leading-6 text-slate-600">ステップ1から順番に進めると、英検4級の文法が分かりやすくなるよ。</p><div className="mt-4 space-y-3">{shownSteps.map(step => {
         const index = eiken4LearningSteps.findIndex(item => item.id === step.id); const state = getLearningStepState(step); const progress = getLearningStepProgress(step); const locked = state === '順番にやろう'; const current = index === activeIndex;
@@ -107,7 +107,7 @@ const Eiken4HomePage: React.FC = () => {
 
       <section className="mt-8"><p className="text-xs font-bold tracking-wider text-cyan-600">PRACTICE</p><h2 className="mt-1 text-xl font-extrabold text-slate-900">習ったところを練習しよう</h2><button onClick={() => navigate('/eiken4/grammar-practice-select')} className="mt-4 flex min-h-24 w-full items-center justify-between rounded-2xl border-2 border-cyan-300 bg-cyan-50 p-4 text-left shadow-sm active:scale-[.99]"><div><h3 className="text-lg font-extrabold text-slate-900">文法を選んで練習</h3><p className="mt-1 text-sm text-slate-600">今覚えた文法だけを選んで、10問ずつ確認できるよ。</p></div><ChevronRightIcon className="h-7 w-7 shrink-0 text-cyan-600"/></button></section>
 
-      <section className="mt-8"><p className="text-xs font-bold tracking-wider text-indigo-600">TRY-IT</p><h2 className="mt-1 text-xl font-extrabold text-slate-900">トライイット</h2><button onClick={() => navigate('/eiken4/try-it')} className="mt-4 flex min-h-24 w-full items-center justify-between rounded-2xl border-2 border-indigo-300 bg-indigo-50 p-4 text-left shadow-sm active:scale-[.99]"><div><h3 className="text-lg font-extrabold text-slate-900">トライイット</h3><p className="mt-1 text-sm leading-6 text-slate-600">英検4級で使う動画を一覧で見る</p><span className="mt-3 inline-flex min-h-11 items-center rounded-xl bg-indigo-600 px-4 font-bold text-white">動画一覧を見る</span></div><ChevronRightIcon className="h-7 w-7 shrink-0 text-indigo-600"/></button></section>
+      <section className="mt-8"><p className="text-xs font-bold tracking-wider text-indigo-600">TRY-IT</p><h2 className="mt-1 text-xl font-extrabold text-slate-900">トライイット</h2><button type="button" onClick={() => navigate('/eiken4/try-it')} className="mt-4 flex min-h-24 w-full items-center justify-between rounded-2xl border-2 border-indigo-300 bg-indigo-50 p-4 text-left shadow-sm active:scale-[.99]"><div><h3 className="text-lg font-extrabold text-slate-900">トライイット</h3><p className="mt-1 text-sm leading-6 text-slate-600">英検4級で使う動画を章ごとに確認できるよ。</p><span className="mt-3 inline-flex min-h-11 items-center rounded-xl bg-indigo-600 px-4 font-bold text-white">動画一覧を見る</span></div><ChevronRightIcon className="h-7 w-7 shrink-0 text-indigo-600"/></button></section>
 
       <section className="mt-8"><p className="text-xs font-bold tracking-wider text-sky-600">MIXED PRACTICE</p><h2 className="mt-1 text-xl font-extrabold text-slate-900">習った文法をまぜて練習しよう</h2><button onClick={() => navigate('/eiken4/mixed-review')} className="mt-4 flex min-h-24 w-full items-center justify-between rounded-2xl border-2 border-sky-300 bg-sky-50 p-4 text-left shadow-sm active:scale-[.99]"><div><h3 className="text-lg font-extrabold text-slate-900">習った文法のまとめ問題</h3><p className="mt-1 text-sm text-slate-600">今までに習った文法だけを、まぜて出題するよ。</p></div><ChevronRightIcon className="h-7 w-7 shrink-0 text-sky-600"/></button></section>
 
