@@ -50,6 +50,7 @@ const checks = [
   ['pages/Eiken4GrammarGuidePage.tsx', /確認問題/, '確認問題の進捗表示がない'],
   ['pages/Eiken4GrammarGuidePage.tsx', /次の確認問題へ/, '確認問題を1問ずつ進められない'],
   ['pages/Eiken4GrammarGuidePage.tsx', /correctCount.*0\.8/, '確認問題の合格条件がない'],
+  ['pages/Eiken4GrammarGuidePage.tsx', /answeredCount === questions\.length/, '全問回答前に確認完了できる可能性がある'],
   ['pages/Eiken4GrammarGuidePage.tsx', /confirmRequiredVideos/, '確認問題後の必須動画確認記録がない'],
   ['pages/Eiken4GrammarGuidePage.tsx', /動画や説明をもう一度確認してみよう/, '確認問題不合格時の再確認案内がない'],
   ['pages/Eiken4GrammarPracticeSelectPage.tsx', /動画から始める/, '動画先行の文法選択導線がない'],

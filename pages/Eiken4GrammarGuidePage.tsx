@@ -84,6 +84,10 @@ const Eiken4GrammarGuidePage: React.FC = () => {
   useEffect(() => {
     if (guideTopicCategory) markGrammarGuideStarted(guideTopicCategory.id);
   }, [guideTopicCategory?.id]);
+  useEffect(() => {
+    setCheckStates({});
+    setVideoFallback({});
+  }, [requestedCategory, requestedTopic]);
   const recordGuideCompletion = (categoryId: Eiken4GrammarCategoryId) => {
     markGrammarGuideCompleted(categoryId);
     recordLearningGrammarGuideCheck(categoryId);
@@ -112,7 +116,8 @@ const Eiken4GrammarGuidePage: React.FC = () => {
       return;
     }
     const correctCount = questions.filter(question => current.answers[question.id] === question.correctAnswer).length;
-    const passed = questions.length > 0 && correctCount / questions.length >= 0.8;
+    const answeredCount = Object.keys(current.answers).length;
+    const passed = questions.length > 0 && answeredCount === questions.length && correctCount / questions.length >= 0.8;
     if (passed) {
       confirmRequiredVideos(videos);
       [...categories].reverse().forEach(category => recordGuideCompletion(category.id));
