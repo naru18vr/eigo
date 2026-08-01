@@ -28,7 +28,8 @@ const stepIcon: Record<string, string> = {
 };
 
 const learningFlow = [
-  ['📖', '文法を覚える', '説明と例文を見て、文の作り方を覚えよう。'],
+  ['🎬', 'トライイット動画を見る', '対応する動画を見て、文法の形を先に知ろう。'],
+  ['📖', '説明と確認問題で理解する', '動画のあと、説明を読んで1問チェックしよう。'],
   ['✏️', '同じ文法を練習する', '今覚えた文法だけを問題で確認しよう。'],
   ['🔀', '習った文法をまぜて練習する', '今までに覚えた文法を組み合わせて解いてみよう。'],
   ['↻', '間違えた問題を復習する', '前に間違えた問題や、忘れかけた問題をやろう。'],
@@ -105,6 +106,8 @@ const Eiken4HomePage: React.FC = () => {
       {lockedStep && <div className="mt-4 rounded-2xl border border-indigo-200 bg-indigo-50 p-4"><p className="font-extrabold text-indigo-950">先に前のステップをやってみよう。</p><p className="mt-1 text-sm leading-6 text-indigo-900">順番に進めると、分かりやすいよ。</p><Button onClick={() => { allowLearningStepStart(lockedStep.id); navigate(`/eiken4/learning-step/${lockedStep.id}`); }} variant="ghost" size="sm" className="mt-3 w-full text-indigo-800">もう習っている場合はここから始める</Button></div>}</section>
 
       <section className="mt-8"><p className="text-xs font-bold tracking-wider text-cyan-600">PRACTICE</p><h2 className="mt-1 text-xl font-extrabold text-slate-900">習ったところを練習しよう</h2><button onClick={() => navigate('/eiken4/grammar-practice-select')} className="mt-4 flex min-h-24 w-full items-center justify-between rounded-2xl border-2 border-cyan-300 bg-cyan-50 p-4 text-left shadow-sm active:scale-[.99]"><div><h3 className="text-lg font-extrabold text-slate-900">文法を選んで練習</h3><p className="mt-1 text-sm text-slate-600">今覚えた文法だけを選んで、10問ずつ確認できるよ。</p></div><ChevronRightIcon className="h-7 w-7 shrink-0 text-cyan-600"/></button></section>
+
+      <section className="mt-8"><p className="text-xs font-bold tracking-wider text-indigo-600">TRY-IT</p><h2 className="mt-1 text-xl font-extrabold text-slate-900">トライイット</h2><button onClick={() => navigate('/eiken4/try-it')} className="mt-4 flex min-h-24 w-full items-center justify-between rounded-2xl border-2 border-indigo-300 bg-indigo-50 p-4 text-left shadow-sm active:scale-[.99]"><div><h3 className="text-lg font-extrabold text-slate-900">トライイット</h3><p className="mt-1 text-sm leading-6 text-slate-600">英検4級で使う動画を一覧で見る</p><span className="mt-3 inline-flex min-h-11 items-center rounded-xl bg-indigo-600 px-4 font-bold text-white">動画一覧を見る</span></div><ChevronRightIcon className="h-7 w-7 shrink-0 text-indigo-600"/></button></section>
 
       <section className="mt-8"><p className="text-xs font-bold tracking-wider text-sky-600">MIXED PRACTICE</p><h2 className="mt-1 text-xl font-extrabold text-slate-900">習った文法をまぜて練習しよう</h2><button onClick={() => navigate('/eiken4/mixed-review')} className="mt-4 flex min-h-24 w-full items-center justify-between rounded-2xl border-2 border-sky-300 bg-sky-50 p-4 text-left shadow-sm active:scale-[.99]"><div><h3 className="text-lg font-extrabold text-slate-900">習った文法のまとめ問題</h3><p className="mt-1 text-sm text-slate-600">今までに習った文法だけを、まぜて出題するよ。</p></div><ChevronRightIcon className="h-7 w-7 shrink-0 text-sky-600"/></button></section>
 
