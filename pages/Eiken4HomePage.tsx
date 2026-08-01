@@ -83,7 +83,7 @@ const Eiken4HomePage: React.FC = () => {
       <Button onClick={() => navigate('/')} variant="ghost" size="sm" className="mb-4 text-slate-600"><ArrowLeftIcon className="mr-2 h-5 w-5"/>ホームに戻る</Button>
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-600 via-indigo-600 to-blue-500 p-6 text-white shadow-xl shadow-indigo-200">
         <div className="absolute -right-8 -top-10 h-32 w-32 rounded-full bg-white/10"/><div className="absolute -bottom-10 right-16 h-24 w-24 rounded-full bg-white/10"/>
-        <div className="relative"><p className="text-xs font-bold tracking-widest text-indigo-100">EIKEN GRADE 4</p><h1 className="mt-2 text-3xl font-extrabold">英検4級の勉強をはじめよう！</h1><p className="mt-3 text-sm leading-6 text-indigo-50">まずはステップ1から、順番に進めよう。<br/>文法を覚えてから問題を解くと、よく分かるようになるよ。</p></div>
+        <div className="relative"><p className="text-xs font-bold tracking-widest text-indigo-100">EIKEN GRADE 4</p><h1 className="mt-2 text-3xl font-extrabold">英検4級の勉強をはじめよう！</h1><p className="mt-3 text-sm leading-6 text-indigo-50">まず動画を見て、説明と確認問題で分かったか確かめよう。<br/>そのあと、同じ文法を問題で練習するよ。</p></div>
       </div>
     </header>
 
