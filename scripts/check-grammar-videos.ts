@@ -1,4 +1,4 @@
-import { EIKEN4_GRAMMAR_VIDEOS } from '../data/eiken4GrammarVideos';
+import { EIKEN4_GRAMMAR_VIDEOS, getEiken4GrammarGuideCategoryId } from '../data/eiken4GrammarVideos';
 import { EIKEN4_GRAMMAR_VIDEO_PROGRESS_KEY } from '../data/eiken4LearningKeys';
 import { areRequiredGrammarVideosConfirmed, getGrammarVideoProgress, getNextGrammarVideoActivity, getRequiredGrammarVideos, markGrammarVideoConfirmed, markGrammarVideoOpened } from '../services/eiken4GrammarVideoProgressService';
 
@@ -19,6 +19,9 @@ if (new Set(EIKEN4_GRAMMAR_VIDEOS.map(video => video.url)).size !== EIKEN4_GRAMM
 if (new Set(EIKEN4_GRAMMAR_VIDEOS.map(video => video.id)).size !== EIKEN4_GRAMMAR_VIDEOS.length) errors.push('動画IDが重複している');
 if (EIKEN4_GRAMMAR_VIDEOS.some(video => !video.title || !video.grammarId || video.provider !== 'try-it' || !video.loginRequired || !video.url.startsWith('https://student.try-it.jp/videos/'))) errors.push('動画データの必須項目が不足');
 if (EIKEN4_GRAMMAR_VIDEOS.filter(video => video.id === 'passive-question-negative').length !== 1) errors.push('受け身の疑問文・否定文が1件ではない');
+if (new Set(EIKEN4_GRAMMAR_VIDEOS.map(video => video.chapter)).size !== 9) errors.push('章が9章ではない');
+if (EIKEN4_GRAMMAR_VIDEOS.map(video => video.chapter).some((chapter, index, chapters) => index > 0 && chapter < chapters[index - 1])) errors.push('章の順番がそろっていない');
+if (getEiken4GrammarGuideCategoryId('future') !== 'future' || getEiken4GrammarGuideCategoryId('conversation') !== 'modal-verb' || getEiken4GrammarGuideCategoryId('passive') !== 'other-eiken4') errors.push('動画から文法ガイドへの対応が不足');
 
 const futureVideos = getRequiredGrammarVideos('future');
 if (futureVideos.length !== 4) errors.push(`未来の必須動画が4本ではない: ${futureVideos.length}`);
