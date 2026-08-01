@@ -6,9 +6,11 @@ import ChevronRightIcon from '../components/shared/ChevronRightIcon';
 import SpeakerWaveIcon from '../components/shared/SpeakerWaveIcon';
 import { speakText } from '../services/speechService';
 import type { Eiken4GrammarCategoryId } from '../data/eiken4GrammarCategories';
+import { getEiken4GrammarVideos } from '../data/eiken4GrammarVideos';
 import { getEiken4GrammarCategoriesForGuideTopic, getGrammarCategory } from '../services/eiken4GrammarPracticeService';
 import { recordLearningGrammarGuideCheck } from '../services/eiken4StepLearningService';
 import { markGrammarGuideCompleted, markGrammarGuideStarted } from '../services/eiken4GrammarProgressService';
+import { getGrammarVideoProgress, markGrammarVideoConfirmed, markGrammarVideoOpened } from '../services/eiken4GrammarVideoProgressService';
 
 type Topic = {
   id: string; title: string; level: string; meaning: string; rule: string;
@@ -40,12 +42,21 @@ const Eiken4GrammarGuidePage: React.FC = () => {
   const requestedTopic = categoryFromRoute?.guideTopic || searchParams.get('topic');
   const [openId, setOpenId] = useState<string | null>(topics.some(topic => topic.id === requestedTopic) ? requestedTopic : topics[0].id);
   const [answers, setAnswers] = useState<Record<string,string>>({});
+  const [videoFallback, setVideoFallback] = useState<Record<string, boolean>>({});
+  const [, setVideoRevision] = useState(0);
   useEffect(() => {
     if (categoryFromRoute) markGrammarGuideStarted(categoryFromRoute.id);
   }, [categoryFromRoute?.id]);
   const recordGuideCompletion = (categoryId: Eiken4GrammarCategoryId) => {
     markGrammarGuideCompleted(categoryId);
     recordLearningGrammarGuideCheck(categoryId);
+  };
+  const openVideo = (videoId: string, grammarId: string) => {
+    markGrammarVideoOpened(videoId, grammarId);
+    setVideoRevision(value => value + 1);
+  };
+  const confirmVideos = (videos: ReturnType<typeof getEiken4GrammarVideos>) => {
+    videos.filter(video => video.required && getGrammarVideoProgress(video.id)?.opened).forEach(video => markGrammarVideoConfirmed(video.id, video.grammarId));
   };
   const handleStartPractice = (categoryId: Eiken4GrammarCategoryId) => {
     recordGuideCompletion(categoryId);
@@ -60,14 +71,27 @@ const Eiken4GrammarGuidePage: React.FC = () => {
       </header>
       <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950"><p className="font-bold">おすすめの使い方</p><p className="mt-1">1日1項目だけ読む → 例文を音で聞く → 最後の1問を解く。全部を一度に暗記しなくてOKです。</p></div>
       <div className="mt-5 space-y-3">{topics.map((topic,index) => {
-        const open = openId === topic.id; const picked = answers[topic.id]; const correct = picked === topic.quiz.answer; const allCategories = getEiken4GrammarCategoriesForGuideTopic(topic.id); const selectedCategory = allCategories.find(category => category.id === requestedCategory); const categories = selectedCategory ? [selectedCategory] : allCategories;
+        const open = openId === topic.id;
+        const picked = answers[topic.id];
+        const correct = picked === topic.quiz.answer;
+        const allCategories = getEiken4GrammarCategoriesForGuideTopic(topic.id);
+        const selectedCategory = allCategories.find(category => category.id === requestedCategory);
+        const categories = selectedCategory ? [selectedCategory] : allCategories;
+        const videos = Array.from(new Map(categories.flatMap(category => getEiken4GrammarVideos(category.id)).map(video => [video.id, video])).values());
+        const requiredVideos = videos.filter(video => video.required);
+        const optionalVideos = videos.filter(video => !video.required);
+        const openedRequiredCount = requiredVideos.filter(video => getGrammarVideoProgress(video.id)?.opened).length;
+        const requiredReady = Boolean(videoFallback[topic.id]) || openedRequiredCount === requiredVideos.length;
+        const currentVideo = requiredVideos.find(video => !getGrammarVideoProgress(video.id)?.opened);
         return <article key={topic.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           <button onClick={() => setOpenId(open ? null : topic.id)} className="flex w-full items-center gap-3 p-4 text-left"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-cyan-100 font-bold text-cyan-800">{index+1}</span><div className="flex-grow"><p className="text-xs font-bold text-cyan-700">{topic.level}</p><h2 className="text-lg font-bold text-slate-800">{topic.title}</h2></div><ChevronRightIcon className={`h-6 w-6 text-slate-400 transition-transform ${open?'rotate-90':''}`}/></button>
           {open && <div className="border-t border-slate-100 p-5">
-            <p className="text-lg font-bold leading-8 text-slate-800">{topic.meaning}</p><div className="mt-4 rounded-xl bg-blue-50 p-4"><p className="text-xs font-bold text-blue-600">作り方</p><p className="mt-1 leading-7 text-blue-950">{topic.rule}</p></div>
+            <p className="text-lg font-bold leading-8 text-slate-800">{topic.meaning}</p>
+            {videos.length > 0 && <section className="mt-4 rounded-2xl border-2 border-indigo-200 bg-indigo-50 p-4"><p className="text-xs font-bold tracking-wide text-indigo-700">{requiredVideos.length > 0 ? 'まず、この動画を見よう' : 'もっと詳しく知りたいとき'}</p><p className="mt-1 text-sm leading-6 text-indigo-950">トライイットの動画で、文法の形を先に確認できます。</p>{requiredVideos.length > 0 && <p className="mt-2 text-xs font-bold text-indigo-800">必須動画 {openedRequiredCount} / {requiredVideos.length} 本を開きました</p>}<div className="mt-3 space-y-2">{requiredVideos.map((video, videoIndex) => { const progress = getGrammarVideoProgress(video.id); const active = !progress?.opened && video.id === currentVideo?.id; return <div key={video.id} className={`rounded-xl border p-3 ${active ? 'border-indigo-400 bg-white shadow-sm' : 'border-indigo-100 bg-indigo-50/60'}`}><p className="text-xs font-bold text-indigo-700">{videoIndex + 1} / {requiredVideos.length}　{active ? 'つぎに見る動画' : progress?.opened ? '開いたよ' : '順番に見よう'}</p><p className="mt-1 font-bold leading-6 text-slate-900">「{video.title}」</p>{active || progress?.opened ? <a href={video.url} target="_blank" rel="noopener noreferrer" onClick={() => openVideo(video.id, video.grammarId)} className={`mt-2 flex min-h-11 items-center justify-center rounded-xl px-4 text-center font-bold ${active ? 'bg-indigo-600 text-white' : 'bg-white text-indigo-700 underline'}`}>{active ? 'トライイットで動画を見る' : 'もう一度動画を見る'}</a> : null}</div>; })}</div>{videos.some(video => video.loginRequired) && <p className="mt-3 text-xs leading-5 text-indigo-900">※トライイットへのログインが必要です。<br/>※動画は新しいタブで開きます。<br/>※見終わったら、このページに戻って確認問題を解こう。</p>}{requiredVideos.length > 0 && requiredReady && <div className="mt-4 rounded-xl bg-emerald-100 p-3 text-sm font-bold text-emerald-900"><p>動画を見終わったかな？</p><p className="mt-1 font-normal">分かったか確認問題を解いてみよう。</p><button onClick={() => document.getElementById(`grammar-check-${topic.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })} className="mt-3 min-h-11 w-full rounded-xl bg-emerald-600 px-4 font-bold text-white">確認問題へ進む</button></div>}{requiredVideos.length > 0 && !requiredReady && <button onClick={() => { setVideoFallback(value => ({ ...value, [topic.id]: true })); document.getElementById(`grammar-check-${topic.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }} className="mt-4 min-h-11 w-full rounded-xl border border-indigo-300 bg-white px-4 text-sm font-bold text-indigo-800">動画を見られないときは説明を読む</button>}{optionalVideos.length > 0 && <div className="mt-4 border-t border-indigo-200 pt-3"><p className="text-xs font-bold text-indigo-800">もっと詳しく知りたいとき</p>{optionalVideos.map(video => <a key={video.id} href={video.url} target="_blank" rel="noopener noreferrer" onClick={() => openVideo(video.id, video.grammarId)} className="mt-2 block rounded-lg bg-white p-3 text-sm font-bold text-indigo-700 underline">{video.title}</a>)}</div>}</section>}
+            <div className="mt-4 rounded-xl bg-blue-50 p-4"><p className="text-xs font-bold text-blue-600">作り方</p><p className="mt-1 leading-7 text-blue-950">{topic.rule}</p></div>
             <div className="mt-4 space-y-3">{topic.examples.map(example=><div key={example.en} className="rounded-xl border border-slate-200 p-3"><div className="flex items-start justify-between gap-2"><p className="font-bold text-slate-800">{example.en}</p><button onClick={()=>speakText(example.en,'en-US',.8)} aria-label="例文を聞く" className="shrink-0 rounded-full bg-indigo-50 p-2 text-indigo-700"><SpeakerWaveIcon className="h-5 w-5"/></button></div><p className="mt-1 text-sm text-slate-600">{example.ja}</p></div>)}</div>
             <div className="mt-4 grid gap-3 sm:grid-cols-2"><div className="rounded-xl bg-rose-50 p-3 text-sm text-rose-900"><p className="font-bold">よくある間違い</p><p className="mt-1">{topic.mistake}</p></div><div className="rounded-xl bg-emerald-50 p-3 text-sm text-emerald-900"><p className="font-bold">英検での見つけ方</p><p className="mt-1">{topic.tip}</p></div></div>
-            <div className="mt-5 rounded-xl border-2 border-violet-200 bg-violet-50 p-4"><p className="text-xs font-bold text-violet-600">1問チェック</p><p className="mt-1 font-bold text-slate-800">{topic.quiz.question}</p><div className="mt-3 grid gap-2">{topic.quiz.choices.map(choice=><button key={choice} disabled={Boolean(picked)} onClick={()=>{ setAnswers(value=>({...value,[topic.id]:choice})); [...categories].reverse().forEach(category=>recordGuideCompletion(category.id)); }} className={`min-h-11 rounded-lg border p-3 text-left font-semibold ${picked && choice===topic.quiz.answer?'border-emerald-500 bg-emerald-50 text-emerald-800':picked===choice?'border-rose-500 bg-rose-50 text-rose-800':'border-violet-200 bg-white text-slate-700'}`}>{choice}</button>)}</div>{picked&&<div className={`mt-3 rounded-lg p-3 ${correct?'bg-emerald-100':'bg-amber-100'}`}><p className="font-bold">{correct?'正解！':`正解：${topic.quiz.answer}`}</p><p className="mt-1 text-sm">{topic.quiz.explanation}</p><button onClick={()=>setAnswers(value=>{const next={...value};delete next[topic.id];return next;})} className="mt-2 text-sm font-bold text-indigo-700">もう一度解く</button></div>}{categories.length > 0 && <div className="mt-4 grid gap-2">{categories.map(category=><Button key={category.id} onClick={()=>handleStartPractice(category.id)} className="w-full">{categories.length === 1 ? 'この文法を練習する' : `${category.title}を練習する`}</Button>)}</div>}</div>
+            <div id={`grammar-check-${topic.id}`} className="mt-5 rounded-xl border-2 border-violet-200 bg-violet-50 p-4"><p className="text-xs font-bold text-violet-600">1問チェック</p><p className="mt-1 font-bold text-slate-800">{topic.quiz.question}</p>{!requiredReady && <p className="mt-2 rounded-lg bg-indigo-100 p-3 text-sm font-bold text-indigo-900">まず動画を見てから確認問題へ進もう。動画を使えないときは、上の「説明を読む」を押せます。</p>}<div className="mt-3 grid gap-2">{topic.quiz.choices.map(choice=><button key={choice} disabled={Boolean(picked) || !requiredReady} onClick={()=>{ setAnswers(value=>({...value,[topic.id]:choice})); confirmVideos(videos); [...categories].reverse().forEach(category=>recordGuideCompletion(category.id)); }} className={`min-h-11 rounded-lg border p-3 text-left font-semibold ${picked && choice===topic.quiz.answer?'border-emerald-500 bg-emerald-50 text-emerald-800':picked===choice?'border-rose-500 bg-rose-50 text-rose-800':!requiredReady?'border-slate-200 bg-slate-100 text-slate-400':'border-violet-200 bg-white text-slate-700'}`}>{choice}</button>)}</div>{picked&&<div className={`mt-3 rounded-lg p-3 ${correct?'bg-emerald-100':'bg-amber-100'}`}><p className="font-bold">{correct?'正解！':`正解：${topic.quiz.answer}`}</p><p className="mt-1 text-sm">{topic.quiz.explanation}</p><button onClick={()=>setAnswers(value=>{const next={...value};delete next[topic.id];return next;})} className="mt-2 text-sm font-bold text-indigo-700">もう一度解く</button></div>}{picked && categories.length > 0 && <div className="mt-4 grid gap-2">{categories.map(category=><Button key={category.id} onClick={()=>handleStartPractice(category.id)} className="w-full">{categories.length === 1 ? 'この文法を練習する' : `${category.title}を練習する`}</Button>)}</div>}</div>
           </div>}
         </article>;
       })}</div>
