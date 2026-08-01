@@ -39,7 +39,7 @@ else {
   if (getGrammarLearningState(target.id).status !== 'not-started') errors.push('初回の文法を「まだ」にできない');
   markGrammarGuideStarted(target.id);
   const afterOpen = getGrammarLearningState(target.id);
-  if (!afterOpen.guideStarted || afterOpen.guideCompleted || afterOpen.status !== 'not-started') errors.push('解説を開いただけで完了扱いになる');
+  if (!afterOpen.guideStarted || afterOpen.guideCompleted || afterOpen.status !== 'in-progress') errors.push('解説を開いた文法を「がんばり中」にできない');
   completeGrammarGuide(target.id);
   const afterGuide = getGrammarLearningState(target.id);
   if (!afterGuide.guideCompleted || afterGuide.status !== 'in-progress') errors.push('解説確認後を「がんばり中」にできない');
