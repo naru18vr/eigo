@@ -92,7 +92,7 @@ export const getGrammarLearningState = (grammarId: Eiken4GrammarCategoryId): Gra
   ]));
   const latestAccuracy = latestAnswers.length ? latestAnswers.filter(answer => answer?.correct).length / latestAnswers.length * 100 : undefined;
   let status: GrammarLearningStatus = 'in-progress';
-  if (!valid || (!guideCompleted && attemptedCount === 0)) status = 'not-started';
+  if (!valid || (!guideCompleted && attemptedCount === 0 && !guideStarted)) status = 'not-started';
   else if (reviewDue || (latestAccuracy !== undefined && latestAccuracy < 80)) status = 'review-needed';
   else if (attemptedCount >= 5 && accuracy >= 80) status = 'completed';
   return { grammarId, guideStarted, guideCompleted, guideViewed: guideCompleted, practiced: attemptedCount > 0, attemptedCount, correctCount, accuracy, incorrectQuestionIds, lastStudiedAt: stats.lastAnsweredAt || latest?.completedAt || savedGuide?.completedAt || savedGuide?.startedAt, nextReviewAt, reviewDue, status };
