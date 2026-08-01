@@ -7,9 +7,12 @@ import CheckCircleIcon from '../components/shared/CheckCircleIcon';
 import ChevronRightIcon from '../components/shared/ChevronRightIcon';
 import ClockIcon from '../components/shared/ClockIcon';
 import { useEiken4Session } from '../contexts/Eiken4SessionContext';
+import { getEiken4GrammarVideos } from '../data/eiken4GrammarVideos';
 import { eiken4Words } from '../data/eiken4Words';
 import { getGrammarCategory } from '../services/eiken4GrammarPracticeService';
+import { getGrammarLearningState } from '../services/eiken4GrammarProgressService';
 import { getDailyLearningReadiness, getDueReviewCount } from '../services/eiken4DailyService';
+import { getNextGrammarVideoActivity } from '../services/eiken4GrammarVideoProgressService';
 import { allowLearningStepStart, eiken4LearningSteps, getLearningStepProgress, getLearningStepState, getNextLearningActivity, getNextLearningStep, type LearningStep } from '../services/eiken4StepLearningService';
 
 const stepStyle: Record<string, string> = {
@@ -45,6 +48,13 @@ const Eiken4HomePage: React.FC = () => {
   const activeIndex = nextStep ? eiken4LearningSteps.findIndex(step => step.id === nextStep.id) : eiken4LearningSteps.length - 1;
   const compactIndexes = new Set([activeIndex - 1, activeIndex, activeIndex + 1].filter(index => index >= 0 && index < eiken4LearningSteps.length));
   const shownSteps = showAllSteps ? eiken4LearningSteps : eiken4LearningSteps.filter((_, index) => compactIndexes.has(index));
+  const videoRecommendation = eiken4LearningSteps.flatMap(step => step.grammarIds).map(id => getGrammarCategory(id)).filter((category): category is NonNullable<typeof category> => Boolean(category)).map(category => {
+    const step = eiken4LearningSteps.find(item => item.grammarIds.includes(category.id));
+    const state = getGrammarLearningState(category.id);
+    const activity = getNextGrammarVideoActivity(category.id);
+    const reviewVideo = state.status === 'review-needed' ? getEiken4GrammarVideos(category.id).find(video => video.required) : undefined;
+    return { category, step, state, activity: activity || (reviewVideo ? { kind: 'watch' as const, video: reviewVideo } : undefined) };
+  }).find(item => item.step && getLearningStepState(item.step) !== '順番にやろう' && !item.state.guideCompleted && item.activity);
 
   const startFresh = (path: string) => { resetSession(); navigate(path); };
   const openStep = (step: LearningStep) => {
@@ -55,7 +65,9 @@ const Eiken4HomePage: React.FC = () => {
   const openRecommendedStep = () => firstCategory?.guideTopic
     ? navigate(`/eiken4/grammar-guide?topic=${firstCategory.guideTopic}&category=${firstCategory.id}`)
     : nextStep && openStep(nextStep);
-  const recommendation = activityCategory && nextActivity
+  const recommendation = videoRecommendation
+    ? { title: `${videoRecommendation.category.title}の動画を${videoRecommendation.activity?.kind === 'confirm' ? '確認しよう' : '見よう'}`, text: `「${videoRecommendation.activity?.video.title}」を見てから、説明と確認問題へ進もう。`, button: videoRecommendation.activity?.kind === 'confirm' ? '確認問題へ進む' : '動画を見る', action: () => navigate(`/eiken4/grammar-guide/${videoRecommendation.category.id}`) }
+    : activityCategory && nextActivity
     ? nextActivity.type === 'grammar-practice'
       ? { title: `${activityCategory.title}を問題で確認しよう`, text: 'さっき説明を見た文法を、10問で練習しよう。', button: '練習する', action: () => navigate(`/eiken4/grammar-practice/${activityCategory.id}`) }
       : { title: `${activityCategory.title}の説明を見直そう`, text: 'もう一度説明を見てから、同じ文法を練習しよう。', button: '説明を見る', action: () => navigate(`/eiken4/grammar-guide?topic=${activityCategory.guideTopic || ''}&category=${activityCategory.id}`) }
