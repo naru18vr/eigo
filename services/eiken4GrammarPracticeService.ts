@@ -2,6 +2,7 @@ import { eiken4CoreSentences } from '../data/eiken4Curriculum';
 import { EIKEN4_GRAMMAR_CATEGORIES, getEiken4GrammarCategory, getEiken4GrammarCategoryForGuideTopic, getEiken4GrammarCategoriesForGuideTopic, type Eiken4GrammarCategory, type Eiken4GrammarCategoryId } from '../data/eiken4GrammarCategories';
 import { EIKEN4_GRAMMAR_PRACTICE_HISTORY_KEY, EIKEN4_GRAMMAR_PRACTICE_STATS_KEY } from '../data/eiken4LearningKeys';
 import { getQuestionById, localDateKey, recordReviewAnswer, type DailyAnswer, type DailyQuestion } from './eiken4DailyService';
+import { getRecentQuestionIds } from './eiken4QuestionSessionService';
 import { safeSetLearningItem } from './storageHealthService';
 
 export type GrammarCategoryId = Eiken4GrammarCategoryId;
@@ -41,14 +42,19 @@ export const getGrammarCategorySentences = (categoryId: GrammarCategoryId) => {
 
 export const getAvailableGrammarCategories = () => grammarCategories.filter(category => getGrammarCategorySentences(category.id).length > 0);
 
-export const getGrammarPracticeQuestions = (categoryId: GrammarCategoryId, attemptId: string, count = 10): GrammarPracticeQuestion[] =>
-  shuffled(getGrammarCategorySentences(categoryId), `${localDateKey()}-${categoryId}-${attemptId}`)
+export const getGrammarPracticeQuestions = (categoryId: GrammarCategoryId, attemptId: string, count = 10): GrammarPracticeQuestion[] => {
+  const shuffledSentences = shuffled(getGrammarCategorySentences(categoryId), `${localDateKey()}-${categoryId}-${attemptId}`);
+  const recent = new Set(getRecentQuestionIds().map(id => id.replace(/^sentence-/, '')));
+  const freshSentences = shuffledSentences.filter(sentence => !recent.has(sentence.id));
+  const source = freshSentences.length >= Math.min(count, shuffledSentences.length) ? freshSentences : shuffledSentences;
+  return source
     .slice(0, count)
     .map(sentence => {
       const question = getQuestionById(`sentence-${sentence.id}`, localDateKey());
       return question ? { ...question, grammarCategory: categoryId } : undefined;
     })
     .filter((question): question is GrammarPracticeQuestion => Boolean(question));
+};
 
 export const loadGrammarPracticeStats = (): Record<string, GrammarPracticeStats> => {
   const stats = read<Record<string, GrammarPracticeStats>>(STATS_KEY, {});

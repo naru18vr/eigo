@@ -5,6 +5,8 @@ import { daysUntilExam, getExamDate, recordEiken4Activity } from './eiken4Progre
 import { safeSetLearningItem } from './storageHealthService';
 import { getStudiedGrammarIds } from './eiken4StepLearningService';
 import { EIKEN4_REVIEW_SCHEDULE_KEY } from '../data/eiken4LearningKeys';
+import { getRecentQuestionIds, rememberQuestionSession } from './eiken4QuestionSessionService';
+import type { Eiken4QuestionType } from '../types';
 
 export const EIKEN4_DAILY_KEY = 'eiken4DailyProgressV4';
 const REVIEW_KEY = EIKEN4_REVIEW_SCHEDULE_KEY;
@@ -22,6 +24,7 @@ export type DailyQuestion = {
   audioText?: string;
   transcript?: string;
   translation?: string;
+  questionType?: Eiken4QuestionType;
 };
 
 export type DailyAnswer = { id: string; correct: boolean };
@@ -88,13 +91,22 @@ const sentenceQuestion = (sentenceId: string, date: string): DailyQuestion | und
   const sentence = eiken4CoreSentences.find(item => `sentence-${item.id}` === sentenceId);
   if (!sentence) return undefined;
   const answer = sentence.words.join(' ').replace(/ ([.,?!])/g, '$1');
+  const questionTypeLabels: Record<Eiken4QuestionType, string> = {
+    reorder: '語句を並べ替えよう',
+    'fill-blank': '空所に入る形を選ぼう',
+    'sentence-choice': '日本語に合う文を選ぼう',
+    response: '会話の返事を選ぼう',
+    dialogue: '会話の流れを考えよう',
+    'error-correction': 'まちがいのない文を選ぼう',
+  };
   return {
     id: sentenceId,
     prompt: sentence.japaneseQuestion,
-    detail: sentence.grammarTag,
+    detail: `${questionTypeLabels[sentence.questionType || 'reorder']}・${sentence.grammarTag}`,
     answer,
     choices: choicesFor(answer, eiken4CoreSentences.filter(item => item.id !== sentence.id).map(item => item.words.join(' ').replace(/ ([.,?!])/g, '$1')), `${date}-${sentence.id}`),
     explanation: sentence.explanation,
+    questionType: sentence.questionType || 'reorder',
     kind: '文法・会話',
   };
 };
@@ -150,6 +162,8 @@ const loadCoverage = (): Record<string, number> => {
   try { return JSON.parse(localStorage.getItem(COVERAGE_KEY) || '{}'); } catch { return {}; }
 };
 
+export { getRecentQuestionIds, rememberQuestionSession } from './eiken4QuestionSessionService';
+
 export const recordQuestionCoverage = (id: string) => {
   if (typeof localStorage === 'undefined') return;
   const coverage = loadCoverage(); coverage[id] = (coverage[id] || 0) + 1;
@@ -158,7 +172,10 @@ export const recordQuestionCoverage = (id: string) => {
 
 const leastSeen = <T extends { id: string }>(items: T[], prefix: string, seed: string, count: number) => {
   const coverage = loadCoverage();
-  return items.map((item, index) => ({ item, seen: coverage[`${prefix}${item.id}`] || 0, order: hash(`${seed}-${index}`) }))
+  const recent = new Set(getRecentQuestionIds());
+  const freshItems = items.filter(item => !recent.has(`${prefix}${item.id}`));
+  const source = freshItems.length >= count ? freshItems : items;
+  return source.map((item, index) => ({ item, seen: coverage[`${prefix}${item.id}`] || 0, order: hash(`${seed}-${index}`) }))
     .sort((a, b) => a.seen - b.seen || a.order - b.order).slice(0, count).map(({ item }) => `${prefix}${item.id}`);
 };
 

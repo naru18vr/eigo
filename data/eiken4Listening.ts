@@ -1,3 +1,5 @@
+import { eiken4AdditionalListeningQuestions } from './eiken4AdditionalListening';
+
 export type Eiken4ListeningQuestion = {
   id: string;
   audioText: string;
@@ -9,7 +11,7 @@ export type Eiken4ListeningQuestion = {
   explanation: string;
 };
 
-export const eiken4ListeningQuestions: Eiken4ListeningQuestion[] = [
+const baseEiken4ListeningQuestions: Eiken4ListeningQuestion[] = [
   { id: 'l001', audioText: "Girl: Do you want some orange juice? Boy: Yes, please.", transcript: "Girl: Do you want some orange juice?\nBoy: Yes, please.", translation: "女の子：オレンジジュースはいかがですか。\n男の子：はい、お願いします。", question: "男の子は何を飲みますか？", choices: ['オレンジジュース', '牛乳', '水', 'お茶'], answer: 'オレンジジュース', explanation: 'Yes, please. と答えて、orange juiceを受け取ります。' },
   { id: 'l002', audioText: "Boy: What time does the movie start? Girl: At seven thirty.", transcript: "Boy: What time does the movie start?\nGirl: At seven thirty.", translation: "男の子：映画は何時に始まりますか。\n女の子：7時30分です。", question: "映画は何時に始まりますか？", choices: ['7時', '7時30分', '8時', '8時30分'], answer: '7時30分', explanation: 'at seven thirtyが開始時刻です。' },
   { id: 'l003', audioText: "Mother: Ken, please clean your room before dinner. Ken: Okay, Mom.", transcript: "Mother: Ken, please clean your room before dinner.\nKen: Okay, Mom.", translation: "母：ケン、夕食前に部屋を掃除してください。\nケン：わかったよ。", question: "ケンは夕食前に何をしますか？", choices: ['宿題をする', '部屋を掃除する', '夕食を作る', '買い物に行く'], answer: '部屋を掃除する', explanation: 'clean your room before dinnerに注目します。' },
@@ -47,3 +49,5 @@ export const eiken4ListeningQuestions: Eiken4ListeningQuestion[] = [
   { id:'l035', audioText:'Girl: Which bus goes to the zoo? Boy: Take bus number twelve from this stop.', transcript:'Girl: Which bus goes to the zoo?\nBoy: Take bus number twelve from this stop.', translation:'女の子：どのバスが動物園へ行きますか。\n男の子：この停留所から12番のバスに乗ってください。', question:'動物園へ行くバスは何番ですか？', choices:['2番','10番','12番','20番'], answer:'12番', explanation:'bus number twelveを聞き取ります。' },
   { id:'l036', audioText:'Boy: I am going to the supermarket. Do you need anything? Girl: Yes, please get some milk.', transcript:'Boy: I am going to the supermarket. Do you need anything?\nGirl: Yes, please get some milk.', translation:'男の子：スーパーへ行きます。何か必要ですか。\n女の子：はい、牛乳を買ってください。', question:'女の子は何を頼みましたか？', choices:['卵','パン','牛乳','ジュース'], answer:'牛乳', explanation:'please get some milkが頼んだ物です。' },
 ];
+
+export const eiken4ListeningQuestions: Eiken4ListeningQuestion[] = [...baseEiken4ListeningQuestions, ...eiken4AdditionalListeningQuestions];

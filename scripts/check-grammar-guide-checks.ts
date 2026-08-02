@@ -5,19 +5,23 @@ const errors: string[] = [];
 const videosById = new Map(EIKEN4_GRAMMAR_VIDEOS.map(video => [video.id, video]));
 
 const expectedTopics: Record<string, number> = {
-  future: 4,
-  conjunction: 4,
-  infinitive: 4,
-  modal: 4,
-  comparison: 5,
+  future: 8,
+  conjunction: 8,
+  infinitive: 8,
+  modal: 8,
+  comparison: 10,
 };
+
+if (EIKEN4_GRAMMAR_GUIDE_CHECKS.length < 60) {
+  errors.push(`文法ガイド確認問題が少なすぎる: ${EIKEN4_GRAMMAR_GUIDE_CHECKS.length}`);
+}
 
 if (new Set(EIKEN4_GRAMMAR_GUIDE_CHECKS.map(question => question.id)).size !== EIKEN4_GRAMMAR_GUIDE_CHECKS.length) {
   errors.push('文法ガイド確認問題のIDが重複している');
 }
 
 for (const question of EIKEN4_GRAMMAR_GUIDE_CHECKS) {
-  if (!question.prompt || question.choices.length < 2 || !question.choices.includes(question.correctAnswer)) {
+  if (!question.prompt || !question.explanation || question.choices.length < 2 || new Set(question.choices).size !== question.choices.length || !question.choices.includes(question.correctAnswer)) {
     errors.push(`確認問題の選択肢または正解が不正: ${question.id}`);
   }
   if (question.videoId && !videosById.has(question.videoId)) {
@@ -27,8 +31,8 @@ for (const question of EIKEN4_GRAMMAR_GUIDE_CHECKS) {
 
 for (const [grammarId, expectedCount] of Object.entries(expectedTopics)) {
   const questions = getGrammarGuideCheckQuestions(grammarId);
-  if (questions.length !== expectedCount) {
-    errors.push(`${grammarId}の確認問題が${expectedCount}問ではない: ${questions.length}`);
+  if (questions.length < expectedCount) {
+    errors.push(`${grammarId}の確認問題が${expectedCount}問未満: ${questions.length}`);
   }
   if (questions.some((question, index) => question.order !== index + 1)) {
     errors.push(`${grammarId}の確認問題の順番が連続していない`);

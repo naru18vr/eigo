@@ -1,6 +1,7 @@
 import { eiken4ExamQuestions } from './eiken4ExamQuestions';
 import { getEiken4GrammarCategoryId } from './eiken4GrammarCategories';
 import { eiken4Sentences } from './eiken4Sentences';
+export type { Eiken4ExamQuestion } from './eiken4ExamQuestions';
 
 // 英検4級（中学中級程度）の毎日学習では、中3で扱う文法を新規出題しない。
 const advancedGrammarTags = ['現在完了', '受け身', '関係代名詞'];

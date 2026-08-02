@@ -9,6 +9,8 @@ export interface GrammarGuideCheckQuestion {
   order: number;
 }
 
+import { EIKEN4_ADDITIONAL_GRAMMAR_GUIDE_CHECKS } from './eiken4AdditionalGrammarGuideChecks';
+
 // 文法ガイドの確認問題は、画面ではなくここで単元・動画ごとに管理する。
 export const EIKEN4_GRAMMAR_GUIDE_CHECKS: GrammarGuideCheckQuestion[] = [
   { id: 'basic-01', grammarId: 'basic', prompt: '「私は毎日テニスをします」に合う文は？', choices: ['I play tennis every day.', 'I playing tennis every day.', 'I played tennis every day.'], correctAnswer: 'I play tennis every day.', explanation: '毎日のことは play のように動詞をそのまま使うよ。', order: 1 },
@@ -50,6 +52,8 @@ export const EIKEN4_GRAMMAR_GUIDE_CHECKS: GrammarGuideCheckQuestion[] = [
   { id: 'give-01', grammarId: 'give', prompt: '「彼は私に写真を見せました」に合う文は？', choices: ['He showed me a picture.', 'He showed a picture me.', 'He show me a picture.'], correctAnswer: 'He showed me a picture.', explanation: 'showed + 人(me) + もの(a picture) の順番だよ。', order: 1 },
   { id: 'there-01', grammarId: 'there', prompt: '(　) three students in the room. に入る語は？', choices: ['There is', 'There are', 'It is'], correctAnswer: 'There are', explanation: 'three students は複数なので There are だよ。', order: 1 },
 ];
+
+EIKEN4_GRAMMAR_GUIDE_CHECKS.push(...EIKEN4_ADDITIONAL_GRAMMAR_GUIDE_CHECKS);
 
 export const getGrammarGuideCheckQuestions = (grammarId: string) => EIKEN4_GRAMMAR_GUIDE_CHECKS
   .filter(question => question.grammarId === grammarId)

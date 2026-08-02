@@ -3,6 +3,7 @@ import { eiken4ListeningQuestions } from '../data/eiken4Listening';
 import { eiken4Readings } from '../data/eiken4Readings';
 import { eiken4CoreExamQuestions, eiken4CoreSentences } from '../data/eiken4Curriculum';
 import { DailyQuestion, getQuestionById, localDateKey } from './eiken4DailyService';
+import { getListeningSectionRanges as getRanges, getListeningSectionTitle } from './eiken4QuestionLoader';
 
 export type PrepQuestion = DailyQuestion & { section: string; passage?: string; evidence?: string };
 export type FullMockResult = { id: string; date: string; reading: number; listening: number; readingTotal: 35; listeningTotal: 30; timeUsed: number; answers?: Record<string,string> };
@@ -13,7 +14,8 @@ const PAST_RESULTS_KEY = 'eiken4PastPaperResultsV1';
 const hash = (value: string) => [...value].reduce((sum, char) => Math.imul(sum, 31) + char.charCodeAt(0) | 0, 0) >>> 0;
 const pick = <T,>(items: T[], seed: string, count: number) => items.map((item, index) => ({ item, order: hash(`${seed}-${index}`) })).sort((a, b) => a.order - b.order).slice(0, count).map(({ item }) => item);
 
-export const listeningSection = (index: number) => index < 12 ? '第1部 会話の応答' : index < 24 ? '第2部 会話の内容' : '第3部 説明文の内容';
+export const getListeningSectionRanges = (total = eiken4ListeningQuestions.length) => getRanges(total);
+export const listeningSection = (index: number) => getListeningSectionTitle(index, eiken4ListeningQuestions.length);
 
 export const getFullMock = (seed = localDateKey()): PrepQuestion[] => {
   const basics = [
@@ -26,7 +28,7 @@ export const getFullMock = (seed = localDateKey()): PrepQuestion[] => {
     choices: pick(question.choices, `${seed}-${reading.id}-${index}`, question.choices.length), explanation: question.explanation,
     kind: '長文', section: 'リーディング4 長文読解', passage: reading.passage, evidence: question.evidence,
   })));
-  const selectedListening = [0, 12, 24].flatMap((from, section) => pick(eiken4ListeningQuestions.slice(from, from + 12), `${seed}-listening-${section}`, 10));
+  const selectedListening = getListeningSectionRanges().flatMap((range, section) => pick(eiken4ListeningQuestions.slice(range.from, range.to), `${seed}-listening-${section}`, 10));
   const listening = selectedListening.map(item => {
     const sourceIndex = eiken4ListeningQuestions.findIndex(source => source.id === item.id);
     return { ...getQuestionById(`listening-${item.id}`, seed)!, section: listeningSection(sourceIndex) };

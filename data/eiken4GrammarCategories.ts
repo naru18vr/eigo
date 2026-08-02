@@ -18,7 +18,7 @@ const words = (sentence: Sentence) => sentence.words.join(' ');
 
 // 画面表示・問題データ・学習履歴で共通利用する、表記ゆれのないカテゴリ定義。
 export const EIKEN4_GRAMMAR_CATEGORIES: Eiken4GrammarCategory[] = [
-  { id: 'general-verb', title: '一般動詞', description: '「する・行く」など、動きを表す文', guideTopic: 'basic', matches: sentence => /^(get up|want＋名詞|道案内)$/.test(tag(sentence)) },
+  { id: 'general-verb', title: '一般動詞', description: '「する・行く」など、動きを表す文', guideTopic: 'basic', matches: sentence => /^(get up|want＋名詞|道案内|一般動詞|一般動詞疑問文|一般動詞否定文)$/.test(tag(sentence)) },
   { id: 'past-tense', title: '過去形', description: '昨日したことを表す文', guideTopic: 'past', matches: sentence => /^(過去形|過去形の疑問文|過去形の否定文|不規則動詞)$/.test(tag(sentence)) },
   { id: 'present-progressive', title: '現在進行形', description: '今していることを表す文', guideTopic: 'present-progressive', matches: sentence => tag(sentence) === '現在進行形' },
   { id: 'past-progressive', title: '過去進行形', description: 'そのときしていたことを表す文', guideTopic: 'past', matches: sentence => tag(sentence) === '過去進行形' },

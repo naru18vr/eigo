@@ -4,8 +4,11 @@ import Button from '../components/Button';
 import ArrowLeftIcon from '../components/shared/ArrowLeftIcon';
 import CheckCircleIcon from '../components/shared/CheckCircleIcon';
 import SpeakerWaveIcon from '../components/shared/SpeakerWaveIcon';
-import { getGrammarCategory, getGrammarPracticeQuestions, recordGrammarPracticeAnswer, saveGrammarPracticeResult, type GrammarCategoryId, type GrammarPracticeQuestion } from '../services/eiken4GrammarPracticeService';
+import { getEiken4GrammarCategory as getGrammarCategory, type Eiken4GrammarCategoryId as GrammarCategoryId } from '../data/eiken4GrammarCategories';
+import type { GrammarPracticeQuestion } from '../services/eiken4GrammarPracticeService';
+import { loadGrammarPracticeService } from '../services/eiken4QuestionLoader';
 import { speakText } from '../services/speechService';
+import { rememberQuestionSession } from '../services/eiken4QuestionSessionService';
 import type { DailyAnswer } from '../services/eiken4DailyService';
 import { getNextGrammarCategory, getNextLearningStep, recordLearningGrammarPractice } from '../services/eiken4StepLearningService';
 import { getGrammarLearningState } from '../services/eiken4GrammarProgressService';
@@ -20,29 +23,44 @@ const Eiken4GrammarPracticePage: React.FC = () => {
   const categoryId = (routeCategoryId || new URLSearchParams(location.search).get('category')) as GrammarCategoryId | null;
   const category = getGrammarCategory(categoryId);
   const isReviewMode = new URLSearchParams(location.search).get('mode') === 'review';
-  const makeQuestions = (nextAttempt: string) => {
-    if (!category) return [];
-    if (!isReviewMode) return getGrammarPracticeQuestions(category.id, nextAttempt);
+  const [practiceService, setPracticeService] = useState<Awaited<ReturnType<typeof loadGrammarPracticeService>> | null>(null);
+  const [loadError, setLoadError] = useState(false);
+  const makeQuestions = (nextAttempt: string, service = practiceService) => {
+    if (!category || !service) return [];
+    if (!isReviewMode) return service.getGrammarPracticeQuestions(category.id, nextAttempt);
     const incorrectIds = new Set(getGrammarLearningState(category.id).incorrectQuestionIds);
-    const reviewQuestions = getGrammarPracticeQuestions(category.id, nextAttempt, Number.MAX_SAFE_INTEGER).filter(question => incorrectIds.has(question.id)).slice(0, 10);
-    return reviewQuestions.length ? reviewQuestions : getGrammarPracticeQuestions(category.id, nextAttempt);
+    const reviewQuestions = service.getGrammarPracticeQuestions(category.id, nextAttempt, Number.MAX_SAFE_INTEGER).filter(question => incorrectIds.has(question.id)).slice(0, 10);
+    return reviewQuestions.length ? reviewQuestions : service.getGrammarPracticeQuestions(category.id, nextAttempt);
   };
   const reviewQuestionCount = category && isReviewMode ? getGrammarLearningState(category.id).incorrectQuestionIds.length : 0;
   const [attemptId, setAttemptId] = useState(makeAttemptId);
-  const [questions, setQuestions] = useState<GrammarPracticeQuestion[]>(() => makeQuestions(attemptId));
+  const [questions, setQuestions] = useState<GrammarPracticeQuestion[]>([]);
   const [answers, setAnswers] = useState<DailyAnswer[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
   const [checked, setChecked] = useState(false);
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
+    let active = true;
+    setLoadError(false);
+    loadGrammarPracticeService().then(service => { if (active) setPracticeService(service); }).catch(() => { if (active) setLoadError(true); });
+    return () => { active = false; };
+  }, []);
+
+  useEffect(() => {
+    if (!practiceService) return;
     const nextAttempt = makeAttemptId();
     setAttemptId(nextAttempt);
     setQuestions(makeQuestions(nextAttempt));
     setAnswers([]); setSelected(null); setChecked(false); setSaved(false);
-  }, [categoryId, isReviewMode]);
+  }, [categoryId, isReviewMode, practiceService]);
+
+  useEffect(() => {
+    if (questions.length) rememberQuestionSession(questions.map(question => question.id));
+  }, [questions]);
 
   if (!category) return <div className="flex-grow bg-slate-50 p-4"><main className="mx-auto max-w-xl"><Button onClick={() => navigate('/eiken4/grammar-practice-select')} variant="ghost" size="sm"><ArrowLeftIcon className="mr-2 h-5 w-5" />文法を選ぶ</Button><section className="mt-12 rounded-3xl bg-white p-7 text-center shadow"><h1 className="text-2xl font-extrabold">指定された文法が見つかりませんでした。</h1><p className="mt-3 text-slate-600">文法を選び直してください。</p><Button onClick={() => navigate('/eiken4/grammar-practice-select')} className="mt-6 w-full">文法選択へ戻る</Button><Button onClick={() => navigate('/eiken4')} variant="ghost" className="mt-2 w-full">英検4級トップへ戻る</Button></section></main></div>;
+  if (!practiceService) return <div className="flex-grow bg-slate-50 p-4"><main className="mx-auto max-w-xl"><section className="mt-12 rounded-3xl bg-white p-7 text-center shadow" role="status"><h1 className="text-2xl font-extrabold">問題を準備しているよ…</h1><p className="mt-3 text-slate-600">少し待ってから、もう一度試してね。</p>{loadError && <Button onClick={() => window.location.reload()} className="mt-6 w-full">もう一度読み込む</Button>}</section></main></div>;
   const current = questions[answers.length];
   const finished = answers.length >= questions.length;
   const correctCount = answers.filter(answer => answer.correct).length;
@@ -57,10 +75,10 @@ const Eiken4GrammarPracticePage: React.FC = () => {
     if (!current || !selected || !checked) return;
     const correct = selected === current.answer;
     const nextAnswers = [...answers, { id: current.id, correct }];
-    recordGrammarPracticeAnswer(current.id, correct);
+    practiceService?.recordGrammarPracticeAnswer(current.id, correct);
     setAnswers(nextAnswers); setSelected(null); setChecked(false);
     if (nextAnswers.length === questions.length && !saved) {
-      saveGrammarPracticeResult(category.id, questions.map(question => question.id), nextAnswers);
+      practiceService?.saveGrammarPracticeResult(category.id, questions.map(question => question.id), nextAnswers);
       recordLearningGrammarPractice(category.id, nextAnswers.filter(answer => answer.correct).length, nextAnswers.length);
       setSaved(true);
     }

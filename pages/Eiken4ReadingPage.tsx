@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import ArrowLeftIcon from '../components/shared/ArrowLeftIcon';
 import BookOpenIcon from '../components/shared/BookOpenIcon';
 import SpeakerWaveIcon from '../components/shared/SpeakerWaveIcon';
 import { useAppContext } from '../contexts/AppContext';
-import { getTodayReading, loadReadingProgress, recordReadingAnswer, saveReadingProgress } from '../services/eiken4ReadingService';
-import { loadDailyProgress } from '../services/eiken4DailyService';
+import { loadReadingService } from '../services/eiken4QuestionLoader';
+import type { Eiken4Reading } from '../data/eiken4Readings';
+import type { ReadingProgress } from '../services/eiken4ReadingService';
 import { copyTextToClipboard, createWorksheetShareLink } from '../services/eiken4WorksheetService';
 import { playCorrectSound, playIncorrectSound } from '../services/soundService';
 import { speakText } from '../services/speechService';
@@ -15,14 +16,30 @@ import { createTransfer } from '../services/learningTransferService';
 const Eiken4ReadingPage: React.FC = () => {
   const navigate = useNavigate();
   const { isSoundEnabled } = useAppContext();
-  const reading = getTodayReading();
-  const [progress, setProgress] = useState(loadReadingProgress);
+  const [readingService, setReadingService] = useState<Awaited<ReturnType<typeof loadReadingService>> | null>(null);
+  const [loadError, setLoadError] = useState(false);
+  const [reading, setReading] = useState<Eiken4Reading | null>(null);
+  const [progress, setProgress] = useState<ReadingProgress | null>(null);
   const [selected, setSelected] = useState('');
   const [attempts, setAttempts] = useState(0);
   const [retrying, setRetrying] = useState(false);
   const [resolved, setResolved] = useState(false);
   const [copyStatus, setCopyStatus] = useState<'idle' | 'copying' | 'copied' | 'error'>('idle');
   const [parentMessage, setParentMessage] = useState('');
+  useEffect(() => {
+    let active = true;
+    setLoadError(false);
+    loadReadingService().then(service => {
+      if (!active) return;
+      setReadingService(service);
+      setReading(service.getTodayReading());
+      setProgress(service.loadReadingProgress());
+    }).catch(() => { if (active) setLoadError(true); });
+    return () => { active = false; };
+  }, []);
+
+  if (!readingService || !reading || !progress) return <div className="flex-grow bg-slate-50 p-4"><main className="mx-auto max-w-xl"><section className="mt-12 rounded-3xl bg-white p-7 text-center shadow" role="status"><h1 className="text-2xl font-extrabold">長文を準備しているよ…</h1><p className="mt-3 text-slate-600">少し待ってから、もう一度試してね。</p>{loadError && <Button onClick={() => window.location.reload()} className="mt-6 w-full">もう一度読み込む</Button>}</section></main></div>;
+
   const index = progress.answers.length;
   const complete = index >= reading.questions.length;
   const question = reading.questions[Math.min(index, reading.questions.length - 1)];
@@ -34,14 +51,14 @@ const Eiken4ReadingPage: React.FC = () => {
     const nextAttempts = attempts + 1;
     setAttempts(nextAttempts);
     if (!correct && nextAttempts < 3) { setRetrying(true); return; }
-    recordReadingAnswer(reading.id, correct);
+    readingService.recordReadingAnswer(reading.id, correct);
     setResolved(true);
   };
 
   const nextQuestion = () => {
     const answers = [...progress.answers, selected];
     const next = { ...progress, answers, ...(answers.length === reading.questions.length ? { completedAt: new Date().toISOString() } : {}) };
-    saveReadingProgress(next);
+    readingService.saveReadingProgress(next);
     setProgress(next);
     setSelected('');
     setAttempts(0);
@@ -52,6 +69,7 @@ const Eiken4ReadingPage: React.FC = () => {
   const copyParentMessage = async () => {
     setCopyStatus('copying');
     try {
+      const { loadDailyProgress } = await import('../services/eiken4DailyService');
       const daily = loadDailyProgress();
       const dailyScore = daily.answers.filter(item => item.correct).length;
       const readingScore = reading.questions.filter((item, i) => progress.answers[i] === item.answer).length;

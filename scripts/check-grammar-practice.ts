@@ -1,6 +1,7 @@
 import { getAvailableGrammarCategories, getGrammarCategorySentences, getGrammarPracticeQuestions, loadGrammarPracticeStats, recordGrammarPracticeAnswer, saveGrammarPracticeResult } from '../services/eiken4GrammarPracticeService';
 import { getGrammarLearningState, markGrammarGuideStarted, migrateGrammarStatus } from '../services/eiken4GrammarProgressService';
 import { completeGrammarGuide } from '../services/eiken4StepLearningService';
+import { getRecentQuestionIds, rememberQuestionSession } from '../services/eiken4QuestionSessionService';
 import { eiken4CoreSentences } from '../data/eiken4Curriculum';
 
 const errors: string[] = [];
@@ -31,6 +32,17 @@ for (const category of categories) {
   if (new Set(questions.map(question => question.id)).size !== questions.length) errors.push(`練習内で問題が重複: ${category.id}`);
   if (questions.some(question => !sentences.some(sentence => `sentence-${sentence.id}` === question.id))) errors.push(`別カテゴリの問題が混入: ${category.id}`);
   if (questions.some(question => question.grammarCategory !== category.id)) errors.push(`問題データのカテゴリIDが不正: ${category.id}`);
+}
+
+const dedupeTarget = categories.find(category => category.id === 'general-verb');
+if (dedupeTarget) {
+  const firstSession = getGrammarPracticeQuestions(dedupeTarget.id, 'dedupe-first', 5);
+  rememberQuestionSession(firstSession.map(question => question.id));
+  const secondSession = getGrammarPracticeQuestions(dedupeTarget.id, 'dedupe-second', 5);
+  const recentIds = new Set(getRecentQuestionIds());
+  if (secondSession.some(question => recentIds.has(question.id))) {
+    errors.push('文法別練習で直近セッションの問題が重複している');
+  }
 }
 
 const target = categories.find(category => category.id === 'past-tense');

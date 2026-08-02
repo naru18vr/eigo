@@ -1,3 +1,5 @@
+import { eiken4AdditionalReadings } from './eiken4AdditionalReadings';
+
 export type Eiken4ReadingQuestion = {
   question: string;
   choices: string[];
@@ -15,7 +17,7 @@ export type Eiken4Reading = {
   questions: Eiken4ReadingQuestion[];
 };
 
-export const eiken4Readings: Eiken4Reading[] = [
+const baseEiken4Readings: Eiken4Reading[] = [
   { id: 'r001', type: 'メール', title: 'From: Lucy / To: Aya', passage: "Hi Aya, Thank you for inviting me to your birthday party this Saturday. I will come with my sister, Kate. We will take the 10:15 train and arrive at Midori Station at 10:45. Can you meet us there? We are looking forward to seeing you!", translation: 'アヤへ。今週土曜日の誕生日会に招待してくれてありがとう。妹のケイトと一緒に行きます。10時15分の電車に乗り、10時45分にみどり駅に着きます。そこで会えますか。会えるのを楽しみにしています。', questions: [
     { question: 'ルーシーは誰とパーティーへ行きますか？', choices: ['妹', '母', '友達', '一人'], answer: '妹', evidence: 'I will come with my sister, Kate.', explanation: 'with my sisterから、妹と一緒に行くと分かります。' },
     { question: '二人は何時に駅へ着きますか？', choices: ['10時15分', '10時30分', '10時45分', '11時'], answer: '10時45分', evidence: 'arrive at Midori Station at 10:45', explanation: 'arrive atは「〜に到着する」です。' },
@@ -89,3 +91,5 @@ export const eiken4Readings: Eiken4Reading[] = [
     {question:'清掃作業は何時に終わりましたか？',choices:['1時','2時','3時','5時'],answer:'3時',evidence:'finished at three',explanation:'finished at threeが終了時刻です。'},
   ]},
 ];
+
+export const eiken4Readings: Eiken4Reading[] = [...baseEiken4Readings, ...eiken4AdditionalReadings];

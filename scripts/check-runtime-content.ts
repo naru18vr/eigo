@@ -69,7 +69,7 @@ for (const item of eiken4CoreSentences) {
 for (const item of eiken4CoreExamQuestions) {
   if (advanced.test(item.explanation)) errors.push(`英検4級演習: 範囲外文法 ${item.id}`);
 }
-if (eiken4Words.length < 180) errors.push(`英検4級単語: ${eiken4Words.length}語では不足`);
+if (eiken4Words.length < 300) errors.push(`英検4級単語: ${eiken4Words.length}語では不足`);
 if (new Set(eiken4Words.map(item => item.id)).size !== eiken4Words.length) errors.push('英検4級単語: ID重複');
 if (new Set(eiken4Words.map(item => item.word.toLowerCase())).size !== eiken4Words.length) errors.push('英検4級単語: 見出し語重複');
 
@@ -152,4 +152,5 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`実行時教材チェックOK: ${grades.flat().length} Units / ${grades.flat().reduce((sum, unit) => sum + unit.sentences.length, 0)}問 / 英検4級 ${eiken4CoreSentences.length}並べ替え・${eiken4Words.length}語 / 学年単語 ${Object.values(gradeVocabularyData).reduce((sum, config) => sum + config.words.length, 0)}語`);
+const eiken4QuestionTypes = new Set(eiken4CoreSentences.map(sentence => sentence.questionType || 'legacy'));
+console.log(`実行時教材チェックOK: ${grades.flat().length} Units / ${grades.flat().reduce((sum, unit) => sum + unit.sentences.length, 0)}問 / 英検4級 ${eiken4CoreSentences.length}問・${eiken4QuestionTypes.size}形式・${eiken4Words.length}語 / 学年単語 ${Object.values(gradeVocabularyData).reduce((sum, config) => sum + config.words.length, 0)}語`);

@@ -1,3 +1,5 @@
+import { eiken4AdditionalWords } from './eiken4AdditionalWords';
+
 export type Eiken4Word = {
   id: string;
   word: string;
@@ -7,7 +9,7 @@ export type Eiken4Word = {
   priority: 'A' | 'B' | 'C';
 };
 
-export const eiken4Words: Eiken4Word[] = [
+const baseEiken4Words: Eiken4Word[] = [
   { id: 'w001', word: 'borrow', meaning: '借りる', example: 'Can I borrow your pen?', category: '基本動詞', priority: 'A' },
   { id: 'w002', word: 'share', meaning: '分け合う、共有する', example: 'Let us share this cake.', category: '基本動詞', priority: 'A' },
   { id: 'w003', word: 'use', meaning: '使う', example: 'You can use my pencil.', category: '基本動詞', priority: 'A' },
@@ -189,3 +191,5 @@ export const eiken4Words: Eiken4Word[] = [
   { id:'w179', word:'never', meaning:'一度も～ない', example:'I never walk to school.', category:'副詞', priority:'A' },
   { id:'w180', word:'maybe', meaning:'たぶん、もしかすると', example:'Maybe it will rain tomorrow.', category:'副詞', priority:'B' },
 ];
+
+export const eiken4Words: Eiken4Word[] = [...baseEiken4Words, ...eiken4AdditionalWords];

@@ -1,3 +1,5 @@
+import { eiken4AdditionalExamQuestions } from './eiken4AdditionalExamQuestions';
+
 export type Eiken4ExamQuestion = {
   id: string;
   type: '短文空所補充' | '会話文空所補充' | '語句整序';
@@ -8,7 +10,7 @@ export type Eiken4ExamQuestion = {
   explanation: string;
 };
 
-export const eiken4ExamQuestions: Eiken4ExamQuestion[] = [
+const baseEiken4ExamQuestions: Eiken4ExamQuestion[] = [
   { id:'x001', type:'短文空所補充', prompt:'My sister ( ___ ) dinner for us yesterday.', translation:'姉は昨日、私たちに夕食を作りました。', choices:['cooks','cooked','cooking','cook'], answer:'cooked', explanation:'yesterdayがあるので過去形cookedを使います。' },
   { id:'x002', type:'短文空所補充', prompt:'There ( ___ ) two cats under the table.', translation:'テーブルの下に猫が2匹います。', choices:['is','are','am','be'], answer:'are', explanation:'主語がtwo catsと複数なのでareです。' },
   { id:'x003', type:'短文空所補充', prompt:'I want ( ___ ) a doctor in the future.', translation:'私は将来、医者になりたいです。', choices:['be','to be','being','was'], answer:'to be', explanation:'want to＋動詞の原形で「～したい」です。' },
@@ -40,3 +42,5 @@ export const eiken4ExamQuestions: Eiken4ExamQuestion[] = [
   { id:'x029', type:'語句整序', prompt:'「窓のそばで本を読んでいる少年は私の弟です。」正しい英文は？', choices:['The boy reading a book by the window is my brother.','The boy is reading by the window a book my brother.','Reading the boy a book is my brother by the window.','The window by a book reading boy my brother is.'], answer:'The boy reading a book by the window is my brother.', explanation:'reading以下がThe boyを後ろから説明します。' },
   { id:'x030', type:'語句整序', prompt:'「あなたは何回京都を訪れたことがありますか。」正しい英文は？', choices:['How many times have you visited Kyoto?','How times many you have visited Kyoto?','How have you many times Kyoto visited?','Many times how visited have Kyoto you?'], answer:'How many times have you visited Kyoto?', explanation:'How many times＋現在完了の疑問文の語順です。' },
 ];
+
+export const eiken4ExamQuestions: Eiken4ExamQuestion[] = [...baseEiken4ExamQuestions, ...eiken4AdditionalExamQuestions];

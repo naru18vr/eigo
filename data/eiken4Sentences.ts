@@ -1,6 +1,7 @@
 import { Sentence } from '../types';
+import { eiken4AdditionalSentences } from './eiken4AdditionalSentences';
 
-export const eiken4Sentences: Sentence[] = [
+const baseEiken4Sentences: Sentence[] = [
   {
     id: 'e4s001',
     japaneseQuestion: '私は7時に起きます。',
@@ -242,3 +243,5 @@ export const eiken4Sentences: Sentence[] = [
   { id:'e4s059', japaneseQuestion:'私が家に着いたとき、母は料理をしていました。', words:['When','I','got','home',',','my','mother','was','cooking','.'], grammarTag:'接続詞 when', explanation:'whenで「～したとき」を表します。' },
   { id:'e4s060', japaneseQuestion:'これは私が昨日買った本です。', words:['This','is','the','book','I','bought','yesterday','.'], grammarTag:'関係代名詞の省略', explanation:'the bookの後に説明する文が続きます。' },
 ];
+
+export const eiken4Sentences: Sentence[] = [...baseEiken4Sentences, ...eiken4AdditionalSentences];

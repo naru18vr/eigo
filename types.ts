@@ -6,7 +6,17 @@ export interface Sentence {
   grammarTag: string;
   grammarCategory?: import('./data/eiken4GrammarCategories').Eiken4GrammarCategoryId;
   explanation: string;
+  /** 英検4級の出題形式。既存問題は並べ替えとして扱い、追加問題では形式を明示する。 */
+  questionType?: Eiken4QuestionType;
 }
+
+export type Eiken4QuestionType =
+  | 'reorder'
+  | 'fill-blank'
+  | 'sentence-choice'
+  | 'response'
+  | 'dialogue'
+  | 'error-correction';
 
 export interface Unit {
   id: string;
