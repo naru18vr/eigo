@@ -1,20 +1,15 @@
 import path from 'path';
 import os from 'os';
-import { defineConfig, loadEnv } from 'vite';
+import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
-export default defineConfig(({ mode }) => {
-    const env = loadEnv(mode, '.', '');
+export default defineConfig(() => {
     // Workbox's Terser plugin creates one worker per logical CPU. Some
     // constrained build runners report zero CPUs, so use its safe, unminified
     // fallback there instead of leaving service-worker generation unfinished.
     const workboxMode = os.cpus().length > 0 ? 'production' : 'development';
     return {
       base: '/eigo/',
-      define: {
-        'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
-      },
       plugins: [VitePWA({
         registerType: 'prompt',
         includeAssets: ['eigo-icon.svg','eigo-icon-192.png','eigo-icon-512.png'],
@@ -29,6 +24,15 @@ export default defineConfig(({ mode }) => {
         alias: {
           '@': path.resolve(__dirname, '.'),
         }
-      }
+      },
+      build: {
+        rollupOptions: {
+          output: {
+            manualChunks: {
+              react: ['react', 'react-dom', 'react-router-dom'],
+            },
+          },
+        },
+      },
     };
 });

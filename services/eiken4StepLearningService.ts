@@ -1,7 +1,7 @@
 import { EIKEN4_GRAMMAR_CATEGORIES, type Eiken4GrammarCategoryId } from '../data/eiken4GrammarCategories';
 import { EIKEN4_GRAMMAR_PRACTICE_STATS_KEY, EIKEN4_STEP_LEARNING_KEY } from '../data/eiken4LearningKeys';
 import { safeSetLearningItem } from './storageHealthService';
-import { getGrammarLearningState, markGrammarGuideCompleted } from './eiken4GrammarProgressService';
+import { getGrammarLearningState, loadGrammarProgressSnapshot, markGrammarGuideCompleted, type GrammarProgressSnapshot } from './eiken4GrammarProgressService';
 
 export type LearningStepId = 'step-1' | 'step-2' | 'step-3' | 'step-4' | 'step-5' | 'step-6' | 'step-7';
 export type LearningStepState = 'まだ' | 'がんばり中' | 'できた！' | 'もう一度やろう' | '順番にやろう';
@@ -120,29 +120,29 @@ export const getLearningStep = (stepId: string | undefined) => eiken4LearningSte
 export const getStudiedGrammarIds = () => allAttempted(readData());
 export const getNextLearningActivity = (data = readData()) => data.nextActivity;
 
-export const getLearningStepState = (step: LearningStep, data = readData()): LearningStepState => {
+export const getLearningStepState = (step: LearningStep, data = readData(), grammarSnapshot: GrammarProgressSnapshot = loadGrammarProgressSnapshot()): LearningStepState => {
   const index = eiken4LearningSteps.findIndex(item => item.id === step.id);
   const previous = index > 0 ? eiken4LearningSteps[index - 1] : undefined;
-  const previousDone = !previous || getLearningStepState(previous, data) === 'できた！';
+  const previousDone = !previous || getLearningStepState(previous, data, grammarSnapshot) === 'できた！';
   const unlocked = previousDone || data.allowedStepIds.includes(step.id);
   if (!unlocked) return '順番にやろう';
   const record = recordFor(data, step.id);
   const legacyFinalComplete = data.version === 1 && step.id === 'step-7' && Boolean(data.steps['step-6']?.completedAt);
   if (step.final) return record.completedAt || legacyFinalComplete ? 'できた！' : record.startedAt ? 'がんばり中' : 'まだ';
-  const grammarStates = step.grammarIds.map(getGrammarLearningState);
+  const grammarStates = step.grammarIds.map(id => getGrammarLearningState(id, grammarSnapshot));
   if (grammarStates.every(state => state.status === 'completed')) return 'できた！';
   if (grammarStates.some(state => state.status === 'review-needed')) return 'もう一度やろう';
   if (grammarStates.some(state => state.guideStarted || state.practiced) || record.startedAt) return 'がんばり中';
   return 'まだ';
 };
 
-export const getLearningStepProgress = (step: LearningStep, data = readData()) => {
+export const getLearningStepProgress = (step: LearningStep, data = readData(), grammarSnapshot: GrammarProgressSnapshot = loadGrammarProgressSnapshot()) => {
   const legacyFinalComplete = data.version === 1 && step.id === 'step-7' && Boolean(data.steps['step-6']?.completedAt);
-  return { done: step.final ? Number(Boolean(recordFor(data, step.id).completedAt) || legacyFinalComplete) : step.grammarIds.filter(id => getGrammarLearningState(id).status === 'completed').length, total: step.final ? 1 : step.grammarIds.length };
+  return { done: step.final ? Number(Boolean(recordFor(data, step.id).completedAt) || legacyFinalComplete) : step.grammarIds.filter(id => getGrammarLearningState(id, grammarSnapshot).status === 'completed').length, total: step.final ? 1 : step.grammarIds.length };
 };
 
-export const getNextLearningStep = (data = readData()) =>
-  eiken4LearningSteps.find(step => getLearningStepState(step, data) !== 'できた！' && getLearningStepState(step, data) !== '順番にやろう');
+export const getNextLearningStep = (data = readData(), grammarSnapshot: GrammarProgressSnapshot = loadGrammarProgressSnapshot()) =>
+  eiken4LearningSteps.find(step => getLearningStepState(step, data, grammarSnapshot) !== 'できた！' && getLearningStepState(step, data, grammarSnapshot) !== '順番にやろう');
 
 export const markLearningStepOpened = (stepId: LearningStepId) => {
   const data = readData(); const record = recordFor(data, stepId); const timestamp = now();

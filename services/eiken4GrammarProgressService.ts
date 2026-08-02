@@ -1,5 +1,5 @@
-import { eiken4CoreSentences } from '../data/eiken4Curriculum';
 import { EIKEN4_GRAMMAR_CATEGORIES, type Eiken4GrammarCategoryId } from '../data/eiken4GrammarCategories';
+import { EIKEN4_GRAMMAR_SENTENCE_IDS } from '../data/eiken4GrammarQuestionIndex';
 import { EIKEN4_GRAMMAR_GUIDE_PROGRESS_KEY, EIKEN4_GRAMMAR_PRACTICE_HISTORY_KEY, EIKEN4_GRAMMAR_PRACTICE_STATS_KEY, EIKEN4_REVIEW_SCHEDULE_KEY, EIKEN4_STEP_LEARNING_KEY } from '../data/eiken4LearningKeys';
 import { safeSetLearningItem } from './storageHealthService';
 
@@ -26,6 +26,13 @@ type History = { categoryId?: string; questionIds?: string[]; answers?: { id?: s
 type Review = { id?: string; dueDate?: string; step?: number; resolved?: boolean };
 type StepData = { guideViewedGrammarIds?: string[] };
 export type GrammarGuideProgress = { grammarId: Eiken4GrammarCategoryId; started: boolean; completed: boolean; startedAt?: string; completedAt?: string };
+export type GrammarProgressSnapshot = {
+  stats: Record<string, Stats>;
+  history: History[];
+  reviews: Review[];
+  stepData: StepData;
+  guideProgress: Record<string, GrammarGuideProgress>;
+};
 
 const read = <T,>(key: string, fallback: T): T => {
   if (typeof localStorage === 'undefined') return fallback;
@@ -38,6 +45,14 @@ const today = () => {
 };
 
 const loadGuideProgress = () => read<Record<string, GrammarGuideProgress>>(EIKEN4_GRAMMAR_GUIDE_PROGRESS_KEY, {});
+
+export const loadGrammarProgressSnapshot = (): GrammarProgressSnapshot => ({
+  stats: read<Record<string, Stats>>(EIKEN4_GRAMMAR_PRACTICE_STATS_KEY, {}),
+  history: read<History[]>(EIKEN4_GRAMMAR_PRACTICE_HISTORY_KEY, []),
+  reviews: read<Review[]>(EIKEN4_REVIEW_SCHEDULE_KEY, []),
+  stepData: read<StepData>(EIKEN4_STEP_LEARNING_KEY, {}),
+  guideProgress: loadGuideProgress(),
+});
 
 export const markGrammarGuideStarted = (grammarId: Eiken4GrammarCategoryId) => {
   const progress = loadGuideProgress();
@@ -66,22 +81,22 @@ export const migrateGrammarStatus = (value: unknown): GrammarLearningStatus => {
   return 'not-started';
 };
 
-export const getGrammarLearningState = (grammarId: Eiken4GrammarCategoryId): GrammarLearningState => {
+export const getGrammarLearningState = (grammarId: Eiken4GrammarCategoryId, snapshot = loadGrammarProgressSnapshot()): GrammarLearningState => {
   const valid = EIKEN4_GRAMMAR_CATEGORIES.some(category => category.id === grammarId);
-  const stats = read<Record<string, Stats>>(EIKEN4_GRAMMAR_PRACTICE_STATS_KEY, {})[grammarId] || {};
-  const history = read<History[]>(EIKEN4_GRAMMAR_PRACTICE_HISTORY_KEY, []).filter(item => item?.categoryId === grammarId);
+  const stats = snapshot.stats[grammarId] || {};
+  const history = snapshot.history.filter(item => item?.categoryId === grammarId);
   const latest = history.at(-1);
   const attemptedCount = Number.isFinite(stats.total) ? Math.max(0, stats.total || 0) : 0;
   const correctCount = Number.isFinite(stats.correct) ? Math.min(attemptedCount, Math.max(0, stats.correct || 0)) : 0;
   const accuracy = attemptedCount ? Math.round(correctCount / attemptedCount * 100) : 0;
-  const stepData = read<StepData>(EIKEN4_STEP_LEARNING_KEY, {});
+  const stepData = snapshot.stepData;
   // 旧データは、練習履歴があれば解説も確認済みと安全に推定する。
-  const savedGuide = loadGuideProgress()[grammarId];
+  const savedGuide = snapshot.guideProgress[grammarId];
   const legacyCompleted = Boolean(stepData.guideViewedGrammarIds?.includes(grammarId) || attemptedCount > 0);
   const guideStarted = Boolean(savedGuide?.started || legacyCompleted);
   const guideCompleted = Boolean(savedGuide?.completed || legacyCompleted);
-  const sentenceIds = new Set(eiken4CoreSentences.filter(sentence => sentence.grammarCategory === grammarId).map(sentence => `sentence-${sentence.id}`));
-  const grammarReviews = read<Review[]>(EIKEN4_REVIEW_SCHEDULE_KEY, []).filter(item => Boolean(item?.id && sentenceIds.has(item.id)));
+  const sentenceIds = new Set((EIKEN4_GRAMMAR_SENTENCE_IDS[grammarId] || []).map(id => `sentence-${id}`));
+  const grammarReviews = snapshot.reviews.filter(item => Boolean(item?.id && sentenceIds.has(item.id)));
   const reviewDue = grammarReviews.some(item => Boolean(item.dueDate && item.dueDate <= today()));
   const nextReviewAt = grammarReviews.map(item => item.dueDate).filter((date): date is string => Boolean(date)).sort()[0];
   const latestAnswers = Array.isArray(latest?.answers) ? latest.answers : [];

@@ -1,4 +1,4 @@
-import { isTransferableLearningKey } from './learningTransferService';
+import { isTransferableLearningKey } from './learningKeyPolicy';
 export type StorageHealth={bytes:number;percent:number;invalidKeys:string[];learningKeys:number;status:'ok'|'warning'|'critical'};
 export const getStorageHealth=():StorageHealth=>{if(typeof localStorage==='undefined')return{bytes:0,percent:0,invalidKeys:[],learningKeys:0,status:'ok'};let bytes=0,learningKeys=0;const invalidKeys:string[]=[];for(let i=0;i<localStorage.length;i++){const key=localStorage.key(i);if(!key)continue;const raw=localStorage.getItem(key)||'';bytes+=(key.length+raw.length)*2;if(isTransferableLearningKey(key)){learningKeys++;if((raw.startsWith('{')||raw.startsWith('['))){try{JSON.parse(raw)}catch{invalidKeys.push(key)}}}}const percent=Math.min(100,Math.round(bytes/5_000_000*100));return{bytes,percent,invalidKeys,learningKeys,status:percent>=90?'critical':percent>=70?'warning':'ok'}};
 export const removeInvalidLearningKeys=(keys:string[])=>{if(typeof localStorage==='undefined')return 0;let count=0;keys.forEach(key=>{if(isTransferableLearningKey(key)){localStorage.removeItem(key);count++}});return count};

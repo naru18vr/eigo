@@ -1,4 +1,5 @@
-import { EIKEN4_GRAMMAR_VIDEOS, getEiken4GrammarGuideCategoryId } from '../data/eiken4GrammarVideos';
+import { EIKEN4_GRAMMAR_VIDEOS, getEiken4GrammarGuideCategoryId, getEiken4GrammarVideos } from '../data/eiken4GrammarVideos';
+import { getRequiredGrammarVideoSummaries } from '../data/eiken4GrammarVideoSummary';
 import { EIKEN4_GRAMMAR_VIDEO_PROGRESS_KEY } from '../data/eiken4LearningKeys';
 import { areRequiredGrammarVideosConfirmed, getGrammarVideoProgress, getNextGrammarVideoActivity, getRequiredGrammarVideos, markGrammarVideoConfirmed, markGrammarVideoOpened } from '../services/eiken4GrammarVideoProgressService';
 
@@ -22,6 +23,12 @@ if (EIKEN4_GRAMMAR_VIDEOS.filter(video => video.id === 'passive-question-negativ
 if (new Set(EIKEN4_GRAMMAR_VIDEOS.map(video => video.chapter)).size !== 9) errors.push('章が9章ではない');
 if (EIKEN4_GRAMMAR_VIDEOS.map(video => video.chapter).some((chapter, index, chapters) => index > 0 && chapter < chapters[index - 1])) errors.push('章の順番がそろっていない');
 if (getEiken4GrammarGuideCategoryId('future') !== 'future' || getEiken4GrammarGuideCategoryId('conversation') !== 'modal-verb' || getEiken4GrammarGuideCategoryId('passive') !== 'other-eiken4') errors.push('動画から文法ガイドへの対応が不足');
+
+['future', 'conjunction', 'infinitive', 'modal-verb', 'gerund', 'comparative', 'superlative'].forEach(grammarId => {
+  const fullIds = getEiken4GrammarVideos(grammarId).filter(video => video.required).map(video => video.id);
+  const summaryIds = getRequiredGrammarVideoSummaries(grammarId).map(video => video.id);
+  if (fullIds.join('|') !== summaryIds.join('|')) errors.push(`動画進捗用軽量索引が${grammarId}と一致しない`);
+});
 
 const futureVideos = getRequiredGrammarVideos('future');
 if (futureVideos.length !== 4) errors.push(`未来の必須動画が4本ではない: ${futureVideos.length}`);

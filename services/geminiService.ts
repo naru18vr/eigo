@@ -2,10 +2,14 @@
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 import { Sentence } from '../types';
 
-// The API key MUST be obtained exclusively from the environment variable process.env.API_KEY.
-// Assume this variable is pre-configured, valid, and accessible in the execution context.
-// Initialize GoogleGenAI client directly with process.env.API_KEY.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// API keys must never be bundled into the public learning app. AI features can
+// still be enabled in a trusted runtime that provides process.env.API_KEY.
+const getAiClient = (): GoogleGenAI | null => {
+  const apiKey = typeof process !== 'undefined' ? process.env?.API_KEY : undefined;
+  return apiKey ? new GoogleGenAI({ apiKey }) : null;
+};
+
+const aiUnavailableMessage = 'AI問題作成は現在利用できません。用意されている問題を使って学習を続けてください。';
 
 /**
  * Generates content using the Gemini API.
@@ -14,6 +18,8 @@ const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
  */
 export const generateTextFromGemini = async (prompt: string): Promise<string> => {
   try {
+    const ai = getAiClient();
+    if (!ai) return aiUnavailableMessage;
     const response: GenerateContentResponse = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
       contents: prompt,
@@ -40,6 +46,8 @@ export const generateTextFromGemini = async (prompt: string): Promise<string> =>
  */
 export const generateTextWithSystemInstruction = async (prompt: string, systemInstruction: string): Promise<string> => {
   try {
+    const ai = getAiClient();
+    if (!ai) return aiUnavailableMessage;
     const response: GenerateContentResponse = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: prompt,
@@ -63,6 +71,8 @@ export const generateTextWithSystemInstruction = async (prompt: string, systemIn
  */
 export const getStructuredDataFromGemini = async (promptForJson: string): Promise<object | string> => {
   try {
+    const ai = getAiClient();
+    if (!ai) return aiUnavailableMessage;
     const response: GenerateContentResponse = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: promptForJson,

@@ -1,6 +1,6 @@
-import { EIKEN4_GRAMMAR_VIDEOS, getEiken4GrammarVideos, type Eiken4GrammarVideo } from '../data/eiken4GrammarVideos';
 import type { Eiken4GrammarCategoryId } from '../data/eiken4GrammarCategories';
 import { EIKEN4_GRAMMAR_VIDEO_PROGRESS_KEY } from '../data/eiken4LearningKeys';
+import { EIKEN4_TOTAL_VIDEO_COUNT, getRequiredGrammarVideoSummaries, type Eiken4GrammarVideoSummary } from '../data/eiken4GrammarVideoSummary';
 import { safeSetLearningItem } from './storageHealthService';
 
 export interface GrammarVideoProgress {
@@ -12,7 +12,7 @@ export interface GrammarVideoProgress {
   confirmedAt?: string;
 }
 
-export type GrammarVideoActivity = { kind: 'watch' | 'confirm'; video: Eiken4GrammarVideo };
+export type GrammarVideoActivity = { kind: 'watch' | 'confirm'; video: Eiken4GrammarVideoSummary };
 
 const read = (): Record<string, GrammarVideoProgress> => {
   if (typeof localStorage === 'undefined') return {};
@@ -57,21 +57,19 @@ export const markGrammarVideoConfirmed = (videoId: string, grammarId: string): v
   save(progress);
 };
 
-export const getRequiredGrammarVideos = (grammarId: Eiken4GrammarCategoryId | string) => getEiken4GrammarVideos(grammarId).filter(video => video.required);
+export const getRequiredGrammarVideos = (grammarId: Eiken4GrammarCategoryId | string) => getRequiredGrammarVideoSummaries(grammarId);
 
-export const getNextGrammarVideoActivity = (grammarId: Eiken4GrammarCategoryId | string): GrammarVideoActivity | undefined => {
+export const getNextGrammarVideoActivity = (grammarId: Eiken4GrammarCategoryId | string, snapshot = read()): GrammarVideoActivity | undefined => {
   const required = getRequiredGrammarVideos(grammarId);
-  const progress = read();
-  const unopened = required.find(video => !progress[video.id]?.opened);
+  const unopened = required.find(video => !snapshot[video.id]?.opened);
   if (unopened) return { kind: 'watch', video: unopened };
-  const unconfirmed = required.find(video => !progress[video.id]?.confirmed);
+  const unconfirmed = required.find(video => !snapshot[video.id]?.confirmed);
   return unconfirmed ? { kind: 'confirm', video: unconfirmed } : undefined;
 };
 
-export const areRequiredGrammarVideosConfirmed = (grammarId: Eiken4GrammarCategoryId | string) => {
+export const areRequiredGrammarVideosConfirmed = (grammarId: Eiken4GrammarCategoryId | string, snapshot = read()) => {
   const required = getRequiredGrammarVideos(grammarId);
-  const progress = read();
-  return required.length === 0 || required.every(video => progress[video.id]?.confirmed);
+  return required.length === 0 || required.every(video => snapshot[video.id]?.confirmed);
 };
 
-export const getGrammarVideoCount = () => EIKEN4_GRAMMAR_VIDEOS.length;
+export const getGrammarVideoCount = () => EIKEN4_TOTAL_VIDEO_COUNT;

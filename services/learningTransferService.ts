@@ -1,19 +1,10 @@
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
+import { isTransferableLearningKey } from './learningKeyPolicy';
+export { isTransferableLearningKey } from './learningKeyPolicy';
 
 // Keep the version 1 package shape so links created by older releases remain valid.
 // The additional prefixes cover the original sentence-building course, whose keys
 // do not start with a grade name.
-const PREFIXES = [
-  'eiken4',
-  'grade1',
-  'grade2',
-  'grade3',
-  'setAttemptCount',
-  'setStats',
-  'sentenceMistakeCount',
-];
-const EXACT_KEYS = new Set(['dailyLog', 'sentenceLearningProfileV1']);
-export const isTransferableLearningKey = (key: string) => EXACT_KEYS.has(key) || PREFIXES.some(prefix => key.startsWith(prefix));
 export type TransferPackage = { version: 1; createdAt: string; values: Record<string, string> };
 export const TRANSFER_LINK_WARNING_LENGTH = 12000;
 

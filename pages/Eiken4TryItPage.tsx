@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import ArrowLeftIcon from '../components/shared/ArrowLeftIcon';
@@ -9,7 +9,7 @@ import {
   type Eiken4GrammarVideo,
 } from '../data/eiken4GrammarVideos';
 import {
-  getGrammarVideoProgress,
+  getAllGrammarVideoProgress,
   markGrammarVideoOpened,
 } from '../services/eiken4GrammarVideoProgressService';
 
@@ -25,23 +25,26 @@ const filters: { id: Filter; label: string }[] = [
 
 const chapterNumbers = Array.from(new Set(EIKEN4_GRAMMAR_VIDEOS.map(video => video.chapter))).sort((a, b) => a - b);
 
-const getVideoState = (video: Eiken4GrammarVideo) => {
-  const progress = getGrammarVideoProgress(video.id);
-  if (progress?.confirmed) return '確認できた！';
-  if (progress?.opened) return '開いたよ';
+const getVideoState = (video: Eiken4GrammarVideo, progress: ReturnType<typeof getAllGrammarVideoProgress>) => {
+  const item = progress[video.id];
+  if (item?.confirmed) return '確認できた！';
+  if (item?.opened) return '開いたよ';
   return 'まだ';
 };
 
-const getInitialChapter = () => EIKEN4_GRAMMAR_VIDEOS.find(video => video.required && !getGrammarVideoProgress(video.id)?.confirmed)?.chapter
-  ?? EIKEN4_GRAMMAR_VIDEOS[0]?.chapter
-  ?? 1;
+const getInitialChapter = (progress: ReturnType<typeof getAllGrammarVideoProgress>) => {
+  return EIKEN4_GRAMMAR_VIDEOS.find(video => video.required && !progress[video.id]?.confirmed)?.chapter
+    ?? EIKEN4_GRAMMAR_VIDEOS[0]?.chapter
+    ?? 1;
+};
 
 const Eiken4TryItPage: React.FC = () => {
   const navigate = useNavigate();
   const [filter, setFilter] = useState<Filter>('all');
   const [query, setQuery] = useState('');
-  const [openChapters, setOpenChapters] = useState<Set<number>>(() => new Set([getInitialChapter()]));
-  const [, setVideoRevision] = useState(0);
+  const [videoRevision, setVideoRevision] = useState(0);
+  const progress = useMemo(() => getAllGrammarVideoProgress(), [videoRevision]);
+  const [openChapters, setOpenChapters] = useState<Set<number>>(() => new Set([getInitialChapter(progress)]));
 
   // 別タブの文法ガイドで確認した状態も、一覧へ戻ったときに反映する。
   useEffect(() => {
@@ -55,18 +58,18 @@ const Eiken4TryItPage: React.FC = () => {
   }, []);
 
   const normalizedQuery = query.trim().toLocaleLowerCase();
-  const visibleVideos = EIKEN4_GRAMMAR_VIDEOS.filter(video => {
-    const progress = getGrammarVideoProgress(video.id);
+  const visibleVideos = useMemo(() => EIKEN4_GRAMMAR_VIDEOS.filter(video => {
+    const item = progress[video.id];
     const matchesFilter = filter === 'all'
       || (filter === 'required' && video.required)
       || (filter === 'optional' && !video.required)
-      || (filter === 'unopened' && !progress?.opened)
-      || (filter === 'confirmed' && Boolean(progress?.confirmed));
+      || (filter === 'unopened' && !item?.opened)
+      || (filter === 'confirmed' && Boolean(item?.confirmed));
     const searchable = `${video.title} ${video.chapterTitle} ${video.grammarId}`.toLocaleLowerCase();
     return matchesFilter && (!normalizedQuery || searchable.includes(normalizedQuery));
-  });
-  const requiredVideos = EIKEN4_GRAMMAR_VIDEOS.filter(video => video.required);
-  const confirmedRequiredCount = requiredVideos.filter(video => getGrammarVideoProgress(video.id)?.confirmed).length;
+  }), [filter, normalizedQuery, progress]);
+  const requiredVideos = useMemo(() => EIKEN4_GRAMMAR_VIDEOS.filter(video => video.required), []);
+  const confirmedRequiredCount = useMemo(() => requiredVideos.filter(video => progress[video.id]?.confirmed).length, [progress, requiredVideos]);
   const visibleChapterNumbers = chapterNumbers.filter(chapter => visibleVideos.some(video => video.chapter === chapter));
 
   const toggleChapter = (chapter: number) => {
@@ -121,7 +124,7 @@ const Eiken4TryItPage: React.FC = () => {
               <ChevronRightIcon className={`h-6 w-6 shrink-0 text-slate-500 transition-transform ${open ? 'rotate-90' : ''}`} />
             </button>
             {open && <div className="space-y-3 border-t border-slate-100 p-3 sm:p-4">{videos.map(video => {
-              const state = getVideoState(video);
+              const state = getVideoState(video, progress);
               const guideCategoryId = getEiken4GrammarGuideCategoryId(video.grammarId);
               return <article key={video.id} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
                 <p className="text-xs font-bold text-indigo-700">第{video.chapter}章　{video.chapterTitle}</p>

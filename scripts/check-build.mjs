@@ -6,6 +6,13 @@ const indexFile = files.find(file => /^index-.*\.js$/.test(file) && !file.starts
 const errors = [];
 if (!indexFile) errors.push('初期JavaScriptが見つからない');
 else if (fs.statSync(path.join('dist/assets', indexFile)).size > 300_000) errors.push(`初期JavaScriptが大きすぎる: ${fs.statSync(path.join('dist/assets', indexFile)).size} bytes`);
+const jsFiles = files.filter(file => file.endsWith('.js'));
+const largestJs = jsFiles.map(file => ({ file, bytes: fs.statSync(path.join('dist/assets', file)).size })).sort((left, right) => right.bytes - left.bytes)[0];
+const homeFile = files.find(file => /^Eiken4HomePage-.*\.js$/.test(file));
+if (homeFile) {
+  const homeSource = fs.readFileSync(path.join('dist/assets', homeFile), 'utf8');
+  if (/eiken4Words|eiken4Curriculum|eiken4GrammarVideos|jspdf/.test(homeSource)) errors.push('英検4級トップが大きな教材データまたはPDFを先読みしている');
+}
 if (!fs.existsSync('dist/sw.js')) errors.push('PWA Service Workerがない');
 if (!fs.existsSync('dist/manifest.webmanifest')) errors.push('PWA manifestがない');
 if (!fs.existsSync('dist/eigo-icon-192.png') || !fs.existsSync('dist/eigo-icon-512.png')) errors.push('Android用PNGアイコンがない');
@@ -13,4 +20,6 @@ const manifest = JSON.parse(fs.readFileSync('dist/manifest.webmanifest', 'utf8')
 if (manifest.display !== 'standalone' || !manifest.icons?.length) errors.push('PWA manifestの必須設定がない');
 if (!files.some(file => file.startsWith('Eiken4ListeningFocusPage-'))) errors.push('原因別リスニングが遅延分割されていない');
 if (errors.length) { console.error(errors.join('\n')); process.exit(1); }
-console.log(`公開ビルドチェックOK: 初期JS ${Math.round(fs.statSync(path.join('dist/assets', indexFile)).size / 1024)}KB・PWA・遅延読込`);
+const initialKb = Math.round(fs.statSync(path.join('dist/assets', indexFile)).size / 1024);
+const largestKb = largestJs ? Math.round(largestJs.bytes / 1024) : 0;
+console.log(`公開ビルドチェックOK: 初期JS ${initialKb}KB・最大チャンク ${largestKb}KB (${largestJs?.file || 'なし'})・トップ教材先読みなし・PWA・遅延読込`);

@@ -1,19 +1,20 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import ArrowLeftIcon from '../components/shared/ArrowLeftIcon';
 import { getEiken4GrammarVideos } from '../data/eiken4GrammarVideos';
 import { getAvailableGrammarCategories, getGrammarCategorySentences } from '../services/eiken4GrammarPracticeService';
 import { getGrammarLearningState, getGrammarStatusLabel } from '../services/eiken4GrammarProgressService';
-import { getNextGrammarVideoActivity } from '../services/eiken4GrammarVideoProgressService';
+import { getAllGrammarVideoProgress, getNextGrammarVideoActivity } from '../services/eiken4GrammarVideoProgressService';
 
 const Eiken4GrammarPracticeSelectPage: React.FC = () => {
   const navigate = useNavigate();
   const categories = getAvailableGrammarCategories();
+  const videoProgress = useMemo(() => getAllGrammarVideoProgress(), []);
 
   const openCategory = (category: typeof categories[number]) => {
     const state = getGrammarLearningState(category.id);
-    const videoActivity = getNextGrammarVideoActivity(category.id);
+    const videoActivity = getNextGrammarVideoActivity(category.id, videoProgress);
     if ((!state.guideViewed || videoActivity) && category.guideTopic && !state.guideCompleted) navigate(`/eiken4/grammar-guide/${category.id}`);
     else navigate(`/eiken4/grammar-practice/${category.id}${state.status === 'review-needed' ? '?mode=review' : ''}`);
   };
@@ -32,7 +33,7 @@ const Eiken4GrammarPracticeSelectPage: React.FC = () => {
           const state = getGrammarLearningState(category.id);
           const label = getGrammarStatusLabel(state.status);
           const videos = getEiken4GrammarVideos(category.id);
-          const videoActivity = getNextGrammarVideoActivity(category.id);
+          const videoActivity = getNextGrammarVideoActivity(category.id, videoProgress);
           const stateStyle = state.status === 'completed' ? 'bg-emerald-100 text-emerald-800' : state.status === 'review-needed' ? 'bg-rose-100 text-rose-800' : state.status === 'in-progress' ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-700';
           const action = !state.guideCompleted && videoActivity?.kind === 'watch' ? '動画から始める' : !state.guideCompleted && videoActivity?.kind === 'confirm' ? '確認問題へ進む' : !state.guideViewed ? '説明を見る' : state.status === 'review-needed' ? '復習する' : state.practiced ? 'もう一度練習する' : '練習する';
           const ariaLabel = `${category.title}の${action}。状態は${label}です`;
