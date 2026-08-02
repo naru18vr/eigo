@@ -5,6 +5,7 @@ import ArrowLeftIcon from '../components/shared/ArrowLeftIcon';
 import CheckCircleIcon from '../components/shared/CheckCircleIcon';
 import SpeakerWaveIcon from '../components/shared/SpeakerWaveIcon';
 import { getQuestionById, loadDailyProgress, recordQuestionCoverage, recordReviewAnswer, saveDailyProgress } from '../services/eiken4DailyService';
+import { rememberQuestionSession } from '../services/eiken4QuestionSessionService';
 import { isSpeechSupported, speakText } from '../services/speechService';
 import { useAppContext } from '../contexts/AppContext';
 import { playCorrectSound, playIncorrectSound } from '../services/soundService';
@@ -47,6 +48,10 @@ const Eiken4DailyPage: React.FC = () => {
   const dailyWordCount = progress.questionIds.filter(id => id.startsWith('word-')).length;
   const finalMode = daysUntilExam(getExamDate()) <= 14;
   const nextLearningStep = getNextLearningStep();
+
+  useEffect(() => {
+    if (progress.questionIds.length) rememberQuestionSession(progress.questionIds);
+  }, [progress.date, progress.questionIds.length]);
 
   useEffect(() => {
     setPlayCount(0);

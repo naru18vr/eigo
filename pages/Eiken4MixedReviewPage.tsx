@@ -1,9 +1,10 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Button from '../components/Button';
 import ArrowLeftIcon from '../components/shared/ArrowLeftIcon';
 import CheckCircleIcon from '../components/shared/CheckCircleIcon';
 import { getQuestionById, recordQuestionCoverage, recordReviewAnswer } from '../services/eiken4DailyService';
+import { rememberQuestionSession } from '../services/eiken4QuestionSessionService';
 import { completeLearningStep, getNextLearningStep } from '../services/eiken4StepLearningService';
 import { loadMixedReviewProgress, saveMixedReviewProgress, startMixedReview, type MixedReviewProgress } from '../services/eiken4MixedReviewService';
 import { useAppContext } from '../contexts/AppContext';
@@ -20,6 +21,10 @@ const Eiken4MixedReviewPage: React.FC = () => {
   const current = useMemo(() => currentId ? getQuestionById(currentId, progress.date) : undefined, [currentId, progress.date]);
   const complete = progress.answers.length >= progress.questionIds.length;
   const nextStep = getNextLearningStep();
+
+  useEffect(() => {
+    if (progress.questionIds.length) rememberQuestionSession(progress.questionIds);
+  }, [progress.date, progress.questionIds.length]);
 
   const answer = (choice: string) => {
     if (!current || selected) return;
