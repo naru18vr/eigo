@@ -96,6 +96,12 @@ const Eiken4HomePage: React.FC = () => {
         <Button onClick={recommendation.action} className="mt-4 w-full" size="lg">{recommendation.button}</Button>
       </section>
 
+      <section className="mt-5">
+        <button type="button" onClick={() => navigate('/eiken4/stamp-course')} className="flex min-h-28 w-full items-center justify-between rounded-3xl border-2 border-orange-300 bg-gradient-to-r from-orange-50 to-rose-50 p-5 text-left shadow-sm active:scale-[.99]">
+          <div className="min-w-0"><p className="text-xs font-bold tracking-wider text-orange-600">NEW COURSE</p><h2 className="mt-1 text-xl font-extrabold text-slate-900">🏁 合格スタンプラリー</h2><p className="mt-1 text-sm leading-6 text-slate-600">1・2・3週間から選んで、ゴールまで見えるよ。期間はあとから変えられます。</p><span className="mt-3 inline-flex min-h-11 items-center rounded-xl bg-orange-500 px-4 font-bold text-white">コースを選ぶ</span></div><ChevronRightIcon className="ml-2 h-7 w-7 shrink-0 text-orange-600"/>
+        </button>
+      </section>
+
       <section className="mt-7 rounded-2xl border border-indigo-100 bg-white p-4 shadow-sm">
         <div className="flex items-center justify-between gap-3"><div><p className="text-xs font-bold tracking-wider text-indigo-600">LEARNING FLOW</p><h2 className="mt-1 text-xl font-extrabold text-slate-900">学習の進め方</h2></div><button type="button" onClick={() => setShowLearningFlow(open => !open)} aria-expanded={showLearningFlow} className="min-h-11 shrink-0 rounded-xl border border-indigo-200 px-4 text-sm font-bold text-indigo-700">{showLearningFlow ? '閉じる' : 'ひらく'}</button></div>
         {showLearningFlow && <div className="mt-4 space-y-2">{learningFlow.map(({ icon, title, description }, index) => <React.Fragment key={title}><div className="flex gap-3 rounded-xl bg-indigo-50 p-3"><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-lg" aria-hidden="true">{icon}</span><div><p className="font-bold text-slate-800">{title}</p><p className="mt-1 text-xs leading-5 text-slate-600">{description}</p></div></div>{index < learningFlow.length - 1 && <p className="text-center text-base font-bold text-indigo-300">↓</p>}</React.Fragment>)}</div>}

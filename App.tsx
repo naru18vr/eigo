@@ -29,6 +29,7 @@ const Eiken4WorksheetPage = lazy(() => import('./pages/Eiken4WorksheetPage'));
 const Eiken4WordMapPage = lazy(() => import('./pages/Eiken4WordMapPage'));
 const Grade1DailyReviewPage = lazy(() => import('./pages/Grade1DailyReviewPage'));
 const Eiken4DailyCoursePage = lazy(() => import('./pages/Eiken4DailyCoursePage'));
+const Eiken4StampCoursePage = lazy(() => import('./pages/Eiken4StampCoursePage'));
 const Eiken4GrammarGuidePage = lazy(() => import('./pages/Eiken4GrammarGuidePage'));
 const Eiken4StepLearningPage = lazy(() => import('./pages/Eiken4StepLearningPage'));
 const Eiken4MixedReviewPage = lazy(() => import('./pages/Eiken4MixedReviewPage'));
@@ -89,6 +90,7 @@ const App: React.FC = () => {
             <Route path="/eiken4/word-map" element={<Eiken4WordMapPage />} />
             <Route path="/eiken4/grade1-review" element={<Grade1DailyReviewPage />} />
             <Route path="/eiken4/course" element={<Eiken4DailyCoursePage />} />
+            <Route path="/eiken4/stamp-course" element={<Eiken4StampCoursePage />} />
             <Route path="/eiken4/grammar-guide" element={<Eiken4GrammarGuidePage />} />
             <Route path="/eiken4/grammar-guide/:grammarId" element={<Eiken4GrammarGuidePage />} />
             <Route path="/eiken4/learning-step/:stepId" element={<Eiken4StepLearningPage />} />
