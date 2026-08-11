@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Button from '../components/Button';
 import ArrowLeftIcon from '../components/shared/ArrowLeftIcon';
 import SpeakerWaveIcon from '../components/shared/SpeakerWaveIcon';
@@ -8,9 +8,12 @@ import { getListeningSectionRanges, getListeningSectionTitle, loadListeningQuest
 import { rememberQuestionSession } from '../services/eiken4QuestionSessionService';
 import { speakText } from '../services/speechService';
 import { listeningCauseOptions, recordListeningCause, type ListeningCause } from '../services/eiken4ListeningCauseService';
+import { setEiken4MissionCompleted } from '../services/eiken4StampCourseService';
 
 const Eiken4ListeningPracticePage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const courseMission = searchParams.get('courseMission');
   const [questionBank, setQuestionBank] = useState<Eiken4ListeningQuestion[] | null>(null);
   const [loadError, setLoadError] = useState(false);
   const [section, setSection] = useState<number | null>(null);
@@ -31,11 +34,12 @@ const Eiken4ListeningPracticePage: React.FC = () => {
     return () => { active = false; };
   }, []);
   useEffect(() => { if (questions.length) rememberQuestionSession(questions.map(question => `listening-${question.id}`)); }, [questions]);
+  useEffect(() => { if (section !== null && questions.length > 0 && index >= questions.length) setEiken4MissionCompleted('listening', true); }, [section, index, questions.length]);
 
   const resetQuestion = () => { setSelected(''); setChecked(false); setPlayCount(0); setCause(''); };
   if (!questionBank) return <div className="flex-grow bg-slate-50 p-4"><main className="mx-auto max-w-xl"><section className="mt-12 rounded-3xl bg-white p-7 text-center shadow" role="status"><h1 className="text-2xl font-extrabold">リスニング問題を準備しているよ…</h1><p className="mt-3 text-slate-600">少し待ってから、もう一度試してね。</p>{loadError && <Button onClick={() => window.location.reload()} className="mt-6 w-full">もう一度読み込む</Button>}</section></main></div>;
   if (section === null) return <div className="flex-grow bg-slate-50 p-4"><div className="mx-auto max-w-xl"><Button onClick={() => navigate('/eiken4')} variant="ghost" size="sm"><ArrowLeftIcon className="mr-2 h-5 w-5" />戻る</Button><header className="mt-4 rounded-3xl bg-gradient-to-br from-indigo-700 to-violet-500 p-6 text-white"><p className="text-sm font-bold opacity-80">本番3部構成</p><h1 className="mt-1 text-3xl font-extrabold">リスニング特訓</h1></header><div className="mt-4 space-y-3">{sections.map((item, i) => <button key={item.title} onClick={() => setSection(i)} className="w-full rounded-2xl bg-white p-5 text-left shadow-sm ring-1 ring-slate-200"><p className="text-xs font-bold text-indigo-600">{item.to - item.from}問</p><h2 className="mt-1 text-lg font-bold">{item.title}</h2><p className="mt-1 text-sm text-slate-500">音声2回まで・原因別復習 →</p></button>)}</div></div></div>;
-  if (index >= questions.length) return <div className="flex-grow bg-slate-50 p-4"><section className="mx-auto mt-10 max-w-xl rounded-3xl bg-white p-7 text-center shadow"><p className="font-bold text-indigo-600">{sections[section].title} 完了</p><h1 className="mt-2 text-4xl font-extrabold">{score} / {questions.length}</h1><Button onClick={() => { setSection(null); setIndex(0); setScore(0); resetQuestion(); }} className="mt-6 w-full">別の部を練習</Button></section></div>;
+  if (index >= questions.length) return <div className="flex-grow bg-slate-50 p-4"><section className="mx-auto mt-10 max-w-xl rounded-3xl bg-white p-7 text-center shadow"><p className="font-bold text-indigo-600">{sections[section].title} 完了</p><h1 className="mt-2 text-4xl font-extrabold">{score} / {questions.length}</h1><Button onClick={() => { if (courseMission) navigate('/eiken4/stamp-course'); else { setSection(null); setIndex(0); setScore(0); resetQuestion(); } }} className="mt-6 w-full">{courseMission ? 'スタンプラリーへ戻る' : '別の部を練習'}</Button></section></div>;
 
   const correct = selected === current.answer;
   const audioSupported = typeof window !== 'undefined' && 'speechSynthesis' in window;

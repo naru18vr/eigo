@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Button from '../components/Button';
 import ArrowLeftIcon from '../components/shared/ArrowLeftIcon';
 import { eiken4Words } from '../data/eiken4Words';
@@ -10,6 +10,7 @@ import { useAppContext } from '../contexts/AppContext';
 import { playCorrectSound, playIncorrectSound } from '../services/soundService';
 import { recordWordCardsDone, recordWordMastery } from '../services/eiken4WordMasteryService';
 import { loadWordMastery, masteryLevel } from '../services/eiken4WordMasteryService';
+import { setEiken4MissionCompleted } from '../services/eiken4StampCourseService';
 
 const CARD_COUNT = 8;
 
@@ -24,6 +25,8 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 
 const Eiken4WordCardsPage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const courseMission = searchParams.get('courseMission');
   const { completeWords } = useEiken4Session();
   const { isSoundEnabled } = useAppContext();
   const words = useMemo(() => {
@@ -49,6 +52,7 @@ const Eiken4WordCardsPage: React.FC = () => {
     if (isLast) {
       completeWords(words.length, nextKnown, nextReview, words.map(word => word.id));
       recordWordCardsDone();
+      setEiken4MissionCompleted('word-cards', true);
       setKnownCount(nextKnown);
       setReviewWords(nextReview);
       setIsComplete(true);
@@ -97,8 +101,8 @@ const Eiken4WordCardsPage: React.FC = () => {
             </div>
 
             <div className="space-y-3">
-              <Button onClick={() => navigate('/eiken4/words/quiz')} variant="primary" size="lg" className="w-full">
-                同じ8語の確認テストへ
+              <Button onClick={() => navigate(courseMission ? '/eiken4/stamp-course' : '/eiken4/words/quiz')} variant="primary" size="lg" className="w-full">
+                {courseMission ? 'スタンプラリーへ戻る' : '同じ8語の確認テストへ'}
               </Button>
               <Button onClick={restartCards} variant="secondary" size="lg" className="w-full">
                 もう一度カードを見る

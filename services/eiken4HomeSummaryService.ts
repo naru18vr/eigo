@@ -32,3 +32,16 @@ export const getLightweightDailyLearningReadiness = () => {
 };
 
 export const getLightweightDueReviewCount = () => getLightweightDailyLearningReadiness().dueReviewCount;
+
+/** スタンプラリーの詳細データを読み込まず、トップ表示に必要な数だけ取得します。 */
+export const getLightweightStampCourseSummary = () => {
+  if (typeof localStorage === 'undefined') return { selected: false, duration: undefined, completedCount: 0 } as const;
+  try {
+    const value = JSON.parse(localStorage.getItem('eiken4StampCourseV1') || 'null') as { duration?: unknown; completedMissionIds?: unknown } | null;
+    const duration = value?.duration === 7 || value?.duration === 14 || value?.duration === 21 ? value.duration : undefined;
+    const completedCount = Array.isArray(value?.completedMissionIds) ? new Set(value.completedMissionIds.filter(id => typeof id === 'string')).size : 0;
+    return { selected: Boolean(duration), duration, completedCount };
+  } catch {
+    return { selected: false, duration: undefined, completedCount: 0 } as const;
+  }
+};

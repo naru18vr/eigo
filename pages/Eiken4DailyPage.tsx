@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Button from '../components/Button';
 import ArrowLeftIcon from '../components/shared/ArrowLeftIcon';
 import CheckCircleIcon from '../components/shared/CheckCircleIcon';
@@ -21,6 +21,8 @@ import { getNextLearningStep } from '../services/eiken4StepLearningService';
 
 const Eiken4DailyPage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const courseMission = searchParams.get('courseMission');
   const { isSoundEnabled } = useAppContext();
   const [progress, setProgress] = useState(loadDailyProgress);
   const [selected, setSelected] = useState<string | null>(null);
@@ -161,8 +163,8 @@ const Eiken4DailyPage: React.FC = () => {
             </Button>
             {pdfStatus === 'error' && <p className="text-sm text-rose-700 font-bold mt-2">PDFを作れませんでした。Chromeで開き直してお試しください。</p>}
           </div>
-          <Button onClick={() => navigate('/eiken4/reading')} className="mt-7 w-full">続けて今日のミニ長文へ</Button>
-          <Button onClick={() => navigate('/eiken4')} variant="ghost" className="mt-2 w-full">英検4級ホームへ</Button>
+          <Button onClick={() => navigate(courseMission ? '/eiken4/stamp-course' : '/eiken4/reading')} className="mt-7 w-full">{courseMission ? 'スタンプラリーへ戻る' : '続けて今日のミニ長文へ'}</Button>
+          {!courseMission && <Button onClick={() => navigate('/eiken4')} variant="ghost" className="mt-2 w-full">英検4級ホームへ</Button>}
         </div>
       </div>
     );

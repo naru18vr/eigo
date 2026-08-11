@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Button from '../components/Button';
 import ArrowLeftIcon from '../components/shared/ArrowLeftIcon';
 import { useAppContext } from '../contexts/AppContext';
@@ -9,9 +9,12 @@ import type { Eiken4ExamQuestion } from '../data/eiken4Curriculum';
 import type { ExamPracticeResult } from '../services/eiken4ExamService';
 import { playCorrectSound, playIncorrectSound } from '../services/soundService';
 import Eiken4GrammarReference from '../components/Eiken4GrammarReference';
+import { completeEiken4MissionForPath } from '../services/eiken4StampCourseService';
 
 const Eiken4ExamPracticePage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const courseMission = searchParams.get('courseMission');
   const { isSoundEnabled } = useAppContext();
   const [examService, setExamService] = useState<Awaited<ReturnType<typeof loadExamService>> | null>(null);
   const [loadError, setLoadError] = useState(false);
@@ -24,10 +27,11 @@ const Eiken4ExamPracticePage: React.FC = () => {
       if (!active) return;
       setExamService(service);
       setQuestions(service.getDailyExamQuestions());
-      setProgress(service.loadExamPractice());
+      const saved = service.loadExamPractice();
+      setProgress(courseMission && saved.courseMissionId !== courseMission ? { date: saved.date, answers: {}, courseMissionId: courseMission } : saved);
     }).catch(() => { if (active) setLoadError(true); });
     return () => { active = false; };
-  }, []);
+  }, [courseMission]);
   useEffect(() => { if (questions.length) rememberQuestionSession(questions.map(question => `exam-${question.id}`)); }, [questions]);
   const [selected, setSelected] = useState('');
   const [checked, setChecked] = useState(false);
@@ -52,6 +56,7 @@ const Eiken4ExamPracticePage: React.FC = () => {
     const answers = { ...progress.answers, [current.id]: selected };
     const nextProgress = { ...progress, answers, ...(Object.keys(answers).length === questions.length ? { completedAt: new Date().toISOString() } : {}) };
     examService.saveExamPractice(nextProgress);
+    if (nextProgress.completedAt) completeEiken4MissionForPath(courseMission, '/eiken4/exam-practice');
     setProgress(nextProgress);
     setSelected('');
     setChecked(false);
@@ -63,7 +68,7 @@ const Eiken4ExamPracticePage: React.FC = () => {
 
   if (complete) {
     const score = questions.filter(question => progress.answers[question.id] === question.answer).length;
-    return <div className="flex-grow container mx-auto p-4 max-w-xl"><div className="mt-12 rounded-2xl bg-white shadow-xl p-7 text-center"><p className="font-bold text-emerald-700">本番形式トレーニング完了</p><h1 className="text-4xl font-bold mt-2">{score} / {questions.length}問</h1><Button onClick={() => navigate('/eiken4')} className="w-full mt-6">英検4級ホームへ</Button></div></div>;
+    return <div className="flex-grow container mx-auto p-4 max-w-xl"><div className="mt-12 rounded-2xl bg-white shadow-xl p-7 text-center"><p className="font-bold text-emerald-700">本番形式トレーニング完了</p><h1 className="text-4xl font-bold mt-2">{score} / {questions.length}問</h1><Button onClick={() => navigate(courseMission ? '/eiken4/stamp-course' : '/eiken4')} className="w-full mt-6">{courseMission ? 'スタンプラリーへ戻る' : '英検4級ホームへ'}</Button></div></div>;
   }
 
   return <div className="flex-grow container mx-auto p-4 max-w-xl">

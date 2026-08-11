@@ -11,7 +11,7 @@ const ATTEMPT_KEY = 'eiken4MockAttemptV1';
 
 export type MockQuestion = DailyQuestion & { section: string; passage?: string; translation?: string; evidence?: string };
 export type MockResult = { week: string; score: number; total: number; answers: Record<string, string>; completedAt: string; timeUsed: number };
-export type MockAttempt = { week: string; index: number; remaining: number; answers: Record<string, string>; plays: Record<string, number> };
+export type MockAttempt = { week: string; index: number; remaining: number; answers: Record<string, string>; plays: Record<string, number>; missionId?: string };
 
 export const weekKey = () => {
   const date = new Date();
@@ -27,8 +27,8 @@ const hash = (value: string) => {
 };
 const pick = <T,>(items: T[], seed: string, count: number) => items.map((item, i) => ({ item, n: hash(`${seed}-${i}`) })).sort((a, b) => a.n - b.n).slice(0, count).map(x => x.item);
 
-export const getWeeklyMock = (): MockQuestion[] => {
-  const week = weekKey();
+export const getWeeklyMock = (seed = weekKey()): MockQuestion[] => {
+  const week = seed;
   const ids = [
     ...pick(eiken4Words, `${week}-w`, 5).map(x => `word-${x.id}`),
     ...pick(eiken4CoreSentences, `${week}-s`, 2).map(x => `sentence-${x.id}`),
@@ -77,11 +77,11 @@ export const saveMockResult = (result: MockResult) => {
   }
   recordEiken4Activity('mock');
 };
-export const loadMockAttempt = (): MockAttempt | null => {
+export const loadMockAttempt = (missionId?: string): MockAttempt | null => {
   if (typeof localStorage === 'undefined') return null;
   try {
     const attempt = JSON.parse(localStorage.getItem(ATTEMPT_KEY) || 'null') as MockAttempt | null;
-    return attempt?.week === weekKey() ? attempt : null;
+    return attempt?.week === weekKey() && attempt.missionId === missionId ? attempt : null;
   } catch { return null; }
 };
 export const saveMockAttempt = (attempt: MockAttempt) => { if (typeof localStorage !== 'undefined') localStorage.setItem(ATTEMPT_KEY, JSON.stringify(attempt)); };

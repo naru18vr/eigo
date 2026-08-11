@@ -7,6 +7,7 @@ import { getStudiedGrammarIds } from './eiken4StepLearningService';
 import { EIKEN4_REVIEW_SCHEDULE_KEY } from '../data/eiken4LearningKeys';
 import { getRecentQuestionIds, rememberQuestionSession } from './eiken4QuestionSessionService';
 import type { Eiken4QuestionType } from '../types';
+import { setEiken4MissionCompleted } from './eiken4StampCourseService';
 
 export const EIKEN4_DAILY_KEY = 'eiken4DailyProgressV4';
 const REVIEW_KEY = EIKEN4_REVIEW_SCHEDULE_KEY;
@@ -282,7 +283,7 @@ export const loadDailyProgress = (): DailyProgress => {
 
 export const saveDailyProgress = (progress: DailyProgress) => {
   if (typeof localStorage !== 'undefined') safeSetLearningItem(EIKEN4_DAILY_KEY, JSON.stringify(progress));
-  if (progress.completedAt) recordEiken4Activity('daily', progress.date);
+  if (progress.completedAt) { recordEiken4Activity('daily', progress.date); setEiken4MissionCompleted('daily-review', true); }
 };
 
 export const resetTodayDailyProgress = () => {

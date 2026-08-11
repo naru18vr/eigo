@@ -9,7 +9,7 @@ import ClockIcon from '../components/shared/ClockIcon';
 import { useEiken4Session } from '../contexts/Eiken4SessionContext';
 import { getEiken4GrammarCategory as getGrammarCategory } from '../data/eiken4GrammarCategories';
 import { getGrammarLearningState, loadGrammarProgressSnapshot } from '../services/eiken4GrammarProgressService';
-import { getLightweightDailyLearningReadiness } from '../services/eiken4HomeSummaryService';
+import { getLightweightDailyLearningReadiness, getLightweightStampCourseSummary } from '../services/eiken4HomeSummaryService';
 import { getAllGrammarVideoProgress, getNextGrammarVideoActivity } from '../services/eiken4GrammarVideoProgressService';
 import { allowLearningStepStart, eiken4LearningSteps, getLearningStepProgress, getLearningStepState, getNextLearningActivity, getNextLearningStep, type LearningStep } from '../services/eiken4StepLearningService';
 
@@ -45,6 +45,7 @@ const Eiken4HomePage: React.FC = () => {
   const nextStep = getNextLearningStep(undefined, grammarProgress);
   const nextActivity = getNextLearningActivity();
   const dailyReadiness = useMemo(() => getLightweightDailyLearningReadiness(), []);
+  const stampCourse = useMemo(() => getLightweightStampCourseSummary(), []);
   const dueReviewCount = dailyReadiness.dueReviewCount;
   const activityCategory = nextActivity ? getGrammarCategory(nextActivity.categoryId) : undefined;
   const activeIndex = nextStep ? eiken4LearningSteps.findIndex(step => step.id === nextStep.id) : eiken4LearningSteps.length - 1;
@@ -98,7 +99,7 @@ const Eiken4HomePage: React.FC = () => {
 
       <section className="mt-5">
         <button type="button" onClick={() => navigate('/eiken4/stamp-course')} className="flex min-h-28 w-full items-center justify-between rounded-3xl border-2 border-orange-300 bg-gradient-to-r from-orange-50 to-rose-50 p-5 text-left shadow-sm active:scale-[.99]">
-          <div className="min-w-0"><p className="text-xs font-bold tracking-wider text-orange-600">NEW COURSE</p><h2 className="mt-1 text-xl font-extrabold text-slate-900">🏁 合格スタンプラリー</h2><p className="mt-1 text-sm leading-6 text-slate-600">1・2・3週間から選んで、ゴールまで見えるよ。期間はあとから変えられます。</p><span className="mt-3 inline-flex min-h-11 items-center rounded-xl bg-orange-500 px-4 font-bold text-white">コースを選ぶ</span></div><ChevronRightIcon className="ml-2 h-7 w-7 shrink-0 text-orange-600"/>
+          <div className="min-w-0"><p className="text-xs font-bold tracking-wider text-orange-600">{stampCourse.selected ? `${stampCourse.duration}日コース・${stampCourse.completedCount}/27` : 'NEW COURSE'}</p><h2 className="mt-1 text-xl font-extrabold text-slate-900">🏁 合格スタンプラリー</h2><p className="mt-1 text-sm leading-6 text-slate-600">{stampCourse.selected ? `スタンプ${stampCourse.completedCount}こ。ゴールまで、つづきから進めよう。` : '1・2・3週間から選んで、ゴールまで見えるよ。期間はあとから変えられます。'}</p><span className="mt-3 inline-flex min-h-11 items-center rounded-xl bg-orange-500 px-4 font-bold text-white">{stampCourse.selected ? 'つづきから' : 'コースを選ぶ'}</span></div><ChevronRightIcon className="ml-2 h-7 w-7 shrink-0 text-orange-600"/>
         </button>
       </section>
 

@@ -9,6 +9,7 @@ import { completeLearningStep, getNextLearningStep } from '../services/eiken4Ste
 import { loadMixedReviewProgress, saveMixedReviewProgress, startMixedReview, type MixedReviewProgress } from '../services/eiken4MixedReviewService';
 import { useAppContext } from '../contexts/AppContext';
 import { playCorrectSound, playIncorrectSound } from '../services/soundService';
+import { setEiken4MissionCompleted } from '../services/eiken4StampCourseService';
 
 const Eiken4MixedReviewPage: React.FC = () => {
   const navigate = useNavigate();
@@ -42,6 +43,7 @@ const Eiken4MixedReviewPage: React.FC = () => {
     const nextProgress = { ...progress, answers: [...progress.answers, { id: current.id, correct }] };
     if (nextProgress.answers.length >= nextProgress.questionIds.length) {
       nextProgress.completedAt = new Date().toISOString();
+      setEiken4MissionCompleted('mixed-review', true);
       if (searchParams.get('step') === '7') completeLearningStep('step-7');
     }
     saveMixedReviewProgress(nextProgress);
@@ -62,7 +64,7 @@ const Eiken4MixedReviewPage: React.FC = () => {
     const correct = progress.answers.filter(answer => answer.correct).length;
     const incorrect = progress.answers.filter(answer => !answer.correct);
     const accuracy = Math.round((correct / progress.questionIds.length) * 100);
-    return <div className="flex-grow bg-gradient-to-b from-cyan-50 to-white p-4 sm:p-6"><main className="mx-auto max-w-xl"><section className="mt-8 rounded-3xl bg-white p-6 text-center shadow"><CheckCircleIcon className="mx-auto h-16 w-16 text-emerald-500"/><p className="mt-4 font-bold text-cyan-700">習った文法のまとめ問題</p><h1 className="mt-2 text-3xl font-extrabold text-slate-900">{correct} / {progress.questionIds.length} 問正解</h1><p className="mt-2 text-lg font-bold text-slate-700">正答率 {accuracy}%</p><p className="mt-4 leading-7 text-slate-600">{accuracy >= 80 ? 'よくできました！ 次は今日の復習で、覚えたことを確かめよう。' : 'ここまでよくがんばったね。間違えた問題の説明を見て、もう一度やってみよう。'}</p>{incorrect.length > 0 && <div className="mt-6 text-left"><h2 className="font-extrabold text-slate-900">もう一度見よう</h2><div className="mt-3 space-y-3">{incorrect.map(answer => { const question = getQuestionById(answer.id, progress.date); return question && <article key={answer.id} className="rounded-xl border border-amber-200 bg-amber-50 p-4"><p className="font-bold text-slate-900">{question.prompt}</p><p className="mt-2 text-sm text-amber-950">正解：{question.answer}</p>{question.explanation && <p className="mt-2 text-sm leading-6 text-slate-700">{question.explanation}</p>}</article>; })}</div></div>}<Button onClick={retry} className="mt-7 w-full" size="lg">もう一度まぜて練習する</Button><Button onClick={() => navigate('/eiken4/daily')} variant="secondary" className="mt-2 w-full">今日の復習問題へ</Button><Button onClick={() => navigate('/eiken4')} variant="ghost" className="mt-2 w-full">英検4級トップへ戻る</Button></section></main></div>;
+    return <div className="flex-grow bg-gradient-to-b from-cyan-50 to-white p-4 sm:p-6"><main className="mx-auto max-w-xl"><section className="mt-8 rounded-3xl bg-white p-6 text-center shadow"><CheckCircleIcon className="mx-auto h-16 w-16 text-emerald-500"/><p className="mt-4 font-bold text-cyan-700">習った文法のまとめ問題</p><h1 className="mt-2 text-3xl font-extrabold text-slate-900">{correct} / {progress.questionIds.length} 問正解</h1><p className="mt-2 text-lg font-bold text-slate-700">正答率 {accuracy}%</p><p className="mt-4 leading-7 text-slate-600">{accuracy >= 80 ? 'よくできました！ 次は今日の復習で、覚えたことを確かめよう。' : 'ここまでよくがんばったね。間違えた問題の説明を見て、もう一度やってみよう。'}</p>{incorrect.length > 0 && <div className="mt-6 text-left"><h2 className="font-extrabold text-slate-900">もう一度見よう</h2><div className="mt-3 space-y-3">{incorrect.map(answer => { const question = getQuestionById(answer.id, progress.date); return question && <article key={answer.id} className="rounded-xl border border-amber-200 bg-amber-50 p-4"><p className="font-bold text-slate-900">{question.prompt}</p><p className="mt-2 text-sm text-amber-950">正解：{question.answer}</p>{question.explanation && <p className="mt-2 text-sm leading-6 text-slate-700">{question.explanation}</p>}</article>; })}</div></div>}<Button onClick={retry} className="mt-7 w-full" size="lg">もう一度まぜて練習する</Button>{searchParams.get('courseMission') ? <Button onClick={() => navigate('/eiken4/stamp-course')} variant="secondary" className="mt-2 w-full">スタンプラリーへ戻る</Button> : <><Button onClick={() => navigate('/eiken4/daily')} variant="secondary" className="mt-2 w-full">今日の復習問題へ</Button><Button onClick={() => navigate('/eiken4')} variant="ghost" className="mt-2 w-full">英検4級トップへ戻る</Button></>}</section></main></div>;
   }
 
   const correct = selected === current.answer;

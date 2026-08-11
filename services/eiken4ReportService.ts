@@ -1,6 +1,8 @@
 import type { DailyProgress } from './eiken4DailyService';
 import type { ReadingProgress } from './eiken4ReadingService';
 import type { Grade1ReviewProgress } from './grade1ReviewService';
+import { EIKEN4_STAMP_MISSIONS } from '../data/eiken4StampCourse';
+import { loadEiken4StampCourse } from './eiken4StampCourseService';
 
 type DailyReportInput = {
   daily: DailyProgress;
@@ -15,6 +17,7 @@ type DailyReportInput = {
 };
 
 export const createParentDailyReport = ({ daily, reading, grade1, readingTotal, readingCorrect, completedSteps, weaknessNames, transferCode, transferLink }: DailyReportInput) => {
+  const courseProgress = loadEiken4StampCourse();
   const dailyCorrect = daily.answers.filter(answer => answer.correct).length;
   const grade1Correct = grade1.answers.filter(Boolean).length;
   const strengths = [
@@ -25,6 +28,7 @@ export const createParentDailyReport = ({ daily, reading, grade1, readingTotal, 
   return `【今日の英検4級】
 日付：${daily.date.replaceAll('-', '/')}
 進み具合：${completedSteps}/5ステップ
+合格スタンプラリー：${courseProgress.completedMissionIds.length}/${EIKEN4_STAMP_MISSIONS.length}
 今日の15分：${daily.answers.length ? `${dailyCorrect}/${daily.questionIds.length}問` : '未実施'}
 ミニ長文：${reading.answers.length ? `${readingCorrect}/${readingTotal}問` : '未実施'}
 中1復習：${grade1.answers.length ? `${grade1Correct}/10問` : '未実施'}

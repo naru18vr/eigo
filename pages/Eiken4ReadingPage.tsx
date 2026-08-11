@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Button from '../components/Button';
 import ArrowLeftIcon from '../components/shared/ArrowLeftIcon';
 import BookOpenIcon from '../components/shared/BookOpenIcon';
@@ -12,9 +12,12 @@ import { copyTextToClipboard, createWorksheetShareLink } from '../services/eiken
 import { playCorrectSound, playIncorrectSound } from '../services/soundService';
 import { speakText } from '../services/speechService';
 import { createTransfer } from '../services/learningTransferService';
+import { completeEiken4MissionForPath } from '../services/eiken4StampCourseService';
 
 const Eiken4ReadingPage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const courseMission = searchParams.get('courseMission');
   const { isSoundEnabled } = useAppContext();
   const [readingService, setReadingService] = useState<Awaited<ReturnType<typeof loadReadingService>> | null>(null);
   const [loadError, setLoadError] = useState(false);
@@ -59,6 +62,7 @@ const Eiken4ReadingPage: React.FC = () => {
     const answers = [...progress.answers, selected];
     const next = { ...progress, answers, ...(answers.length === reading.questions.length ? { completedAt: new Date().toISOString() } : {}) };
     readingService.saveReadingProgress(next);
+    if (next.completedAt) completeEiken4MissionForPath(courseMission, '/eiken4/reading');
     setProgress(next);
     setSelected('');
     setAttempts(0);
@@ -98,8 +102,8 @@ const Eiken4ReadingPage: React.FC = () => {
       <p className="font-bold text-slate-700 mt-4">全文和訳</p><p className="text-slate-700 leading-7 mt-1">{reading.translation}</p>
       <div className="mt-5 space-y-4">{reading.questions.map((item, i) => <div key={item.question} className="rounded-lg bg-white p-4"><p className="font-bold">{i + 1}. {progress.answers[i] === item.answer ? '正解' : `正解：${item.answer}`}</p><p className="text-sm text-sky-800 mt-2">根拠：“{item.evidence}”</p><p className="text-sm text-slate-600 mt-1">{item.explanation}</p></div>)}</div>
       <div className="mt-5 rounded-xl bg-amber-50 border border-amber-200 p-4"><p className="font-bold text-amber-900">保護者へ完了報告</p><p className="text-sm text-amber-900 mt-1">類似長文を含む印刷リンクをGoogle Chatへ送れます。</p><Button onClick={copyParentMessage} disabled={copyStatus === 'copying'} className="w-full mt-3">{copyStatus === 'copying' ? 'コピー中…' : copyStatus === 'copied' ? 'コピーしました！' : '結果と印刷リンクをコピー'}</Button>{copyStatus === 'copied' && <p className="text-sm text-emerald-700 font-bold mt-2">コピーしました！ Google Chatに貼り付けてください。</p>}{copyStatus === 'error' && <><p className="text-sm text-rose-700 font-bold mt-2">自動コピーできませんでした。下の文章を長押ししてコピーしてください。</p><textarea readOnly value={parentMessage} onFocus={event => event.currentTarget.select()} className="mt-2 w-full h-36 rounded-lg border border-amber-300 bg-white p-2 text-xs text-slate-700" aria-label="Google Chatへ送る文章" /></>}</div>
-      <Button onClick={() => navigate('/eiken4/words')} className="w-full mt-5">次は英単語カードへ</Button>
-      <Button onClick={() => navigate('/eiken4/course')} variant="ghost" className="w-full mt-2">コース一覧を見る</Button>
+      <Button onClick={() => navigate(courseMission ? '/eiken4/stamp-course' : '/eiken4/words')} className="w-full mt-5">{courseMission ? 'スタンプラリーへ戻る' : '次は英単語カードへ'}</Button>
+      {!courseMission && <Button onClick={() => navigate('/eiken4/course')} variant="ghost" className="w-full mt-2">コース一覧を見る</Button>}
     </section>}
   </div>;
 };

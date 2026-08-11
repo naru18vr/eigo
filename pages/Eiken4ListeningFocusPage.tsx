@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Button from '../components/Button';
 import ArrowLeftIcon from '../components/shared/ArrowLeftIcon';
 import SpeakerWaveIcon from '../components/shared/SpeakerWaveIcon';
@@ -7,6 +7,7 @@ import { eiken4ListeningQuestions } from '../data/eiken4Listening';
 import { getTopListeningCause } from '../services/eiken4ListeningCauseService';
 import { speakText } from '../services/speechService';
 import { recordReviewAnswer } from '../services/eiken4DailyService';
+import { setEiken4MissionCompleted } from '../services/eiken4StampCourseService';
 
 const tipFor = (cause: string) => cause === '単語を知らなかった' ? '音声の前後にある名詞・動詞を1語ずつ拾おう。'
   : cause === '音がつながって聞こえた' ? '最初はゆっくり、次は本番速度で同じ文を聞こう。'
@@ -18,6 +19,8 @@ const matchesCause = (audio: string, cause: string) => cause === '疑問詞を�
 
 const Eiken4ListeningFocusPage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const courseMission = searchParams.get('courseMission');
   const cause = getTopListeningCause() || '選択肢を読むのが遅かった';
   const questions = useMemo(() => {
     const matched = eiken4ListeningQuestions.filter(item => matchesCause(item.audioText, cause));
@@ -25,7 +28,8 @@ const Eiken4ListeningFocusPage: React.FC = () => {
   }, [cause]);
   const [index, setIndex] = useState(0); const [selected, setSelected] = useState(''); const [checked, setChecked] = useState(false); const [plays, setPlays] = useState(0); const [score, setScore] = useState(0);
   const current = questions[index];
-  if (!current) return <div className="flex-grow bg-slate-50 p-4"><section className="mx-auto mt-12 max-w-xl rounded-3xl bg-white p-7 text-center shadow"><p className="font-bold text-indigo-600">原因別練習 完了</p><h1 className="mt-2 text-4xl font-extrabold">{score} / {questions.length}</h1><Button onClick={() => navigate('/eiken4')} className="mt-6 w-full">英検4級ホームへ</Button></section></div>;
+  useEffect(() => { if (index >= questions.length) setEiken4MissionCompleted('listening-focus', true); }, [index, questions.length]);
+  if (!current) return <div className="flex-grow bg-slate-50 p-4"><section className="mx-auto mt-12 max-w-xl rounded-3xl bg-white p-7 text-center shadow"><p className="font-bold text-indigo-600">原因別練習 完了</p><h1 className="mt-2 text-4xl font-extrabold">{score} / {questions.length}</h1><Button onClick={() => navigate(courseMission ? '/eiken4/stamp-course' : '/eiken4')} className="mt-6 w-full">{courseMission ? 'スタンプラリーへ戻る' : '英検4級ホームへ'}</Button></section></div>;
   const correct = selected === current.answer;
   const next = () => { if (!checked) { setChecked(true); if (correct) setScore(value => value + 1); else recordReviewAnswer(`listening-${current.id}`, false, false); return; } setIndex(value => value + 1); setSelected(''); setChecked(false); setPlays(0); };
   const audioSupported=typeof window!=='undefined'&&'speechSynthesis'in window;

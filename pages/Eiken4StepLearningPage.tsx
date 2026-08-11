@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import Button from '../components/Button';
 import ArrowLeftIcon from '../components/shared/ArrowLeftIcon';
 import CheckCircleIcon from '../components/shared/CheckCircleIcon';
@@ -8,6 +8,8 @@ import { eiken4LearningSteps, getLearningStep, getLearningStepProgress, getLearn
 
 const Eiken4StepLearningPage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const courseMission = searchParams.get('courseMission');
   const { stepId } = useParams<{ stepId: string }>();
   const step = getLearningStep(stepId);
   const [picked, setPicked] = useState<string | null>(null);
@@ -71,7 +73,7 @@ const Eiken4StepLearningPage: React.FC = () => {
       {step.final && <section className="mt-4 rounded-3xl border border-rose-100 bg-white p-5 shadow-sm"><p className="text-xs font-bold text-rose-600">3　まとめに挑戦</p><h2 className="mt-2 text-xl font-extrabold text-slate-900">習った文法のまとめ問題</h2><p className="mt-2 text-sm leading-6 text-slate-600">まずは習った文法だけをまぜて確認しよう。そのあと今日の復習問題で、間違えた問題を見直せるよ。</p><Button onClick={startFinalPractice} className="mt-4 w-full" size="lg">習った文法のまとめ問題を始める</Button><div className="mt-3 grid gap-2 sm:grid-cols-2"><Button onClick={() => navigate('/eiken4/words')} variant="secondary" className="min-h-11 w-full">英単語を練習</Button><Button onClick={() => navigate('/eiken4/listening-practice')} variant="secondary" className="min-h-11 w-full">聞く問題を練習</Button></div></section>}
 
       <div className="mt-5 rounded-2xl bg-slate-100 p-4 text-sm text-slate-700"><p className="font-bold">次にすること</p><p className="mt-1">{step.final ? 'まずは、習った文法のまとめ問題をやってみよう。' : '確認問題のあと、下の文法を1つずつ練習しよう。'}</p></div>
-      <Button onClick={() => navigate('/eiken4')} variant="ghost" className="mb-4 mt-4 w-full">ステップ一覧へ戻る</Button>
+      <Button onClick={() => navigate(courseMission ? '/eiken4/stamp-course' : '/eiken4')} variant="ghost" className="mb-4 mt-4 w-full">{courseMission ? 'スタンプラリーへ戻る' : 'ステップ一覧へ戻る'}</Button>
     </main>
   </div>;
 };

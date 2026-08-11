@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Button from '../components/Button';
 import ArrowLeftIcon from '../components/shared/ArrowLeftIcon';
 import { eiken4Words, Eiken4Word } from '../data/eiken4Words';
@@ -9,6 +9,7 @@ import { speakText } from '../services/speechService';
 import { useAppContext } from '../contexts/AppContext';
 import { playCorrectSound, playIncorrectSound } from '../services/soundService';
 import { recordWordMastery, recordWordQuizDone } from '../services/eiken4WordMasteryService';
+import { setEiken4MissionCompleted } from '../services/eiken4StampCourseService';
 
 const QUIZ_COUNT = 8;
 
@@ -30,6 +31,8 @@ const makeChoices = (target: Eiken4Word) => {
 
 const Eiken4WordQuizPage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const courseMission = searchParams.get('courseMission');
   const { completeWordQuiz, result } = useEiken4Session();
   const { isSoundEnabled } = useAppContext();
   const quizWords = useMemo(() => {
@@ -71,7 +74,8 @@ const Eiken4WordQuizPage: React.FC = () => {
     if (isLast) {
       completeWordQuiz(quizWords.length, nextCorrect, nextWrong);
       recordWordQuizDone();
-      navigate('/eiken4/daily');
+      setEiken4MissionCompleted('word-quiz', true);
+      navigate(courseMission ? '/eiken4/stamp-course' : '/eiken4/daily');
       return;
     }
 

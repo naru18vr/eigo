@@ -1,18 +1,21 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Button from '../components/Button';
 import ArrowLeftIcon from '../components/shared/ArrowLeftIcon';
 import SpeakerWaveIcon from '../components/shared/SpeakerWaveIcon';
 import { clearMockAttempt, getWeeklyMock, loadMockAttempt, loadMockResult, saveMockAttempt, saveMockResult, weekKey } from '../services/eiken4MockService';
 import { speakText } from '../services/speechService';
+import { completeEiken4MissionForPath } from '../services/eiken4StampCourseService';
 
 const LIMIT = 10 * 60;
 
 const Eiken4MockPage: React.FC = () => {
   const navigate = useNavigate();
-  const questions = useMemo(getWeeklyMock, []);
+  const [searchParams] = useSearchParams();
+  const courseMission = searchParams.get('courseMission');
+  const questions = useMemo(() => getWeeklyMock(courseMission ? `${weekKey()}-${courseMission}` : undefined), [courseMission]);
   const previous = loadMockResult();
-  const savedAttempt = useMemo(loadMockAttempt, []);
+  const savedAttempt = useMemo(() => loadMockAttempt(courseMission || undefined), [courseMission]);
   const [started, setStarted] = useState(Boolean(savedAttempt));
   const [finished, setFinished] = useState(false);
   const [index, setIndex] = useState(savedAttempt?.index || 0);
@@ -23,6 +26,7 @@ const Eiken4MockPage: React.FC = () => {
   const finish = () => {
     const score = questions.filter(q => answers[q.id] === q.answer).length;
     saveMockResult({ week: weekKey(), score, total: questions.length, answers, completedAt: new Date().toISOString(), timeUsed: LIMIT - remaining });
+    completeEiken4MissionForPath(courseMission, '/eiken4/mock');
     setFinished(true);
   };
 
@@ -34,8 +38,8 @@ const Eiken4MockPage: React.FC = () => {
   }, [started, finished, remaining]);
 
   useEffect(() => {
-    if (started && !finished) saveMockAttempt({ week: weekKey(), index, remaining, answers, plays });
-  }, [started, finished, index, remaining, answers, plays]);
+    if (started && !finished) saveMockAttempt({ week: weekKey(), index, remaining, answers, plays, ...(courseMission ? { missionId: courseMission } : {}) });
+  }, [started, finished, index, remaining, answers, plays, courseMission]);
 
   const restart = () => { clearMockAttempt(); setIndex(0); setRemaining(LIMIT); setAnswers({}); setPlays({}); setStarted(true); };
 
@@ -50,7 +54,7 @@ const Eiken4MockPage: React.FC = () => {
   if (finished) {
     const result = loadMockResult();
     return <div className="flex-grow container mx-auto p-4 sm:p-6 max-w-2xl"><div className="rounded-2xl bg-white shadow-xl p-6"><p className="text-center text-violet-700 font-bold">ミニ模試終了</p><h1 className="text-center text-4xl font-bold mt-2">{result?.score} / {questions.length}問</h1><p className="text-center text-slate-500 mt-2">所要時間 {Math.floor((result?.timeUsed || 0) / 60)}分{(result?.timeUsed || 0) % 60}秒</p>
-      <div className="mt-6 space-y-3">{questions.map((q, i) => { const correct = answers[q.id] === q.answer; return <div key={q.id} className={`rounded-xl p-4 ${correct ? 'bg-emerald-50' : 'bg-rose-50'}`}><p className="font-bold">{i + 1}. {correct ? '正解' : `正解：${q.answer}`}</p><p className="text-sm mt-1">{q.prompt}</p>{!correct && <p className="text-sm text-slate-600 mt-1">{q.explanation}</p>}{q.evidence && <p className="text-sm text-sky-800 mt-1">根拠：“{q.evidence}”</p>}</div>; })}</div><Button onClick={() => navigate('/eiken4')} className="w-full mt-5">英検4級ホームへ</Button></div></div>;
+      <div className="mt-6 space-y-3">{questions.map((q, i) => { const correct = answers[q.id] === q.answer; return <div key={q.id} className={`rounded-xl p-4 ${correct ? 'bg-emerald-50' : 'bg-rose-50'}`}><p className="font-bold">{i + 1}. {correct ? '正解' : `正解：${q.answer}`}</p><p className="text-sm mt-1">{q.prompt}</p>{!correct && <p className="text-sm text-slate-600 mt-1">{q.explanation}</p>}{q.evidence && <p className="text-sm text-sky-800 mt-1">根拠：“{q.evidence}”</p>}</div>; })}</div><Button onClick={() => navigate(courseMission ? '/eiken4/stamp-course' : '/eiken4')} className="w-full mt-5">{courseMission ? 'スタンプラリーへ戻る' : '英検4級ホームへ'}</Button></div></div>;
   }
 
   const current = questions[index];

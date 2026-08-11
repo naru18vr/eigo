@@ -10,9 +10,9 @@ export type Eiken4StampMission = {
 };
 
 export const EIKEN4_COURSE_DURATIONS = [
-  { days: 7 as const, label: '1週間コース', pace: '1日3〜5こ', minutes: '約90〜140分/日', description: '模試と過去問まで短期集中で進める', recommended: false },
-  { days: 14 as const, label: '2週間コース', pace: '1日1〜3こ', minutes: '約45〜75分/日', description: '本番演習を多めに、バランスよく進める', recommended: true },
-  { days: 21 as const, label: '3週間コース', pace: '1日1〜2こ', minutes: '約25〜65分/日', description: '復習をはさみながら本番演習を重ねる', recommended: false },
+  { days: 7 as const, label: '1週間コース', pace: '1日3〜5こ', description: '模試と過去問まで短期集中で進める', recommended: false },
+  { days: 14 as const, label: '2週間コース', pace: '1日1〜3こ', description: '本番演習を多めに、バランスよく進める', recommended: true },
+  { days: 21 as const, label: '3週間コース', pace: '1日1〜2こ', description: '復習をはさみながら本番演習を重ねる', recommended: false },
 ] as const;
 
 // 期間を変えてもスタンプが消えないよう、ミッションIDと順番は固定する。
@@ -74,4 +74,9 @@ export const buildEiken4CourseDays = (duration: Eiken4CourseDuration) => {
     remainingMinutes -= dayMinutes;
   }
   return result;
+};
+
+export const getEiken4CourseMinuteRange = (duration: Eiken4CourseDuration) => {
+  const totals = buildEiken4CourseDays(duration).map(day => day.reduce((sum, mission) => sum + mission.estimatedMinutes, 0));
+  return { min: Math.min(...totals), max: Math.max(...totals), total: totals.reduce((sum, value) => sum + value, 0) };
 };
