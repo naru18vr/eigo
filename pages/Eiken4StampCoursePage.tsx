@@ -64,11 +64,11 @@ const Eiken4StampCoursePage: React.FC = () => {
           <p className="mt-1 text-xs leading-5 text-slate-500">※フル模試・公式過去問の日は約65分かかります。時間のある日にずらして大丈夫です。</p>
         </section>
 
-        {nextMission ? <section className="mt-5 rounded-2xl border-2 border-amber-300 bg-amber-50 p-5 shadow-sm"><p className="text-xs font-bold text-amber-700">つぎのマス</p><h2 className="mt-1 text-xl font-extrabold text-slate-900">{nextMission.icon} {nextMission.title}</h2><p className="mt-1 text-sm text-slate-600">{nextMission.description}・約{nextMission.estimatedMinutes}分</p><Button onClick={() => navigate(nextMission.path)} className="mt-4 w-full" size="lg">学習を始める</Button></section> : <section className="mt-5 rounded-2xl bg-emerald-600 p-6 text-center text-white shadow-lg"><p className="text-5xl" aria-hidden="true">🏆</p><h2 className="mt-3 text-2xl font-extrabold">GOAL！</h2><p className="mt-2">21個のスタンプが全部そろったよ！</p></section>}
+        {nextMission ? <section className="mt-5 rounded-2xl border-2 border-amber-300 bg-amber-50 p-5 shadow-sm"><p className="text-xs font-bold text-amber-700">つぎのマス</p><h2 className="mt-1 text-xl font-extrabold text-slate-900">{nextMission.icon} {nextMission.title}</h2><p className="mt-1 text-sm text-slate-600">{nextMission.description}・約{nextMission.estimatedMinutes}分</p><Button onClick={() => navigate(nextMission.path)} className="mt-4 w-full" size="lg">学習を始める</Button></section> : <section className="mt-5 rounded-2xl bg-emerald-600 p-6 text-center text-white shadow-lg"><p className="text-5xl" aria-hidden="true">🏆</p><h2 className="mt-3 text-2xl font-extrabold">GOAL！</h2><p className="mt-2">{EIKEN4_STAMP_MISSIONS.length}個のスタンプが全部そろったよ！</p></section>}
 
         <section className="mt-7">
           <div className="flex items-end justify-between gap-3"><div><p className="text-xs font-bold tracking-wider text-orange-600">SUGOROKU</p><h2 className="mt-1 text-2xl font-extrabold text-slate-900">ゴールまでの道</h2></div><span className="text-3xl" aria-hidden="true">🏁</span></div>
-          <p className="mt-2 text-sm leading-6 text-slate-600">学習を終えたら「スタンプを押す」を押そう。間違えて押したときは、もう一度押すと戻せます。</p>
+          <p className="mt-2 text-sm leading-6 text-slate-600">学習を終えたら「スタンプを押す」を押そう。フル模試3回・公式過去問3回で、本番に慣れてからGOALを目指すよ。</p>
           <div className="mt-4 space-y-4">{days.map((missions, dayIndex) => {
             const dayDone = missions.every(mission => completed.has(mission.id));
             const current = !dayDone && missions.some(mission => mission.id === nextMission?.id);
