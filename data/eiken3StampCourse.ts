@@ -23,7 +23,7 @@ export const EIKEN3_STAMP_MISSIONS: Eiken3StampMission[] = [
   { id: 'step-4', title: '未来・助動詞', description: 'will・be going to・must', path: '/eiken3/learning-step/step-4', estimatedMinutes: 30, icon: '📖' },
   { id: 'mini-mock', title: '10分ミニ模試①', description: '前半の力を本番形式で確認', path: '/eiken3/mock', estimatedMinutes: 10, icon: '🏁' },
   { id: 'step-5', title: '文をくわしくする', description: '不定詞・動名詞・接続詞', path: '/eiken3/learning-step/step-5', estimatedMinutes: 35, icon: '📖' },
-  { id: 'step-6', title: 'くらべる文', description: '比較級・最上級', path: '/eiken3/learning-step/step-6', estimatedMinutes: 25, icon: '📖' },
+  { id: 'step-6', title: '大切な文法', description: '比較級・最上級・現在完了・受け身など', path: '/eiken3/learning-step/step-6', estimatedMinutes: 25, icon: '📖' },
   { id: 'step-7', title: '文法の仕上げ', description: '段階別学習のまとめ', path: '/eiken3/learning-step/step-7', estimatedMinutes: 20, icon: '📖' },
   { id: 'exam-practice', title: '本番形式10問①', description: '文法と会話を本番形式で確認', path: '/eiken3/exam-practice', estimatedMinutes: 15, icon: '✏️' },
   { id: 'word-cards', title: '単語カード', description: '英検3級の重要単語を覚える', path: '/eiken3/words', estimatedMinutes: 15, icon: '🔤' },
