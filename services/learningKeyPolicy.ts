@@ -1,6 +1,7 @@
 // データ引き継ぎと保存状態確認で共通利用する、軽量なキー判定だけを置きます。
 const PREFIXES = [
   'eiken4',
+  'eiken3',
   'grade1',
   'grade2',
   'grade3',

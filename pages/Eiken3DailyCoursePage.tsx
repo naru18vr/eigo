@@ -1,0 +1,63 @@
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Button from '../components/Button';
+import ArrowLeftIcon from '../components/shared/ArrowLeftIcon';
+import CheckCircleIcon from '../components/shared/CheckCircleIcon';
+import ChevronRightIcon from '../components/shared/ChevronRightIcon';
+import { loadEiken3Grade1Review, resetTodayEiken3Grade1Review } from '../services/eiken3Grade1ReviewService';
+import { loadDailyProgress, resetTodayDailyProgress } from '../services/eiken3DailyService';
+import { loadReadingProgress, resetTodayReadingProgress } from '../services/eiken3ReadingService';
+import { isWordQuizDoneToday, resetTodayWordCourse } from '../services/eiken3WordMasteryService';
+import { useEiken3Session } from '../contexts/Eiken3SessionContext';
+import { isWorksheetDoneToday, resetTodayWorksheetDone } from '../services/eiken3CourseService';
+
+const Eiken3DailyCoursePage: React.FC = () => {
+  const navigate = useNavigate();
+  const { resetSession } = useEiken3Session();
+  const [confirmReset, setConfirmReset] = useState(false);
+  const [, setResetVersion] = useState(0);
+  const grade1Done = Boolean(loadEiken3Grade1Review().completedAt);
+  const dailyDone = Boolean(loadDailyProgress().completedAt);
+  const readingDone = Boolean(loadReadingProgress().completedAt);
+  const cardsDone = isWordQuizDoneToday();
+  const steps = [
+    { title: '中1のおさらい', detail: '英検3級頻出の単語5語＋文法5問・約8分', path: '/eiken3/grade1-review', done: grade1Done },
+    { title: '今日の15分', detail: '単語・文法・リスニング・本番形式18問', path: '/eiken3/daily', done: dailyDone },
+    { title: 'ミニ長文', detail: '英文1題＋設問2問', path: '/eiken3/reading', done: readingDone },
+    { title: '英単語＋確認テスト', detail: 'カード8語を見て、同じ8語をテスト', path: '/eiken3/words', done: cardsDone },
+    { title: '紙の類似プリント', detail: '印刷リンクをお母さんへ送る', path: '/eiken3/daily', done: isWorksheetDoneToday() },
+  ];
+  const nextIndex = steps.findIndex(step => !step.done);
+  const next = steps[nextIndex < 0 ? steps.length - 1 : nextIndex];
+  const completed = steps.filter(step => step.done).length;
+  const resetToday = () => {
+    if (!confirmReset) { setConfirmReset(true); return; }
+    resetTodayEiken3Grade1Review();
+    resetTodayDailyProgress();
+    resetTodayReadingProgress();
+    resetTodayWordCourse();
+    resetTodayWorksheetDone();
+    resetSession();
+    setConfirmReset(false);
+    setResetVersion(value => value + 1);
+  };
+  return <div className="flex-grow container mx-auto p-4 sm:p-6 max-w-xl">
+    <Button onClick={() => navigate('/eiken3')} variant="ghost" size="sm"><ArrowLeftIcon className="h-5 w-5 mr-2"/>英検3級に戻る</Button>
+    <header className="mt-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white p-6 shadow-lg">
+      <p className="text-sm font-bold opacity-90">もっと練習したい日に</p><h1 className="text-3xl font-bold mt-1">追加の練習メニュー</h1><p className="mt-2">できた：{completed} / 5</p>
+    </header>
+    <button onClick={() => navigate('/eiken3/grammar-guide')} className="mt-4 w-full rounded-xl border border-cyan-200 bg-cyan-50 p-4 text-left"><p className="text-xs font-bold text-cyan-700">問題の文法がわからないとき</p><p className="font-bold text-slate-800 mt-1">習う前でもわかる「英検3級文法」を読む →</p></button>
+    <div className="mt-5 space-y-3">{steps.map((step, index) => {
+      const isNext = index === nextIndex;
+      return <button key={step.title} onClick={() => navigate(step.path)} className={`w-full rounded-xl border-2 p-4 text-left shadow-sm flex items-center gap-3 ${step.done ? 'bg-emerald-50 border-emerald-300' : isNext ? 'bg-amber-50 border-amber-400' : 'bg-white border-slate-200'}`}>
+        <div className={`h-11 w-11 shrink-0 rounded-full flex items-center justify-center font-bold ${step.done ? 'bg-emerald-500 text-white' : isNext ? 'bg-amber-500 text-white' : 'bg-slate-200 text-slate-600'}`}>{step.done ? <CheckCircleIcon className="h-7 w-7"/> : index + 1}</div>
+        <div className="flex-grow"><p className={`text-xs font-bold ${isNext ? 'text-amber-700' : step.done ? 'text-emerald-700' : 'text-slate-500'}`}>{step.done ? '完了！' : isNext ? '次はこれ' : index === 4 ? '最後にする' : 'このあと'}</p><h2 className="text-lg font-bold text-slate-800">{step.title}</h2><p className="text-sm text-slate-600">{step.detail}</p></div><ChevronRightIcon className="h-6 w-6 text-slate-400"/>
+      </button>;
+    })}</div>
+    <Button onClick={() => navigate(next.path)} className="w-full mt-6" size="lg">{nextIndex === 4 ? '結果と印刷リンクを開く' : `次の「${next.title}」を始める`}</Button>
+    {completed > 0 && <Button onClick={resetToday} variant={confirmReset ? 'danger' : 'secondary'} className="w-full mt-3">{confirmReset ? '本当に追加の練習をやり直す' : '追加の練習をやり直す'}</Button>}
+    {confirmReset && <p className="text-xs text-center text-rose-600 mt-2">もう一度押すと今日の5ステップだけ未完了に戻ります。累積の定着記録は残ります。</p>}
+    <p className="text-xs text-center text-slate-500 mt-3">本番形式10問とミニ模試は、余裕のある日だけで大丈夫です。</p>
+  </div>;
+};
+export default Eiken3DailyCoursePage;

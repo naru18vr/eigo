@@ -14,7 +14,7 @@ export default defineConfig(() => {
         registerType: 'prompt',
         includeAssets: ['eigo-icon.svg','eigo-icon-192.png','eigo-icon-512.png'],
         manifest: {
-          name: '英検4級 毎日学習', short_name: '英検4級', description: '中1復習から英検4級模試まで毎日続ける英語学習アプリ',
+          name: '英検4級・3級 毎日学習', short_name: '英検4級・3級', description: '中1復習から英検4級・3級の文法、単語、模試まで毎日続ける英語学習アプリ',
           theme_color: '#4f46e5', background_color: '#f8fafc', display: 'standalone', start_url: '/eigo/', scope: '/eigo/', lang: 'ja',
           icons: [{ src: '/eigo/eigo-icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },{ src: '/eigo/eigo-icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },{ src: '/eigo/eigo-icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }],
         },

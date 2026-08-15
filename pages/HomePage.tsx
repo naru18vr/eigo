@@ -62,6 +62,22 @@ const HomePage: React.FC = () => {
           </Link>
 
           <Link
+            to="/eiken3"
+            className="block p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 bg-violet-700 text-white transform hover:scale-105 active:scale-95"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="p-3 rounded-full bg-violet-700 inline-block mb-3">
+                  <BookOpenIcon className="h-8 w-8 text-white" />
+                </div>
+                <h2 className="text-2xl font-bold">英検3級</h2>
+                <p className="text-sm opacity-90">文法・単語・長文・リスニング・英作文・面接</p>
+              </div>
+              <ChevronRightIcon className="h-8 w-8 opacity-70" />
+            </div>
+          </Link>
+
+          <Link
             to="/progress"
             className="block p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 bg-teal-500 text-white transform hover:scale-105 active:scale-95"
           >

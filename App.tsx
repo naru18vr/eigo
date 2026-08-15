@@ -2,6 +2,7 @@
 import React, { Suspense, lazy } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Eiken4SessionProvider } from './contexts/Eiken4SessionContext';
+import { Eiken3SessionProvider } from './contexts/Eiken3SessionContext';
 import HomePage from './pages/HomePage';
 import PwaUpdatePrompt from './components/PwaUpdatePrompt';
 import StorageErrorBanner from './components/StorageErrorBanner';
@@ -43,6 +44,35 @@ const Eiken4WeaknessPage = lazy(() => import('./pages/Eiken4WeaknessPage'));
 const Eiken4WordChallengePage = lazy(() => import('./pages/Eiken4WordChallengePage'));
 const LearningTransferPage = lazy(() => import('./pages/LearningTransferPage'));
 const Eiken4ListeningFocusPage = lazy(() => import('./pages/Eiken4ListeningFocusPage'));
+const Eiken3HomePage = lazy(() => import('./pages/Eiken3HomePage'));
+const Eiken3DailyPage = lazy(() => import('./pages/Eiken3DailyPage'));
+const Eiken3WordCardsPage = lazy(() => import('./pages/Eiken3WordCardsPage'));
+const Eiken3WordQuizPage = lazy(() => import('./pages/Eiken3WordQuizPage'));
+const Eiken3SentencesPage = lazy(() => import('./pages/Eiken3SentencesPage'));
+const Eiken3ResultPage = lazy(() => import('./pages/Eiken3ResultPage'));
+const Eiken3ReadingPage = lazy(() => import('./pages/Eiken3ReadingPage'));
+const Eiken3MockPage = lazy(() => import('./pages/Eiken3MockPage'));
+const Eiken3ProgressPage = lazy(() => import('./pages/Eiken3ProgressPage'));
+const Eiken3ExamPracticePage = lazy(() => import('./pages/Eiken3ExamPracticePage'));
+const Eiken3Grade1ReviewPage = lazy(() => import('./pages/Eiken3Grade1ReviewPage'));
+const Eiken3WritingPage = lazy(() => import('./pages/Eiken3WritingPage'));
+const Eiken3SpeakingPage = lazy(() => import('./pages/Eiken3SpeakingPage'));
+const Eiken3WorksheetPage = lazy(() => import('./pages/Eiken3WorksheetPage'));
+const Eiken3WordMapPage = lazy(() => import('./pages/Eiken3WordMapPage'));
+const Eiken3DailyCoursePage = lazy(() => import('./pages/Eiken3DailyCoursePage'));
+const Eiken3StampCoursePage = lazy(() => import('./pages/Eiken3StampCoursePage'));
+const Eiken3GrammarGuidePage = lazy(() => import('./pages/Eiken3GrammarGuidePage'));
+const Eiken3StepLearningPage = lazy(() => import('./pages/Eiken3StepLearningPage'));
+const Eiken3MixedReviewPage = lazy(() => import('./pages/Eiken3MixedReviewPage'));
+const Eiken3GrammarPracticeSelectPage = lazy(() => import('./pages/Eiken3GrammarPracticeSelectPage'));
+const Eiken3GrammarPracticePage = lazy(() => import('./pages/Eiken3GrammarPracticePage'));
+const Eiken3TryItPage = lazy(() => import('./pages/Eiken3TryItPage'));
+const Eiken3FullMockPage = lazy(() => import('./pages/Eiken3FullMockPage'));
+const Eiken3ListeningPracticePage = lazy(() => import('./pages/Eiken3ListeningPracticePage'));
+const Eiken3PastPaperRecordPage = lazy(() => import('./pages/Eiken3PastPaperRecordPage'));
+const Eiken3WeaknessPage = lazy(() => import('./pages/Eiken3WeaknessPage'));
+const Eiken3WordChallengePage = lazy(() => import('./pages/Eiken3WordChallengePage'));
+const Eiken3ListeningFocusPage = lazy(() => import('./pages/Eiken3ListeningFocusPage'));
 const StorageRecoveryPage = lazy(() => import('./pages/StorageRecoveryPage'));
 const GradeDataBoundary = lazy(() => import('./components/GradeDataBoundary'));
 
@@ -59,6 +89,7 @@ const App: React.FC = () => {
   return (
     <HashRouter>
       <Eiken4SessionProvider>
+      <Eiken3SessionProvider>
         <div className="min-h-screen flex flex-col">
           <PwaUpdatePrompt />
           <StorageErrorBanner />
@@ -106,12 +137,44 @@ const App: React.FC = () => {
             <Route path="/eiken4/past-papers" element={<Eiken4PastPaperRecordPage />} />
             <Route path="/eiken4/weakness" element={<Eiken4WeaknessPage />} />
             <Route path="/eiken4/word-challenge" element={<Eiken4WordChallengePage />} />
+            <Route path="/eiken3" element={<Eiken3HomePage />} />
+            <Route path="/eiken3/daily" element={<Eiken3DailyPage />} />
+            <Route path="/eiken3/reading" element={<Eiken3ReadingPage />} />
+            <Route path="/eiken3/mock" element={<Eiken3MockPage />} />
+            <Route path="/eiken3/progress" element={<Eiken3ProgressPage />} />
+            <Route path="/eiken3/exam-practice" element={<Eiken3ExamPracticePage />} />
+            <Route path="/eiken3/grade1-review" element={<Eiken3Grade1ReviewPage />} />
+            <Route path="/eiken3/words" element={<Eiken3WordCardsPage />} />
+            <Route path="/eiken3/words/quiz" element={<Eiken3WordQuizPage />} />
+            <Route path="/eiken3/sentences" element={<Eiken3SentencesPage />} />
+            <Route path="/eiken3/result" element={<Eiken3ResultPage />} />
+            <Route path="/eiken3/worksheet" element={<Eiken3WorksheetPage />} />
+            <Route path="/eiken3/word-map" element={<Eiken3WordMapPage />} />
+            <Route path="/eiken3/course" element={<Eiken3DailyCoursePage />} />
+            <Route path="/eiken3/stamp-course" element={<Eiken3StampCoursePage />} />
+            <Route path="/eiken3/grammar-guide" element={<Eiken3GrammarGuidePage />} />
+            <Route path="/eiken3/grammar-guide/:grammarId" element={<Eiken3GrammarGuidePage />} />
+            <Route path="/eiken3/learning-step/:stepId" element={<Eiken3StepLearningPage />} />
+            <Route path="/eiken3/mixed-review" element={<Eiken3MixedReviewPage />} />
+            <Route path="/eiken3/try-it" element={<Eiken3TryItPage />} />
+            <Route path="/eiken3/grammar-practice-select" element={<Eiken3GrammarPracticeSelectPage />} />
+            <Route path="/eiken3/grammar-practice/:categoryId" element={<Eiken3GrammarPracticePage />} />
+            <Route path="/eiken3/grammar-practice" element={<Eiken3GrammarPracticePage />} />
+            <Route path="/eiken3/full-mock" element={<Eiken3FullMockPage />} />
+            <Route path="/eiken3/listening-practice" element={<Eiken3ListeningPracticePage />} />
+            <Route path="/eiken3/listening-focus" element={<Eiken3ListeningFocusPage />} />
+            <Route path="/eiken3/past-papers" element={<Eiken3PastPaperRecordPage />} />
+            <Route path="/eiken3/weakness" element={<Eiken3WeaknessPage />} />
+            <Route path="/eiken3/word-challenge" element={<Eiken3WordChallengePage />} />
+            <Route path="/eiken3/writing" element={<Eiken3WritingPage />} />
+            <Route path="/eiken3/speaking" element={<Eiken3SpeakingPage />} />
             <Route path="/transfer" element={<LearningTransferPage />} />
             <Route path="/storage-recovery" element={<StorageRecoveryPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
           </Suspense>
         </div>
+      </Eiken3SessionProvider>
       </Eiken4SessionProvider>
     </HashRouter>
   );
