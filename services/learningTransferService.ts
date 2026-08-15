@@ -24,12 +24,17 @@ export const createTransfer = () => {
   const checksum = hash(`eigo-transfer:${payload}`).toString(16).padStart(8, '0');
   const base = typeof window === 'undefined' ? '' : `${window.location.origin}${window.location.pathname}`;
   const link = `${base}#/transfer?data=${encodeURIComponent(payload)}&code=${code}&sig=${checksum}`;
-  const activity = safeObject(values.eiken4ActivityLogV1);
-  const mocks = safeArray(values.eiken4FullMockResultsV1).length + safeArray(values.eiken4PastPaperResultsV1).length;
-  const mastery = safeObject(values.eiken4WordMasteryV2);
-  const masteredWords = Object.values(mastery).filter(value => { const days = Object.values((value as { days?: Record<string, boolean> })?.days || {}); return days.filter(Boolean).length >= 4 && days.at(-1) === true; }).length;
-  const latestLearningDate = [...Object.keys(activity), ...Object.values(mastery).map(value => String((value as { lastSeen?: string })?.lastSeen || '').slice(0, 10))].filter(Boolean).sort().at(-1) || '記録なし';
-  return { code, checksum, link, itemCount: Object.keys(values).length, linkLength: link.length, isLong: link.length > TRANSFER_LINK_WARNING_LENGTH, compressionRatio: json.length ? compressed.length / json.length : 1, summary: { activityDays: Object.keys(activity).length, masteredWords, mockResults: mocks, latestLearningDate } };
+  const activities = [safeObject(values.eiken4ActivityLogV1), safeObject(values.eiken3ActivityLogV1)];
+  const mocks = [
+    safeArray(values.eiken4FullMockResultsV1),
+    safeArray(values.eiken4PastPaperResultsV1),
+    safeArray(values.eiken3FullMockResultsV1),
+    safeArray(values.eiken3PastPaperResultsV1),
+  ].reduce((total, list) => total + list.length, 0);
+  const masteries = [safeObject(values.eiken4WordMasteryV2), safeObject(values.eiken3WordMasteryV2)];
+  const masteredWords = masteries.reduce((total, mastery) => total + Object.values(mastery).filter(value => { const days = Object.values((value as { days?: Record<string, boolean> })?.days || {}); return days.filter(Boolean).length >= 4 && days.at(-1) === true; }).length, 0);
+  const latestLearningDate = [...activities.flatMap(activity => Object.keys(activity)), ...masteries.flatMap(mastery => Object.values(mastery).map(value => String((value as { lastSeen?: string })?.lastSeen || '').slice(0, 10)))].filter(Boolean).sort().at(-1) || '記録なし';
+  return { code, checksum, link, itemCount: Object.keys(values).length, linkLength: link.length, isLong: link.length > TRANSFER_LINK_WARNING_LENGTH, compressionRatio: json.length ? compressed.length / json.length : 1, summary: { activityDays: new Set(activities.flatMap(activity => Object.keys(activity))).size, masteredWords, mockResults: mocks, latestLearningDate } };
 };
 
 const safeObject = (raw?: string): Record<string, unknown> => { try { const value = JSON.parse(raw || '{}'); return value && typeof value === 'object' && !Array.isArray(value) ? value : {}; } catch { return {}; } };

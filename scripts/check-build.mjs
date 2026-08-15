@@ -19,6 +19,9 @@ if (!fs.existsSync('dist/eigo-icon-192.png') || !fs.existsSync('dist/eigo-icon-5
 const manifest = JSON.parse(fs.readFileSync('dist/manifest.webmanifest', 'utf8'));
 if (manifest.display !== 'standalone' || !manifest.icons?.length) errors.push('PWA manifestの必須設定がない');
 if (!files.some(file => file.startsWith('Eiken4ListeningFocusPage-'))) errors.push('原因別リスニングが遅延分割されていない');
+if (!files.some(file => file.startsWith('Eiken3HomePage-'))) errors.push('英検3級トップがビルドに含まれていない');
+if (!files.some(file => file.startsWith('Eiken3WritingPage-')) || !files.some(file => file.startsWith('Eiken3SpeakingPage-'))) errors.push('英検3級の英作文・面接ページが遅延分割されていない');
+if (indexFile && !fs.readFileSync(path.join('dist/assets', indexFile), 'utf8').includes('/eiken3')) errors.push('英検3級ルートが初期ルーターに登録されていない');
 if (errors.length) { console.error(errors.join('\n')); process.exit(1); }
 const initialKb = Math.round(fs.statSync(path.join('dist/assets', indexFile)).size / 1024);
 const largestKb = largestJs ? Math.round(largestJs.bytes / 1024) : 0;
