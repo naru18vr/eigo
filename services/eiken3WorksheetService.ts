@@ -4,7 +4,7 @@ import { eiken3Words } from '../data/eiken3Words';
 import { eiken3Readings } from '../data/eiken3Readings';
 import { DailyProgress, getQuestionById } from './eiken3DailyService';
 import type { ReadingProgress } from './eiken3ReadingService';
-import { getGrade1DailyItems, getGrade1DailySelection, getGrade1ItemsBySelection, grade1GrammarItems, type Grade1Selection } from './grade1ReviewService';
+import { getEiken3Grade1DailyItems, getEiken3Grade1DailySelection, getEiken3Grade1ItemsBySelection, grade1GrammarItems, type Grade1Selection } from './eiken3Grade1ReviewService';
 
 export type WorksheetShareData = Pick<DailyProgress, 'date' | 'questionIds' | 'answers'> & { reading?: ReadingProgress; grade1?: Grade1Selection };
 export type SharedWorksheet = { progress: DailyProgress; reading?: ReadingProgress; grade1?: Grade1Selection };
@@ -41,7 +41,7 @@ export const copyTextToClipboard = async (text: string) => {
 };
 
 export const createWorksheetShareLink = (progress: DailyProgress, reading?: ReadingProgress) => {
-  const data: WorksheetShareData = { date: progress.date, questionIds: progress.questionIds, answers: progress.answers, grade1: getGrade1DailySelection(progress.date), ...(reading?.completedAt ? { reading } : {}) };
+  const data: WorksheetShareData = { date: progress.date, questionIds: progress.questionIds, answers: progress.answers, grade1: getEiken3Grade1DailySelection(progress.date), ...(reading?.completedAt ? { reading } : {}) };
   const bytes = new TextEncoder().encode(JSON.stringify(data));
   let binary = '';
   bytes.forEach(byte => { binary += String.fromCharCode(byte); });
@@ -253,7 +253,7 @@ export const downloadDailyWorksheet = async (progress: DailyProgress, readingPro
     pages.push(canvas);
   }
 
-  const grade1 = grade1Selection ? getGrade1ItemsBySelection(grade1Selection) : getGrade1DailyItems(progress.date);
+  const grade1 = grade1Selection ? getEiken3Grade1ItemsBySelection(grade1Selection) : getEiken3Grade1DailyItems(progress.date);
   const { canvas: grade1Page, context: grade1Context } = createPage();
   drawHeader(grade1Context, progress.date, `6 / ${pageCount}`);
   grade1Context.font = 'bold 29px sans-serif';

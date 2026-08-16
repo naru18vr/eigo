@@ -113,8 +113,12 @@ const writingSource = readFileSync('pages/Eiken3WritingPage.tsx', 'utf8');
 const speakingSource = readFileSync('pages/Eiken3SpeakingPage.tsx', 'utf8');
 const writingServiceSource = readFileSync('services/eiken3WritingService.ts', 'utf8');
 const speakingServiceSource = readFileSync('services/eiken3SpeakingService.ts', 'utf8');
+const resultSource = readFileSync('pages/Eiken3ResultPage.tsx', 'utf8');
+const worksheetServiceSource = readFileSync('services/eiken3WorksheetService.ts', 'utf8');
 if (!writingSource.includes('completeWritingTask') || !writingServiceSource.includes('eiken3WritingProgressV1')) errors.push('英作文の保存キーが画面に接続されていません');
 if (!speakingSource.includes('completeSpeakingCard') || !speakingServiceSource.includes('eiken3SpeakingProgressV1')) errors.push('面接の保存キーが画面に接続されていません');
+if (!resultSource.includes('loadEiken3Grade1Review') || resultSource.includes("services/grade1ReviewService")) errors.push('英検3級の結果画面が中1復習の3級専用保存を使っていません');
+if (!worksheetServiceSource.includes('getEiken3Grade1DailySelection') || !worksheetServiceSource.includes('getEiken3Grade1ItemsBySelection') || worksheetServiceSource.includes("from './grade1ReviewService'")) errors.push('英検3級の類題プリントが中1復習の3級専用選定を使っていません');
 
 if (errors.length) {
   console.error(errors.join('\n'));
