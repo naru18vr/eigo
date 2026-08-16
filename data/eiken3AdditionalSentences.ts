@@ -108,7 +108,7 @@ export const eiken3AdditionalSentences = makeSentences([
   ['e3add-inf-02', '彼は英語を学ぶためにアメリカへ行きました。', ['He', 'went', 'to', 'America', 'to', 'learn', 'English', '.'], '目的の不定詞', '2つ目の to learn は目的「～するために」だよ。', 'reorder'],
   ['e3add-inf-03', '私はあなたに会えてうれしいです。', ['I', 'am', 'happy', 'to', 'see', 'you', '.'], '目的の不定詞', 'happy to ～ で「～してうれしい」だよ。', 'fill-blank'],
   ['e3add-inf-04', '読むべき本があります。', ['I', 'have', 'a', 'book', 'to', 'read', '.'], '目的の不定詞', 'book to read で「読むための本」だよ。', 'sentence-choice'],
-  ['e3add-inf-05', 'あなたは水を飲む必要があります。', ['You', 'need', 'to', 'drink', 'water', '.'], 'want to', 'need to + 動詞の原形で「～する必要がある」だよ。', 'error-correction'],
+  ['e3add-inf-05', 'あなたは水を飲む必要があります。', ['You', 'need', 'to', 'drink', 'water', '.'], 'need to', 'need to + 動詞の原形で「～する必要がある」だよ。', 'error-correction'],
   ['e3add-inf-06', '私たちは一緒に昼食を食べたいですか。', ['Would', 'you', 'like', 'to', 'eat', 'lunch', 'together', '?'], 'Would you like to ...?', 'Would you like to ～? は丁寧な誘いだよ。', 'response'],
   ['e3add-inf-07', '彼女は写真を撮るためにカメラを持っています。', ['She', 'has', 'a', 'camera', 'to', 'take', 'pictures', '.'], '目的の不定詞', '目的を表す to take を使うよ。', 'reorder'],
 
@@ -132,18 +132,18 @@ export const eiken3AdditionalSentences = makeSentences([
   ['e3add-other-07', 'コーチは私たちに新しい練習を教えました。', ['The', 'coach', 'taught', 'us', 'a', 'new', 'practice', '.'], 'teach＋人＋物', 'taught は teach の過去形だよ。', 'error-correction'],
 
   // 疑問詞（既存4問 → 10問）
-  ['e3add-q-01', 'あなたはどこに住んでいますか。', ['Where', 'do', 'you', 'live', '?'], '疑問詞 What', 'Where は「どこ」をたずねる疑問詞だよ。', 'response'],
+  ['e3add-q-01', 'あなたはどこに住んでいますか。', ['Where', 'do', 'you', 'live', '?'], '疑問詞 Where', 'Where は「どこ」をたずねる疑問詞だよ。', 'response'],
   ['e3add-q-02', 'あなたはどのくらいの頻度で泳ぎますか。', ['How', 'often', 'do', 'you', 'swim', '?'], 'How often ...?', 'How often は回数・頻度をたずねるよ。', 'sentence-choice'],
   ['e3add-q-03', '駅までどのくらい時間がかかりますか。', ['How', 'long', 'does', 'it', 'take', 'to', 'the', 'station', '?'], 'How long ...?', 'How long does it take ～? で時間をたずねるよ。', 'reorder'],
   ['e3add-q-04', 'あなたは何冊本を持っていますか。', ['How', 'many', 'books', 'do', 'you', 'have', '?'], 'How many ...?', '数えられる名詞の数は How many でたずねるよ。', 'fill-blank'],
-  ['e3add-q-05', 'あなたの誕生日はいつですか。', ['When', 'is', 'your', 'birthday', '?'], '疑問詞 What', 'When は「いつ」をたずねる疑問詞だよ。', 'response'],
-  ['e3add-q-06', 'これは誰のかばんですか。', ['Whose', 'bag', 'is', 'this', '?'], '疑問詞 What', 'Whose は「誰の」をたずねる疑問詞だよ。', 'sentence-choice'],
+  ['e3add-q-05', 'あなたの誕生日はいつですか。', ['When', 'is', 'your', 'birthday', '?'], '疑問詞 When', 'When は「いつ」をたずねる疑問詞だよ。', 'response'],
+  ['e3add-q-06', 'これは誰のかばんですか。', ['Whose', 'bag', 'is', 'this', '?'], '疑問詞 Whose', 'Whose は「誰の」をたずねる疑問詞だよ。', 'sentence-choice'],
 
   // 接続詞（既存3問 → 10問）
   ['e3add-conj-01', '私は疲れていたので早く寝ました。', ['I', 'went', 'to', 'bed', 'early', 'because', 'I', 'was', 'tired', '.'], 'because', 'because は理由「～なので」を表すよ。', 'sentence-choice'],
   ['e3add-conj-02', 'もし明日晴れたら、私たちは公園へ行きます。', ['If', 'it', 'is', 'sunny', 'tomorrow', ',', 'we', 'will', 'go', 'to', 'the', 'park', '.'], '接続詞 if', 'if は「もし～なら」という条件を表すよ。', 'reorder'],
   ['e3add-conj-03', '家に着いたら電話してください。', ['Call', 'me', 'when', 'you', 'get', 'home', '.'], '接続詞 when', 'when は「～するとき」を表すよ。', 'fill-blank'],
-  ['e3add-conj-04', '私は彼が親切だと思います。', ['I', 'think', 'that', 'he', 'is', 'kind', '.'], 'because', 'that は think の内容をつなぐよ。', 'sentence-choice'],
+  ['e3add-conj-04', '私は彼が親切だと思います。', ['I', 'think', 'that', 'he', 'is', 'kind', '.'], '接続詞 that', 'that は think の内容をつなぐよ。', 'sentence-choice'],
   ['e3add-conj-05', '雨が降ったので試合は中止になりました。', ['The', 'game', 'was', 'canceled', 'because', 'it', 'rained', '.'], 'because', 'because の後ろに理由の文を置くよ。', 'error-correction'],
   ['e3add-conj-06', '時間があれば、私を手伝ってください。', ['If', 'you', 'have', 'time', ',', 'please', 'help', 'me', '.'], '接続詞 if', 'If you have time は「時間があれば」だよ。', 'reorder'],
   ['e3add-conj-07', '夕食が終わったとき、宿題をしました。', ['When', 'dinner', 'was', 'over', ',', 'I', 'did', 'my', 'homework', '.'], '接続詞 when', 'when の後ろに起きた時を表す文を置くよ。', 'sentence-choice'],

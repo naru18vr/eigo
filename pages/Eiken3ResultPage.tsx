@@ -5,7 +5,7 @@ import ArrowLeftIcon from '../components/shared/ArrowLeftIcon';
 import { useEiken3Session } from '../contexts/Eiken3SessionContext';
 import { getQuestionById, loadDailyProgress } from '../services/eiken3DailyService';
 import { getTodayReading, loadReadingProgress } from '../services/eiken3ReadingService';
-import { loadGrade1Review } from '../services/grade1ReviewService';
+import { loadEiken3Grade1Review } from '../services/eiken3Grade1ReviewService';
 import { createTransfer } from '../services/learningTransferService';
 import { copyTextToClipboard } from '../services/eiken3WorksheetService';
 import { createParentDailyReport } from '../services/eiken3ReportService';
@@ -14,7 +14,7 @@ import { getLightweightTodayCourseSteps } from '../services/eiken3CourseSummaryS
 const Eiken3ResultPage: React.FC = () => {
   const navigate = useNavigate(); const { result } = useEiken3Session();
   const daily = loadDailyProgress(); const readingProgress = loadReadingProgress(); const reading = getTodayReading();
-  const grade1 = loadGrade1Review();
+  const grade1 = loadEiken3Grade1Review();
   const dailyCorrect = daily.answers.filter(answer => answer.correct).length;
   const readingCorrect = reading.questions.filter((item, index) => readingProgress.answers[index] === item.answer).length;
   const wrongKinds = Array.from(new Set(daily.answers.filter(answer => !answer.correct).map(answer => getQuestionById(answer.id, daily.date)?.kind).filter(Boolean)));
