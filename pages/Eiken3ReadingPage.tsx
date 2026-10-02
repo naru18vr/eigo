@@ -35,11 +35,11 @@ const Eiken3ReadingPage: React.FC = () => {
     loadReadingService().then(service => {
       if (!active) return;
       setReadingService(service);
-      setReading(service.getTodayReading());
-      setProgress(service.loadReadingProgress());
+      setReading(service.getTodayReading(courseMission || undefined));
+      setProgress(service.loadReadingProgress(courseMission || undefined));
     }).catch(() => { if (active) setLoadError(true); });
     return () => { active = false; };
-  }, []);
+  }, [courseMission]);
 
   if (!readingService || !reading || !progress) return <div className="flex-grow bg-slate-50 p-4"><main className="mx-auto max-w-xl"><section className="mt-12 rounded-3xl bg-white p-7 text-center shadow" role="status"><h1 className="text-2xl font-extrabold">長文を準備しているよ…</h1><p className="mt-3 text-slate-600">少し待ってから、もう一度試してね。</p>{loadError && <Button onClick={() => window.location.reload()} className="mt-6 w-full">もう一度読み込む</Button>}</section></main></div>;
 

@@ -20,5 +20,5 @@ export const loadSpeakingProgress = (): Eiken3SpeakingProgress => {
 export const completeSpeakingCard = (cardId: string) => {
   if (!eiken3SpeakingCards.some(card => card.id === cardId)) return;
   const current = loadSpeakingProgress();
-  safeSetLearningItem(EIKEN3_SPEAKING_KEY, JSON.stringify({ version: 1, completedCardIds: Array.from(new Set([...current.completedCardIds, cardId])), updatedAt: new Date().toISOString() } satisfies Eiken3SpeakingProgress));
+  return safeSetLearningItem(EIKEN3_SPEAKING_KEY, JSON.stringify({ version: 1, completedCardIds: Array.from(new Set([...current.completedCardIds, cardId])), updatedAt: new Date().toISOString() } satisfies Eiken3SpeakingProgress));
 };

@@ -1,3 +1,4 @@
+import { safeSetLearningItem } from './storageHealthService';
 const ACTIVITY_KEY = 'eiken3ActivityLogV1';
 const EXAM_DATE_KEY = 'eiken3ExamDateV1';
 
@@ -11,7 +12,7 @@ export const getLocalDate = (date = new Date()) => {
 
 export const loadActivityLog = (): ActivityLog => {
   if (typeof localStorage === 'undefined') return {};
-  try { return JSON.parse(localStorage.getItem(ACTIVITY_KEY) || '{}'); } catch { return {}; }
+  try { const value = JSON.parse(localStorage.getItem(ACTIVITY_KEY) || '{}'); return value && typeof value === 'object' && !Array.isArray(value) ? value : {}; } catch { return {}; }
 };
 
 export const recordEiken3Activity = (kind: ActivityKind, date = getLocalDate()) => {
@@ -20,10 +21,14 @@ export const recordEiken3Activity = (kind: ActivityKind, date = getLocalDate()) 
   localStorage.setItem(ACTIVITY_KEY, JSON.stringify(log));
 };
 
-export const getExamDate = () => typeof localStorage === 'undefined' ? '2026-09-25' : localStorage.getItem(EXAM_DATE_KEY) || '2026-09-25';
-export const saveExamDate = (date: string) => { if (typeof localStorage !== 'undefined') localStorage.setItem(EXAM_DATE_KEY, date); };
-
+const validDate = (value: string) => /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(new Date(`${value}T00:00:00`).getTime()) && getLocalDate(new Date(`${value}T00:00:00`)) === value;
+export const getExamDate = () => {
+  if (typeof localStorage === 'undefined') return '';
+  try { const value = localStorage.getItem(EXAM_DATE_KEY) || ''; return validDate(value) ? value : ''; } catch { return ''; }
+};
+export const saveExamDate = (date: string) => { if (!date || validDate(date)) safeSetLearningItem(EXAM_DATE_KEY, date); };
 export const daysUntilExam = (date: string) => {
+  if (!validDate(date)) return Infinity;
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const target = new Date(`${date}T00:00:00`);
   return Math.ceil((target.getTime() - today.getTime()) / 86400000);

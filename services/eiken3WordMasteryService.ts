@@ -20,7 +20,7 @@ export const loadWordMastery = (): WordMasteryMap => {
   if (typeof localStorage === 'undefined') return {};
   try {
     const saved = JSON.parse(localStorage.getItem(KEY) || 'null') as WordMasteryMap | null;
-    if (saved) return saved;
+    if (saved && typeof saved === 'object' && !Array.isArray(saved)) return Object.fromEntries(Object.entries(saved).filter(([, item]) => item && typeof item === 'object' && item.days && typeof item.days === 'object' && !Array.isArray(item.days)).map(([id,item]) => [id, { ...item, days: Object.fromEntries(Object.entries(item.days).filter(([, correct]) => typeof correct === 'boolean')), correct: Number.isFinite(item.correct) ? item.correct : 0, wrong: Number.isFinite(item.wrong) ? item.wrong : 0 }]));
     const legacy = JSON.parse(localStorage.getItem(LEGACY_KEY) || '{}') as Record<string, { correct?: number; wrong?: number; streak?: number; lastSeen?: string }>;
     return Object.fromEntries(Object.entries(legacy).map(([id, item]) => [id, { days: item.lastSeen ? { [item.lastSeen.slice(0, 10)]: (item.streak || 0) > 0 } : {}, correct: item.correct || 0, wrong: item.wrong || 0, lastSeen: item.lastSeen || '' }]));
   } catch { return {}; }

@@ -26,10 +26,10 @@ const Eiken4PastPaperRecordPage: React.FC = () => {
     const readingScore = Number(reading);
     const listeningScore = Number(listening);
     if (!Number.isInteger(readingScore) || readingScore < 0 || readingScore > 35 || !Number.isInteger(listeningScore) || listeningScore < 0 || listeningScore > 30) return;
-    savePastPaperResult({ id: new Date().toISOString(), date: new Date().toLocaleDateString('ja-JP'), label, reading: readingScore, listening: listeningScore, note });
+    const savedOk = savePastPaperResult({ id: new Date().toISOString(), date: new Date().toLocaleDateString('ja-JP'), label, reading: readingScore, listening: listeningScore, note, ...(courseMission ? { missionId: courseMission } : {}) });
+    if (!savedOk) return;
     if (courseMission) {
-      completeEiken4MissionForPath(courseMission, '/eiken4/past-papers');
-      setSavedForCourse(true);
+      setSavedForCourse(completeEiken4MissionForPath(courseMission, '/eiken4/past-papers'));
     }
     setItems(loadPastPaperResults());
     setReading('');

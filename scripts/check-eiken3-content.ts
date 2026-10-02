@@ -106,7 +106,7 @@ for (const duration of [7, 14, 21] as const) {
   if (flattened.length !== 27 || new Set(flattened.map(item => item.id)).size !== 27) errors.push(`${duration}日コースでミッションが欠けています`);
   if (days.some(day => day.length === 0)) errors.push(`${duration}日コースに空の日があります`);
   const range = getEiken3CourseMinuteRange(duration);
-  if (range.total !== 800) errors.push(`${duration}日コースの合計時間が一致しません: ${range.total}`);
+  if (range.total !== 950) errors.push(`${duration}日コースの合計時間が一致しません: ${range.total}`);
 }
 
 const writingSource = readFileSync('pages/Eiken3WritingPage.tsx', 'utf8');

@@ -42,7 +42,7 @@ export const eiken3WritingTasks: Eiken3WritingTask[] = [
     japanesePrompt: '「生徒は毎日本を読むべきだと思いますか」という質問に、理由を2つ書いて答えよう。',
     wordRange: '25〜35語を目標',
     checklist: ['I think / I do not thinkで意見を書いた', '理由を2つ書いた', 'becauseやalsoで文をつないだ'],
-    modelAnswer: 'I think students should read books every day. First, they can learn many new words. Also, reading is a good way to relax.',
+    modelAnswer: 'I think students should read books every day. First, they can learn many new words. Also, reading is a good way to relax after a busy school day.',
     explanation: '意見 → Firstの理由 → Alsoの理由、の3つに分けると書きやすくなります。',
   },
   {
@@ -53,7 +53,7 @@ export const eiken3WritingTasks: Eiken3WritingTask[] = [
     japanesePrompt: '「友達と一緒に英語を勉強するのが好きですか」という質問に、理由を2つ書いて答えよう。',
     wordRange: '25〜35語を目標',
     checklist: ['Yes / Noの意見を書いた', '理由を2つ書いた', '友達と学ぶ具体的なよさを書いた'],
-    modelAnswer: 'Yes, I do. I can ask my friends questions, and we can practice speaking together. Studying with friends is fun.',
+    modelAnswer: 'Yes, I do. I can ask my friends questions, and we can practice speaking together. Studying with friends is fun, and it helps me keep practicing every week.',
     explanation: '「質問できる」「一緒に練習できる」のように、具体的な理由を2つ考えます。',
   },
 ];

@@ -1,3 +1,4 @@
+import { safeSetLearningItem } from './storageHealthService';
 import { eiken4Words } from '../data/eiken4Words';
 import { eiken4ListeningQuestions } from '../data/eiken4Listening';
 import { eiken4Readings } from '../data/eiken4Readings';
@@ -6,8 +7,8 @@ import { DailyQuestion, getQuestionById, localDateKey } from './eiken4DailyServi
 import { getListeningSectionRanges as getRanges, getListeningSectionTitle } from './eiken4QuestionLoader';
 
 export type PrepQuestion = DailyQuestion & { section: string; passage?: string; evidence?: string };
-export type FullMockResult = { id: string; date: string; reading: number; listening: number; readingTotal: 35; listeningTotal: 30; timeUsed: number; answers?: Record<string,string> };
-export type PastPaperResult = { id: string; date: string; label: string; reading: number; listening: number; note: string };
+export type FullMockResult = { id: string; date: string; reading: number; listening: number; readingTotal: 35; listeningTotal: 30; timeUsed: number; answers?: Record<string,string>; missionId?: string; courseEligible?: boolean };
+export type PastPaperResult = { id: string; date: string; label: string; reading: number; listening: number; note: string; missionId?: string };
 
 const FULL_RESULTS_KEY = 'eiken4FullMockResultsV1';
 const PAST_RESULTS_KEY = 'eiken4PastPaperResultsV1';
@@ -36,9 +37,9 @@ export const getFullMock = (seed = localDateKey()): PrepQuestion[] => {
   return [...basics, ...passages, ...listening];
 };
 
-const read = <T,>(key: string): T[] => { if (typeof localStorage === 'undefined') return []; try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; } };
-const save = <T,>(key: string, values: T[]) => { if (typeof localStorage !== 'undefined') localStorage.setItem(key, JSON.stringify(values)); };
-export const loadFullMockResults = () => read<FullMockResult>(FULL_RESULTS_KEY);
+const read = <T,>(key: string): T[] => { if (typeof localStorage === 'undefined') return []; try { const value = JSON.parse(localStorage.getItem(key) || '[]'); return Array.isArray(value) ? value.filter(item => item && typeof item === 'object' && typeof item.id === 'string' && typeof item.date === 'string' && Number.isInteger(item.reading) && item.reading >= 0 && item.reading <= 35 && Number.isInteger(item.listening) && item.listening >= 0 && item.listening <= 30) : []; } catch { return []; } };
+const save = <T,>(key: string, values: T[]) => safeSetLearningItem(key, JSON.stringify(values));
+export const loadFullMockResults = () => read<FullMockResult>(FULL_RESULTS_KEY).map(item => ({ ...item, readingTotal: 35 as const }));
 export const saveFullMockResult = (result: FullMockResult) => save(FULL_RESULTS_KEY, [...loadFullMockResults(), result].slice(-12));
 export const loadPastPaperResults = () => read<PastPaperResult>(PAST_RESULTS_KEY);
 export const savePastPaperResult = (result: PastPaperResult) => save(PAST_RESULTS_KEY, [...loadPastPaperResults(), result].slice(-20));

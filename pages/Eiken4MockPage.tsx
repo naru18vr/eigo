@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Button from '../components/Button';
 import ArrowLeftIcon from '../components/shared/ArrowLeftIcon';
@@ -19,14 +19,18 @@ const Eiken4MockPage: React.FC = () => {
   const [started, setStarted] = useState(Boolean(savedAttempt));
   const [finished, setFinished] = useState(false);
   const [index, setIndex] = useState(savedAttempt?.index || 0);
-  const [remaining, setRemaining] = useState(savedAttempt?.remaining || LIMIT);
+  const [remaining, setRemaining] = useState(savedAttempt?.remaining ?? LIMIT);
   const [answers, setAnswers] = useState<Record<string, string>>(savedAttempt?.answers || {});
   const [plays, setPlays] = useState<Record<string, number>>(savedAttempt?.plays || {});
 
+  const finishedRef = useRef(false);
   const finish = () => {
+    if (finishedRef.current) return;
     const score = questions.filter(q => answers[q.id] === q.answer).length;
-    saveMockResult({ week: weekKey(), score, total: questions.length, answers, completedAt: new Date().toISOString(), timeUsed: LIMIT - remaining });
-    completeEiken4MissionForPath(courseMission, '/eiken4/mock');
+    const savedOk = saveMockResult({ week: weekKey(), score, total: questions.length, answers, completedAt: new Date().toISOString(), timeUsed: LIMIT - remaining, courseEligible: Object.keys(answers).length > 0, ...(courseMission ? { missionId: courseMission } : {}) });
+    if (!savedOk) return;
+    finishedRef.current = true;
+    if (Object.keys(answers).length) completeEiken4MissionForPath(courseMission, '/eiken4/mock');
     setFinished(true);
   };
 
@@ -41,7 +45,7 @@ const Eiken4MockPage: React.FC = () => {
     if (started && !finished) saveMockAttempt({ week: weekKey(), index, remaining, answers, plays, ...(courseMission ? { missionId: courseMission } : {}) });
   }, [started, finished, index, remaining, answers, plays, courseMission]);
 
-  const restart = () => { clearMockAttempt(); setIndex(0); setRemaining(LIMIT); setAnswers({}); setPlays({}); setStarted(true); };
+  const restart = () => { finishedRef.current = false; clearMockAttempt(); setIndex(0); setRemaining(LIMIT); setAnswers({}); setPlays({}); setStarted(true); };
 
   if (!started) return <div className="flex-grow container mx-auto p-4 sm:p-6 max-w-xl">
     <Button onClick={() => navigate('/eiken4')} variant="ghost" size="sm"><ArrowLeftIcon className="h-5 w-5 mr-2"/>英検4級に戻る</Button>

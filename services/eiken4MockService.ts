@@ -1,3 +1,4 @@
+import { safeSetLearningItem } from './storageHealthService';
 import { eiken4Words } from '../data/eiken4Words';
 import { eiken4ListeningQuestions } from '../data/eiken4Listening';
 import { eiken4Readings } from '../data/eiken4Readings';
@@ -10,7 +11,7 @@ const HISTORY_KEY = 'eiken4MockHistoryV1';
 const ATTEMPT_KEY = 'eiken4MockAttemptV1';
 
 export type MockQuestion = DailyQuestion & { section: string; passage?: string; translation?: string; evidence?: string };
-export type MockResult = { week: string; score: number; total: number; answers: Record<string, string>; completedAt: string; timeUsed: number };
+export type MockResult = { week: string; score: number; total: number; answers: Record<string, string>; completedAt: string; timeUsed: number; missionId?: string; courseEligible?: boolean };
 export type MockAttempt = { week: string; index: number; remaining: number; answers: Record<string, string>; plays: Record<string, number>; missionId?: string };
 
 export const weekKey = () => {
@@ -51,12 +52,13 @@ export const getWeeklyMock = (seed = weekKey()): MockQuestion[] => {
 
 export const loadMockResult = (): MockResult | null => {
   if (typeof localStorage === 'undefined') return null;
-  try { return JSON.parse(localStorage.getItem(RESULT_KEY) || 'null'); } catch { return null; }
+  try { const item = JSON.parse(localStorage.getItem(RESULT_KEY) || 'null'); return item && typeof item.completedAt === 'string' && Number.isFinite(item.score) && Number.isFinite(item.total) && item.total > 0 ? item : null; } catch { return null; }
 };
 export const loadMockHistory = (): MockResult[] => {
   if (typeof localStorage === 'undefined') return [];
   try {
-    const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]') as MockResult[];
+    const raw = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+    const history: MockResult[] = Array.isArray(raw) ? raw.filter(item => item && typeof item.completedAt === 'string' && Number.isFinite(item.score) && Number.isFinite(item.total) && item.total > 0) : [];
     const source = history.length ? history : (loadMockResult() ? [loadMockResult()!] : []);
     const unique = source.filter((result, index, items) =>
       items.findIndex(item => item.completedAt === result.completedAt) === index
@@ -71,17 +73,18 @@ export const saveMockResult = (result: MockResult) => {
   if (typeof localStorage !== 'undefined') {
     const history = loadMockHistory();
     if (!history.some(item => item.completedAt === result.completedAt)) history.push(result);
-    localStorage.setItem(RESULT_KEY, JSON.stringify(result));
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(-20)));
+    if (!safeSetLearningItem(RESULT_KEY, JSON.stringify(result))) return false;
+    if (!safeSetLearningItem(HISTORY_KEY, JSON.stringify(history.slice(-20)))) return false;
     localStorage.removeItem(ATTEMPT_KEY);
   }
   recordEiken4Activity('mock');
+  return true;
 };
 export const loadMockAttempt = (missionId?: string): MockAttempt | null => {
   if (typeof localStorage === 'undefined') return null;
   try {
     const attempt = JSON.parse(localStorage.getItem(ATTEMPT_KEY) || 'null') as MockAttempt | null;
-    return attempt?.week === weekKey() && attempt.missionId === missionId ? attempt : null;
+    return attempt?.week === weekKey() && attempt.missionId === missionId && Number.isInteger(attempt.index) && attempt.index >= 0 && attempt.index < 15 && Number.isFinite(attempt.remaining) && attempt.remaining >= 0 && attempt.remaining <= 600 && attempt.answers && typeof attempt.answers === 'object' && !Array.isArray(attempt.answers) ? attempt : null;
   } catch { return null; }
 };
 export const saveMockAttempt = (attempt: MockAttempt) => { if (typeof localStorage !== 'undefined') localStorage.setItem(ATTEMPT_KEY, JSON.stringify(attempt)); };

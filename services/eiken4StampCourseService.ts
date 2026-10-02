@@ -61,15 +61,37 @@ export const completeEiken4MissionForPath = (missionId: string | null, expectedP
   return true;
 };
 
-const completedByCount = (ids: string[], count: number) => ids.slice(0, Math.max(0, count));
-const savedArrayLength = (key: string) => {
-  if (typeof localStorage === 'undefined') return 0;
-  try { const value = JSON.parse(localStorage.getItem(key) || '[]'); return Array.isArray(value) ? value.length : 0; } catch { return 0; }
+// Tagged attempts complete their own mission. Only untagged legacy results fill other slots.
+const completedFromResults = (ids: string[], key: string, currentIds: string[]) => {
+  if (typeof localStorage === 'undefined') return [];
+  try {
+    let value = JSON.parse(localStorage.getItem(key) || '[]');
+    if (key === 'eiken4MockHistoryV1' && Array.isArray(value) && !value.length) {
+      const previous = JSON.parse(localStorage.getItem('eiken4WeeklyMockResultV1') || 'null');
+      if (previous && typeof previous.completedAt === 'string') value = [previous];
+    }
+    if (!Array.isArray(value)) return [];
+    const results = value.filter(item => item && item.courseEligible !== false && typeof item === 'object' && (typeof item.id === 'string' || typeof item.completedAt === 'string'));
+    const tagged = results.map(item => item.missionId).filter(id => ids.includes(id));
+    const occupied = new Set([...currentIds, ...tagged]);
+    const legacy = results.filter(item => !item.missionId).length;
+    const alreadyCovered = ids.filter(id => currentIds.includes(id) && !tagged.includes(id)).length;
+    return [...tagged, ...ids.filter(id => !occupied.has(id)).slice(0, Math.max(0, legacy - alreadyCovered))];
+  } catch { return []; }
 };
-const savedMockCount = () => {
-  const historyCount = savedArrayLength('eiken4MockHistoryV1');
-  if (historyCount || typeof localStorage === 'undefined') return historyCount;
-  try { return localStorage.getItem('eiken4WeeklyMockResultV1') ? 1 : 0; } catch { return 0; }
+const completedReadings = (currentIds: string[]) => {
+  if (typeof localStorage === 'undefined') return [];
+  try {
+    const markers = JSON.parse(localStorage.getItem('eiken4ReadingCoverageV1-markers') || '[]');
+    if (!Array.isArray(markers)) return [];
+    const ids = ['reading-1', 'reading-2'];
+    const valid = markers.filter(marker => typeof marker === 'string');
+    const tagged = ids.filter(id => valid.some(marker => marker.endsWith(`:mission=${id}`)));
+    const occupied = new Set([...currentIds, ...tagged]);
+    const legacy = valid.filter(marker => !marker.includes(':mission=')).length;
+    const covered = ids.filter(id => currentIds.includes(id) && !tagged.includes(id)).length;
+    return [...tagged, ...ids.filter(id => !occupied.has(id)).slice(0, Math.max(0, legacy - covered))];
+  } catch { return []; }
 };
 const savedObjectHasCompletedAt = (key: string) => {
   if (typeof localStorage === 'undefined') return false;
@@ -93,10 +115,10 @@ export const syncEiken4StampCourseFromLearning = () => {
     ...(savedObjectHasCompletedAt('eiken4MixedReviewV1') ? ['mixed-review'] : []),
     ...(savedObjectHasCompletedAt('eiken4DailyProgressV4') ? ['daily-review'] : []),
     ...(savedObjectHasCompletedAt('eiken4ExamPracticeV1') ? ['exam-practice'] : []),
-    ...completedByCount(['reading-1', 'reading-2'], savedArrayLength('eiken4ReadingCoverageV1-markers')),
-    ...completedByCount(['mini-mock', 'mini-mock-2'], savedMockCount()),
-    ...completedByCount(['full-mock', 'full-mock-2', 'full-mock-3'], savedArrayLength('eiken4FullMockResultsV1')),
-    ...completedByCount(['past-paper', 'past-paper-2', 'past-paper-3'], savedArrayLength('eiken4PastPaperResultsV1')),
+    ...completedReadings(current.completedMissionIds),
+    ...completedFromResults(['mini-mock', 'mini-mock-2'], 'eiken4MockHistoryV1', current.completedMissionIds),
+    ...completedFromResults(['full-mock', 'full-mock-2', 'full-mock-3'], 'eiken4FullMockResultsV1', current.completedMissionIds),
+    ...completedFromResults(['past-paper', 'past-paper-2', 'past-paper-3'], 'eiken4PastPaperResultsV1', current.completedMissionIds),
   ];
   const completedMissionIds = Array.from(new Set([...current.completedMissionIds, ...derived])).filter(id => validMissionIds.has(id));
   if (completedMissionIds.length !== current.completedMissionIds.length) save({ ...current, completedMissionIds });
