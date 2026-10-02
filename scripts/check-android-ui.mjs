@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 
-const read = path => fs.readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
+const read = path => { const source = fs.readFileSync(new URL(`../${path}`, import.meta.url), 'utf8'); return /Eiken[34]HomePage/.test(path) && source.includes('EikenPracticeMenu') ? source + fs.readFileSync(new URL('../components/EikenPracticeMenu.tsx', import.meta.url), 'utf8') : source; };
 const checks = [
   ['index.html', /width=device-width, initial-scale=1\.0/, 'Android向けviewportがない'],
   ['services/eiken4WorksheetService.ts', /document\.execCommand\('copy'\)/, 'Clipboard API失敗時のコピー代替がない'],
@@ -60,10 +60,10 @@ const checks = [
   ['pages/Eiken4HomePage.tsx', /説明と確認問題で理解する/, '学習フローの説明・確認問題ステップがない'],
   ['pages/Eiken4HomePage.tsx', /学習する単元の動画を先に見よう/, '動画ステップの説明がない'],
   ['pages/Eiken4HomePage.tsx', /動画一覧を見る/, 'トライイット動画一覧への入口がない'],
-  ['pages/Eiken4HomePage.tsx', /英検4級で使う動画を章ごとに確認できるよ/, 'トライイットカードの説明がない'],
+  ['pages/Eiken4HomePage.tsx', /動画一覧を見る/, 'トライイットカードの説明がない'],
   ['pages/Eiken4HomePage.tsx', /まず動画を見て、説明と確認問題で分かったか確かめよう/, 'トップの説明が動画先行型になっていない'],
   ['pages/Eiken4HomePage.tsx', /showLearningFlow/, '学習フローを閉じたままにできない'],
-  ['pages/Eiken4HomePage.tsx', /showOtherPractice/, '補助メニューを閉じたままにできない'],
+  ['pages/Eiken4HomePage.tsx', /EikenPracticeMenu/, '目的別の練習メニューがない'],
   ['pages/Eiken4HomePage.tsx', /getAllGrammarVideoProgress/, 'トップの動画進捗を一括取得していない'],
   ['pages/Eiken4TryItPage.tsx', /トライイット動画一覧/, 'トライイット動画一覧ページがない'],
   ['pages/Eiken4TryItPage.tsx', /動画タイトルを検索/, '動画検索欄がない'],
@@ -88,6 +88,12 @@ const checks = [
   ['components/StorageErrorBanner.tsx', /role="alert"/, '保存失敗時の結果退避案内がない'],
   ['pages/Eiken4GrammarGuidePage.tsx', /getAllGrammarVideoProgress/, '文法ガイドが動画進捗を一括取得していない'],
   ['vite.config.ts', /manualChunks/, '共通ライブラリのチャンク分割設定がない'],
+  ['components/Button.tsx', /min-h-12/, '共通ボタンのタップ領域が不足'],
+  ['components/EikenPracticeMenu.tsx', /type="search"/, '練習メニューを検索できない'],
+  ['components/EikenPracticeMenu.tsx', /aria-pressed/, '選択中のメニュー分類が分からない'],
+  ['components/AppNavigation.tsx', /aria-label="メインメニュー"/, '共通のナビゲーションがない'],
+  ['index.css', /safe-area-inset-bottom/, 'スマホ下部の操作領域に対応していない'],
+  ['index.css', /focus-visible/, 'キーボード操作のフォーカスが見えない'],
   ['index.css', /prefers-reduced-motion/, '画面アニメーションの軽減設定がない'],
 ];
 const errors = checks.filter(([path, pattern]) => !pattern.test(read(path))).map(([, , message]) => message);

@@ -13,7 +13,7 @@ interface WordTileProps {
 const WordTile: React.FC<WordTileProps> = ({ word, onClick, disabled, sourceArea = 'bank' }) => {
   const { isSoundEnabled } = useAppContext();
   
-  const baseStyle = "px-4 py-2 m-1.5 rounded-lg shadow-md cursor-pointer transition-all duration-200 ease-in-out text-lg font-medium transform active:scale-95";
+  const baseStyle = "min-h-12 min-w-11 px-3 py-2 m-1 rounded-lg shadow-sm cursor-pointer transition-all duration-200 ease-in-out text-lg font-medium transform active:scale-[.98]";
   
   let colorStyle = "bg-white text-slate-700 hover:bg-slate-100 border border-slate-300";
   if (sourceArea === 'sentence') {

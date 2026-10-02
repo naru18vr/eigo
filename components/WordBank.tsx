@@ -9,8 +9,8 @@ interface WordBankProps {
 
 const WordBank: React.FC<WordBankProps> = ({ words, onWordClick }) => {
   return (
-    <div className="bg-white p-4 rounded-lg shadow-lg">
-      <h3 className="text-lg font-semibold text-slate-700 mb-3 text-center">単語バンク</h3>
+    <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+      <h3 className="text-lg font-semibold text-slate-700 mb-3 text-center">使う単語</h3>
       <div className="flex flex-wrap items-center justify-center min-h-[60px]">
         {words.length === 0 && <p className="text-slate-500">すべての単語を使いました！</p>}
         {words.map((word, index) => (

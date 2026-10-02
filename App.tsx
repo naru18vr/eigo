@@ -4,6 +4,7 @@ import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Eiken4SessionProvider } from './contexts/Eiken4SessionContext';
 import { Eiken3SessionProvider } from './contexts/Eiken3SessionContext';
 import HomePage from './pages/HomePage';
+import AppNavigation from './components/AppNavigation';
 import PwaUpdatePrompt from './components/PwaUpdatePrompt';
 import StorageErrorBanner from './components/StorageErrorBanner';
 
@@ -90,7 +91,9 @@ const App: React.FC = () => {
     <HashRouter>
       <Eiken4SessionProvider>
       <Eiken3SessionProvider>
-        <div className="min-h-screen flex flex-col">
+        <div className="app-shell min-h-screen flex flex-col">
+          <AppNavigation />
+          <div id="app-content" tabIndex={-1} className="flex flex-grow flex-col">
           <PwaUpdatePrompt />
           <StorageErrorBanner />
           <Suspense fallback={<PageLoading />}>
@@ -173,6 +176,7 @@ const App: React.FC = () => {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
           </Suspense>
+          </div>
         </div>
       </Eiken3SessionProvider>
       </Eiken4SessionProvider>

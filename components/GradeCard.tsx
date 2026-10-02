@@ -1,36 +1,14 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Grade } from '../types';
-import BookOpenIcon from './shared/BookOpenIcon';
 import ChevronRightIcon from './shared/ChevronRightIcon';
-
-interface GradeCardProps {
-  grade: Grade;
-}
-
-const GradeCard: React.FC<GradeCardProps> = ({ grade }) => {
-  const defaultColor = 'bg-blue-500';
-  const baseBgColor = grade.iconColor || defaultColor;
-
-
-  return (
-    <Link 
-      to={`/grade/${grade.id}`} 
-      className={`block p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ${baseBgColor} text-white transform hover:scale-105 active:scale-95`}
-    >
-      <div className="flex items-center justify-between">
-        <div>
-          <div className={`p-3 rounded-full ${baseBgColor} inline-block mb-3`}>
-             <BookOpenIcon className="h-8 w-8 text-white" />
-          </div>
-          <h2 className="text-2xl font-bold">{grade.name}</h2>
-          <p className="text-sm opacity-90">{grade.units.length > 0 ? `${grade.units.length} ユニット利用可能` : '学年別コースを開く'}</p>
-        </div>
-        <ChevronRightIcon className="h-8 w-8 opacity-70" />
-      </div>
-    </Link>
-  );
+const grades: Record<string, {label:string;hint:string;style:string}> = {
+  grade1:{label:'中学1年',hint:'英語の基本から、ゆっくり',style:'bg-emerald-100 text-emerald-800'},
+  grade2:{label:'中学2年',hint:'過去・未来・比較を練習',style:'bg-sky-100 text-sky-800'},
+  grade3:{label:'中学3年',hint:'現在完了・受け身・関係代名詞',style:'bg-violet-100 text-violet-800'},
 };
-
+const GradeCard: React.FC<{grade:Grade}> = ({grade}) => {
+  const info=grades[grade.id];
+  return <Link to={`/grade/${grade.id}`} className="menu-row"><span className={`grade-number ${info?.style || 'bg-indigo-100 text-indigo-800'}`} aria-hidden="true">{grade.id.replace('grade','')}</span><span className="min-w-0 flex-1"><strong>{info?.label || grade.name}</strong><small>{info?.hint || '学年別の文法を練習'}</small></span><ChevronRightIcon className="h-5 w-5 shrink-0 text-slate-400"/></Link>;
+};
 export default GradeCard;

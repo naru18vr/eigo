@@ -149,7 +149,7 @@ const SetSelectPage: React.FC = () => {
         </Button>
         <div className={`p-6 rounded-lg shadow-md ${gradeColorClass} text-white`}>
           <h1 className="text-3xl sm:text-4xl font-bold">{unit.title}</h1>
-          <p className="mt-1 opacity-90">練習する問題セットを選んでください。</p>
+          <p className="mt-1 opacity-90">1回10問。好きなところから始めよう。</p>
         </div>
       </header>
       
@@ -172,27 +172,27 @@ const SetSelectPage: React.FC = () => {
             <Link
               key={setIndex}
               to={`/grade/${gradeId}/unit/${unitId}/set/${setIndex}`}
-              className={`block p-6 rounded-xl shadow-lg transition-all duration-300 text-white transform hover:scale-105 active:scale-95 ${gradeColorClass} ${hoverBgClass}`}
+              className="unit-card"
               aria-label={`問題セット ${setIndex + 1} を開始、${sentenceCountInSet}問`}
             >
               <div className="flex flex-col justify-between h-full">
                 <div>
                   <h3 className="text-2xl font-bold mb-2">
-                    セット {setIndex + 1}
+                    練習 {setIndex + 1}
                   </h3>
-                  <p className="text-sm opacity-90">
+                  <p className="text-sm text-slate-600">
                     問題 {displayStartNum} - {displayEndNum} ({sentenceCountInSet}問)
                   </p>
                   {attemptCount > 0 && (
-                    <p className="text-xs opacity-80 mt-1">挑戦回数: {attemptCount}回</p>
+                    <p className="text-xs text-slate-500 mt-1">挑戦回数: {attemptCount}回</p>
                   )}
                   {attempted > 0 && (
-                    <p className="text-xs opacity-80 mt-1">
+                    <p className="text-xs text-slate-500 mt-1">
                       正解率: {accuracy}% ({correct}/{attempted})
                     </p>
                   )}
                    {attemptCount === 0 && attempted === 0 && (
-                     <p className="text-xs opacity-70 italic mt-2">まだ挑戦していません</p>
+                     <p className="text-xs text-slate-500 mt-2">まだ挑戦していません</p>
                    )}
                 </div>
                 <div className="mt-4 text-right">
